@@ -14,7 +14,11 @@ typedef struct hit_record_s
     point3_t p;
     vec3_t normal;
     double t;
+
+    bool front_face;
 } hit_record_t;
+
+void hit_record_set_front_face(hit_record_t *record, const ray_t *ray, const vec3_t *outward_normal);
 
 typedef enum hittable_type_e
 {

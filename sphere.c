@@ -48,7 +48,8 @@ bool sphere_hit(const sphere_t *sphere, const ray_t *ray, double t_min, double t
     {
         record->t = t;
         record->p = ray_at(*ray, t);
-        record->normal = vec3_scale(vec3_diff(record->p, sphere->center), 1.0 / sphere->radius);
+        vec3_t outward_normal = vec3_scale(vec3_diff(record->p, sphere->center), 1.0 / sphere->radius);
+        hit_record_set_front_face(record, ray, &outward_normal);
     }
 
     return true;
