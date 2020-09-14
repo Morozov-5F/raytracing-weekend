@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "vec3.h"
 
 int main()
 {
@@ -14,11 +15,11 @@ int main()
         fflush(stderr);
         for (int i = 0; i < image_width; ++i)
         {
-            double r = (double)i / (image_width - 1);
-            double g = (double)(image_height - j - 1) / (image_height - 1);
-            double b = 0.25;
+            colour pixel = vec3((double) i / (image_width - 1), (double) (image_height - j - 1) / (image_height - 1),
+                                0.25);
 
-            fprintf(stdout, "%d %d %d\n", (int)(r * 255.999), (int)(g * 255.99), (int)(b * 255.99));
+            fprintf(stdout, "%d %d %d\n", (int) (vec3_x(&pixel) * 255.999), (int) (vec3_y(&pixel) * 255.99),
+                    (int) (vec3_z(&pixel) * 255.99));
         }
     }
     fprintf(stderr, "\nDone\n");
