@@ -32,6 +32,10 @@ void hittable_list_clear(hittable_list_t *list)
 {
     assert(NULL != list);
 
+    for (size_t i = 0; i < list->size; ++i)
+    {
+        hittable_delete(list->hittables[i]);
+    }
     list->size = 0;
 }
 
@@ -39,9 +43,10 @@ void hittable_list_deinit(hittable_list_t *list)
 {
     assert(NULL != list);
 
+    hittable_list_clear(list);
+
     free(list->hittables);
     list->capacity = 0;
-    list->size = 0;
     list->hittables = NULL;
 }
 

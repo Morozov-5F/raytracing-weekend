@@ -40,10 +40,8 @@ int main()
     // World
     hittable_list_t world;
     hittable_list_init(&world, 2);
-    sphere_t small_sphere = sphere_init(vec3(0, 0, -1), 0.5);
-    hittable_list_add(&world, (hittable_t *)&small_sphere);
-    sphere_t big_sphere = sphere_init(vec3(0, -100.5, -1), 100);
-    hittable_list_add(&world, (hittable_t *)&big_sphere);
+    hittable_list_add(&world, (hittable_t *)sphere_new(vec3(0, 0, -1), 0.5));
+    hittable_list_add(&world, (hittable_t *)sphere_new(vec3(0, -100.5, -1), 100));
 
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -68,6 +66,9 @@ int main()
         }
     }
     fprintf(stderr, "\nDone\n");
+
+    // Cleanup
+    hittable_list_deinit(&world);
 
     return 0;
 }

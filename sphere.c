@@ -3,8 +3,18 @@
 //
 
 #include <assert.h>
+#include <stdlib.h>
 #include "sphere.h"
 #include "vec3.h"
+#include "hittable_shared.h"
+
+struct sphere_s
+{
+    hittable_t base;
+
+    point3_t center;
+    double radius;
+};
 
 sphere_t sphere_init(point3_t center, double radius)
 {
@@ -53,4 +63,18 @@ bool sphere_hit(const sphere_t *sphere, const ray_t *ray, double t_min, double t
     }
 
     return true;
+}
+
+sphere_t *sphere_new(point3_t center, double radius)
+{
+    sphere_t *sphere = calloc(1, sizeof(sphere_t));
+    assert(NULL != sphere);
+
+    *sphere = sphere_init(center, radius);
+    return sphere;
+}
+
+void sphere_delete(sphere_t *sphere)
+{
+    free(sphere);
 }

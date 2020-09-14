@@ -4,6 +4,7 @@
 
 #include <assert.h>
 #include "hittable.h"
+#include "hittable_shared.h"
 #include "sphere.h"
 
 void hit_record_set_front_face(hit_record_t *record, const ray_t *ray, const vec3_t *outward_normal)
@@ -28,4 +29,16 @@ bool hittable_hit(const hittable_t *hittable, const ray_t *ray, double t_min, do
             assert(0);
     }
     return false;
+}
+
+void hittable_delete(hittable_t *hittable)
+{
+    switch (hittable->type)
+    {
+        case HITTABLE_TYPE_SPHERE:
+            sphere_delete((sphere_t *)hittable);
+            break;
+        default:
+            assert(0);
+    }
 }

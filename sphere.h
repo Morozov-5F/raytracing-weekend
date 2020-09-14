@@ -10,15 +10,10 @@
 #include "hittable.h"
 #include "ray.h"
 
-typedef struct sphere_s
-{
-    hittable_t base;
+typedef struct sphere_s sphere_t;
 
-    point3_t center;
-    double radius;
-} sphere_t;
-
-sphere_t sphere_init(point3_t center, double radius);
+sphere_t *sphere_new(point3_t center, double radius);
+void sphere_delete(sphere_t *sphere);
 
 bool sphere_hit(const sphere_t *sphere, const ray_t *ray, double t_min, double t_max, hit_record_t *record);
 
