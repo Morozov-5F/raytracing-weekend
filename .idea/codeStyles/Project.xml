@@ -3,6 +3,7 @@
     <Objective-C>
       <option name="NAMESPACE_BRACE_PLACEMENT" value="2" />
       <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
+      <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE_PARS" value="true" />
     </Objective-C>
     <Objective-C-extensions>
       <rules>
@@ -23,6 +24,8 @@
     <codeStyleSettings language="ObjectiveC">
       <option name="BRACE_STYLE" value="2" />
       <option name="CLASS_BRACE_STYLE" value="2" />
+      <option name="ALIGN_MULTILINE_CHAINED_METHODS" value="true" />
+      <option name="SPACE_AFTER_TYPE_CAST" value="false" />
     </codeStyleSettings>
   </code_scheme>
 </component>

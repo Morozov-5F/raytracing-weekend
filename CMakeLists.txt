@@ -4,3 +4,4 @@ project(ray_tracing_one_week C)
 set(CMAKE_C_STANDARD 11)
 
 add_executable(ray_tracing_one_week main.c)
+target_link_libraries(ray_tracing_one_week m)

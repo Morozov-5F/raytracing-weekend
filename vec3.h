@@ -25,14 +25,21 @@ static inline vec3_t vec3(double x, double y, double z)
 static inline vec3_t vec3_negate(const vec3_t *v)
 { return vec3(-v->x, -v->y, -v->z); }
 
-static inline void vec3_add(vec3_t *a, const vec3_t *b)
+static inline void vec3_add(vec3_t *a, vec3_t b)
 {
-    a->x += b->x;
-    a->y += b->y;
-    a->z += b->z;
+    a->x += b.x;
+    a->y += b.y;
+    a->z += b.z;
 }
 
-static inline void vec3_scale(vec3_t *a, double scalar)
+static inline void vec3_sub(vec3_t *a, vec3_t b)
+{
+    a->x -= b.x;
+    a->y -= b.y;
+    a->z -= b.z;
+}
+
+static inline void vec3_scale_in_place(vec3_t *a, double scalar)
 {
     a->x *= scalar;
     a->y *= scalar;
@@ -40,7 +47,7 @@ static inline void vec3_scale(vec3_t *a, double scalar)
 }
 
 static inline double vec3_length_squared(vec3_t v)
-{ return v.x * v.x + v.y + v.y + v.z * v.z; }
+{ return v.x * v.x + v.y * v.y + v.z * v.z; }
 
 static inline double vec3_length(vec3_t v)
 { return sqrt(vec3_length_squared(v)); }
@@ -54,7 +61,7 @@ static inline vec3_t vec3_diff(vec3_t a, vec3_t b)
 static inline vec3_t vec3_multiply(vec3_t a, vec3_t b)
 { return vec3(a.x * b.x, a.y * b.y, a.z * b.z); }
 
-static inline vec3_t vec3_multiply_scalar(vec3_t a, double s)
+static inline vec3_t vec3_scale(vec3_t a, double s)
 { return vec3(a.x * s, a.y * s, a.z * s); }
 
 static inline double vec3_dor(vec3_t a, vec3_t b)
@@ -69,7 +76,7 @@ static inline vec3_t vec3_cross(vec3_t a, vec3_t b)
 
 static inline vec3_t vec3_normalized(vec3_t a)
 {
-    return vec3_multiply_scalar(a, 1.0 / vec3_length(a));
+    return vec3_scale(a, 1.0 / vec3_length(a));
 }
 
 static inline const char * vec3_to_string(vec3_t a, char *buffer, size_t max_buffer_len)
@@ -79,6 +86,11 @@ static inline const char * vec3_to_string(vec3_t a, char *buffer, size_t max_buf
         return NULL;
     }
     return buffer;
+}
+
+static inline vec3_t vec3_lerp(vec3_t from, vec3_t to, double t)
+{
+    return vec3_sum(vec3_scale(from, 1 - t), vec3_scale(to, t));
 }
 
 typedef vec3_t colour_t;

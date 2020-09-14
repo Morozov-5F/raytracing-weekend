@@ -11,7 +11,7 @@ typedef struct ray_s
     vec3_t direction;
 } ray_t;
 
-static inline ray_t ray(vec3_t origin, vec3_t direction)
+static inline ray_t ray_init(vec3_t origin, vec3_t direction)
 {
     ray_t result = {origin, direction};
     return result;
@@ -19,7 +19,7 @@ static inline ray_t ray(vec3_t origin, vec3_t direction)
 
 static inline point3_t ray_at(ray_t ray, double t)
 {
-    return vec3_sum(ray.origin, vec3_multiply_scalar(ray.direction, t));
+    return vec3_sum(ray.origin, vec3_scale(ray.direction, t));
 }
 
 #endif //RAY_TRACING_ONE_WEEK_RAY_H
