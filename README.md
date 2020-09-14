@@ -9,11 +9,11 @@ This project uses [PPM image format](https://en.wikipedia.org/wiki/Netpbm#PPM_ex
 This project uses CMake to generate build system files. 
 
 1. Create a build directory:
-   ```
+   ``` bash
    ? mkdir -p build
    ```
 1. Go to new directory:
-   ```
+   ``` bash
    ? cd build
    ```
 1. Run CMake to generate project. I recommend [Ninja](https://ninja-build.org/) as a build system, but UNIX Makefiles will work too.
