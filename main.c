@@ -2,34 +2,19 @@
 #include "vec3.h"
 #include "ray.h"
 
-double hit_sphere(const point3_t *center, double radius, const ray_t *ray)
-{
-    vec3_t ac = vec3_diff(ray->origin, *center);
-    double a = vec3_length_squared(ray->direction);
-    double b = vec3_dot(ray->direction, ac);
-    double c = vec3_length_squared(ac) - radius * radius;
-
-    double discriminant_4 = b * b - a * c;
-    if (discriminant_4 < 0) // No intersection
-    {
-        return -1.0;
-    }
-
-    return (-b - sqrt(discriminant_4)) / a;
-}
+#include "sphere.h"
 
 colour_t ray_colour(const ray_t *ray)
 {
-    point3_t sphere_center = vec3(0, 0, -1);
-    double t = hit_sphere(&sphere_center, 0.5, ray);
-    if (t > 0)
-    {
-        vec3_t N = vec3_normalized(vec3_diff(ray_at(*ray, t), sphere_center));
-        return vec3_scale(vec3(N.x + 1, N.y + 1, N.z + 1), 0.5);
-    }
+    sphere_t sphere = sphere_init(vec3(0, 0, -1), 0.5);
 
+    hit_record_t record;
+    if (hittable_hit(&sphere, ray, 0, INFINITY, &record))
+    {
+        return vec3_scale(vec3_sum(record.normal, vec3(1, 1, 1)), 0.5);
+    }
     point3_t unit_direction = vec3_normalized(ray->direction);
-    t = 0.5 * (unit_direction.y + 1.0);
+    double t = 0.5 * (unit_direction.y + 1.0);
     return vec3_lerp(vec3(1, 1, 1), vec3(0.5, 0.7, 1), t);
 }
 
