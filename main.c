@@ -3,13 +3,12 @@
 #include "ray.h"
 
 #include "sphere.h"
+#include "hittable_list.h"
 
-colour_t ray_colour(const ray_t *ray)
+colour_t ray_colour(const ray_t *ray, const hittable_list_t *list)
 {
-    sphere_t sphere = sphere_init(vec3(0, 0, -1), 0.5);
-
     hit_record_t record;
-    if (hittable_hit(&sphere, ray, 0, INFINITY, &record))
+    if (hittable_list_hit_test(list, ray, 0, INFINITY, &record))
     {
         return vec3_scale(vec3_sum(record.normal, vec3(1, 1, 1)), 0.5);
     }
@@ -22,7 +21,7 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 16.0 / 9.0;
-    const int IMAGE_WIDTH = 400;
+    const int IMAGE_WIDTH = 1024;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
 
     // Camera parameters
@@ -37,6 +36,14 @@ int main()
     vec3_sub(&lower_left_corner, vec3_scale(horizontal, 0.5));
     vec3_sub(&lower_left_corner, vec3_scale(vertical, 0.5));
     vec3_sub(&lower_left_corner, vec3(0, 0, FOCAL_LENGTH));
+
+    // World
+    hittable_list_t world;
+    hittable_list_init(&world, 2);
+    sphere_t small_sphere = sphere_init(vec3(0, 0, -1), 0.5);
+    hittable_list_add(&world, (hittable_t *)&small_sphere);
+    sphere_t big_sphere = sphere_init(vec3(0, -100.5, -1), 100);
+    hittable_list_add(&world, (hittable_t *)&big_sphere);
 
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -55,7 +62,7 @@ int main()
             vec3_sub(&ray_direction, origin);
 
             ray_t ray = ray_init(origin, ray_direction);
-            colour_t pixel = ray_colour(&ray);
+            colour_t pixel = ray_colour(&ray, &world);
             fprintf(stdout, "%d %d %d\n", (int)(pixel.x * 255.99), (int)(pixel.y * 255.99),
                     (int)(pixel.z * 255.99));
         }

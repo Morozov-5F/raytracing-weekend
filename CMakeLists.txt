@@ -3,6 +3,6 @@ project(ray_tracing_one_week C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(ray_tracing_one_week hittable.c sphere.c main.c)
+add_executable(ray_tracing_one_week hittable.c sphere.c hittable_list.c main.c)
 target_compile_options(ray_tracing_one_week PUBLIC -Wall -Wextra -Winline)
 target_link_libraries(ray_tracing_one_week m)
