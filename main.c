@@ -2,8 +2,27 @@
 #include "vec3.h"
 #include "ray.h"
 
+#include <stdbool.h>
+
+bool hit_sphere(const point3_t *center, double radius, const ray_t *ray)
+{
+    vec3_t ac = vec3_diff(ray->origin, *center);
+    double a = vec3_dot(ray->direction, ray->direction);
+    double b = vec3_dot(ray->direction, ac);
+    double c = vec3_dot(ac, ac) - radius * radius;
+
+    double discriminant_4 = b * b - a * c;
+    return discriminant_4 >= 0;
+}
+
 colour_t ray_colour(const ray_t *ray)
 {
+    point3_t sphere_center = vec3(0, 0, -1);
+    if (hit_sphere(&sphere_center, 0.5, ray))
+    {
+        return vec3(1, 0, 0);
+    }
+
     point3_t unit_direction = vec3_normalized(ray->direction);
     double t = 0.5 * (unit_direction.y + 1.0);
     return vec3_lerp(vec3(1, 1, 1), vec3(0.5, 0.7, 1), t);
@@ -31,7 +50,7 @@ int main()
 
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
-    for (int j = IMAGE_HEIGHT - 1; j >=0; --j)
+    for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
     {
         fprintf(stderr, "\rScanlines remaining: %d", j);
         fflush(stderr);

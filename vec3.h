@@ -64,7 +64,7 @@ static inline vec3_t vec3_multiply(vec3_t a, vec3_t b)
 static inline vec3_t vec3_scale(vec3_t a, double s)
 { return vec3(a.x * s, a.y * s, a.z * s); }
 
-static inline double vec3_dor(vec3_t a, vec3_t b)
+static inline double vec3_dot(vec3_t a, vec3_t b)
 { return a.x * b.x + a.y * b.y + a.z * b.z; }
 
 static inline vec3_t vec3_cross(vec3_t a, vec3_t b)
