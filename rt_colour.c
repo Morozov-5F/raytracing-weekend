@@ -18,10 +18,9 @@ void rt_write_colour(FILE *stream, colour_t pixel_colour, size_t samples_per_pix
     double b = pixel_colour.z;
 
     double scale = 1.0 / samples_per_pixel;
-    r *= scale;
-    g *= scale;
-    b *= scale;
-
+    r = sqrt(scale * r);
+    g = sqrt(scale * g);
+    b = sqrt(scale * b);
 
     fprintf(stream, "%d %d %d\n", RT_MAKE_COLOUR_COMPONENT(r), RT_MAKE_COLOUR_COMPONENT(g),
             RT_MAKE_COLOUR_COMPONENT(b));
