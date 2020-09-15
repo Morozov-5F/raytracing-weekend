@@ -6,8 +6,7 @@
 #define RAY_TRACING_ONE_WEEK_HITTABLE_H
 
 #include <stdbool.h>
-#include "vec3.h"
-#include "ray.h"
+#include "rtweekend.h"
 
 typedef struct hit_record_s
 {

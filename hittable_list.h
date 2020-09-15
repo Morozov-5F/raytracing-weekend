@@ -6,8 +6,7 @@
 #define RAY_TRACING_ONE_WEEK_HITTABLE_LIST_H
 
 #include <stdlib.h>
-#include "vec3.h"
-#include "ray.h"
+#include "rtweekend.h"
 #include "hittable.h"
 
 typedef struct hittable_list_s

@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #include "hittable.h"
-#include "ray.h"
+#include "rtweekend.h"
 
 typedef struct sphere_s sphere_t;
 

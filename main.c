@@ -1,7 +1,6 @@
 #include <stdio.h>
-#include "vec3.h"
-#include "ray.h"
 
+#include "rtweekend.h"
 #include "sphere.h"
 #include "hittable_list.h"
 
