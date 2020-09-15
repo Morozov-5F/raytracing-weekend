@@ -4,6 +4,7 @@
 #include "rt_sphere.h"
 #include "rt_hittable_list.h"
 #include "rt_camera.h"
+#include "rt_colour.h"
 
 colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list)
 {
@@ -45,8 +46,7 @@ int main()
 
             ray_t ray = rt_camera_get_ray(camera, u, v);
             colour_t pixel = ray_colour(&ray, world);
-            fprintf(stdout, "%d %d %d\n", (int)(pixel.x * 255.99), (int)(pixel.y * 255.99),
-                    (int)(pixel.z * 255.99));
+            rt_write_colour(stdout, pixel);
         }
     }
     fprintf(stderr, "\nDone\n");
