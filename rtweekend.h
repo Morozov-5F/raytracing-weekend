@@ -22,7 +22,7 @@ static inline double random_double(double min, double max)
     return min + (max - min) * rand() / (RAND_MAX + 1.0);
 }
 
-#include "vec3.h"
-#include "ray.h"
+#include "rt_vec3.h"
+#include "rt_ray.h"
 
 #endif //RAY_TRACING_ONE_WEEK_RTWEEKEND_H

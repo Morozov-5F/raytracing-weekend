@@ -4,9 +4,9 @@
 
 #include <assert.h>
 #include <stdlib.h>
-#include "sphere.h"
-#include "vec3.h"
-#include "hittable_shared.h"
+#include "rt_sphere.h"
+#include "rt_vec3.h"
+#include "rt_hittable_shared.h"
 
 struct sphere_s
 {

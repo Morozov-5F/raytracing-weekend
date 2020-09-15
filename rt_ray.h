@@ -2,8 +2,8 @@
 // Created by morozov on 14.09.2020.
 //
 
-#ifndef RAY_TRACING_ONE_WEEK_RAY_H
-#define RAY_TRACING_ONE_WEEK_RAY_H
+#ifndef RAY_TRACING_ONE_WEEK_RT_RAY_H
+#define RAY_TRACING_ONE_WEEK_RT_RAY_H
 
 typedef struct ray_s
 {
@@ -22,4 +22,4 @@ static inline point3_t ray_at(ray_t ray, double t)
     return vec3_sum(ray.origin, vec3_scale(ray.direction, t));
 }
 
-#endif //RAY_TRACING_ONE_WEEK_RAY_H
+#endif //RAY_TRACING_ONE_WEEK_RT_RAY_H

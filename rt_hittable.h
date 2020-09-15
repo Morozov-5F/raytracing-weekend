@@ -2,8 +2,8 @@
 // Created by morozov on 15.09.2020.
 //
 
-#ifndef RAY_TRACING_ONE_WEEK_HITTABLE_H
-#define RAY_TRACING_ONE_WEEK_HITTABLE_H
+#ifndef RAY_TRACING_ONE_WEEK_RT_HITTABLE_H
+#define RAY_TRACING_ONE_WEEK_RT_HITTABLE_H
 
 #include <stdbool.h>
 #include "rtweekend.h"
@@ -25,4 +25,4 @@ bool hittable_hit(const hittable_t *hittable, const ray_t *ray, double t_min, do
 
 void hittable_delete(hittable_t *hittable);
 
-#endif //RAY_TRACING_ONE_WEEK_HITTABLE_H
+#endif //RAY_TRACING_ONE_WEEK_RT_HITTABLE_H

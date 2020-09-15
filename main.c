@@ -1,8 +1,8 @@
 #include <stdio.h>
 
 #include "rtweekend.h"
-#include "sphere.h"
-#include "hittable_list.h"
+#include "rt_sphere.h"
+#include "rt_hittable_list.h"
 #include "rt_camera.h"
 
 colour_t ray_colour(const ray_t *ray, const hittable_list_t *list)

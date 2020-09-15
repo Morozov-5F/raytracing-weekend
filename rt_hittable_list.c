@@ -3,7 +3,7 @@
 //
 
 #include <assert.h>
-#include "hittable_list.h"
+#include "rt_hittable_list.h"
 
 void hittable_list_init(hittable_list_t *list, size_t capacity)
 {

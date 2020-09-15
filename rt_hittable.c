@@ -3,9 +3,9 @@
 //
 
 #include <assert.h>
-#include "hittable.h"
-#include "hittable_shared.h"
-#include "sphere.h"
+#include "rt_hittable.h"
+#include "rt_hittable_shared.h"
+#include "rt_sphere.h"
 
 void hit_record_set_front_face(hit_record_t *record, const ray_t *ray, const vec3_t *outward_normal)
 {

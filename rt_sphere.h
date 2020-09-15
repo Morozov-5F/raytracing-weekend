@@ -2,12 +2,12 @@
 // Created by morozov on 15.09.2020.
 //
 
-#ifndef RAY_TRACING_ONE_WEEK_SPHERE_H
-#define RAY_TRACING_ONE_WEEK_SPHERE_H
+#ifndef RAY_TRACING_ONE_WEEK_RT_SPHERE_H
+#define RAY_TRACING_ONE_WEEK_RT_SPHERE_H
 
 #include <stdbool.h>
 
-#include "hittable.h"
+#include "rt_hittable.h"
 #include "rtweekend.h"
 
 typedef struct sphere_s sphere_t;
@@ -17,4 +17,4 @@ void sphere_delete(sphere_t *sphere);
 
 bool sphere_hit(const sphere_t *sphere, const ray_t *ray, double t_min, double t_max, hit_record_t *record);
 
-#endif //RAY_TRACING_ONE_WEEK_SPHERE_H
+#endif //RAY_TRACING_ONE_WEEK_RT_SPHERE_H

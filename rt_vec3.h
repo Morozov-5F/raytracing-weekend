@@ -1,5 +1,5 @@
-#ifndef RAY_TRACING_ONE_WEEK_VEC3_H
-#define RAY_TRACING_ONE_WEEK_VEC3_H
+#ifndef RAY_TRACING_ONE_WEEK_RT_VEC3_H
+#define RAY_TRACING_ONE_WEEK_RT_VEC3_H
 
 #include <math.h>
 #include <stdio.h>
@@ -102,4 +102,4 @@ typedef vec3_t colour_t;
 typedef vec3_t point3_t;
 #define point3(x, y, z) vec3((x), (y), (z))
 
-#endif //RAY_TRACING_ONE_WEEK_VEC3_H
+#endif //RAY_TRACING_ONE_WEEK_RT_VEC3_H
