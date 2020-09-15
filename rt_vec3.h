@@ -79,7 +79,7 @@ static inline vec3_t vec3_normalized(vec3_t a)
     return vec3_scale(a, 1.0 / vec3_length(a));
 }
 
-static inline const char * vec3_to_string(vec3_t a, char *buffer, size_t max_buffer_len)
+static inline const char *vec3_to_string(vec3_t a, char *buffer, size_t max_buffer_len)
 {
     if (-1 == snprintf(buffer, max_buffer_len, "%f %f %f", a.x, a.y, a.z))
     {
@@ -98,14 +98,12 @@ static inline vec3_t vec3_random(double min, double max)
     return vec3(rt_random_double(min, max), rt_random_double(min, max), rt_random_double(min, max));
 }
 
-static inline vec3_t vec3_random_in_unit_sphere(void)
+static inline vec3_t vec3_random_unit_vector(void)
 {
-    vec3_t res = vec3_random(-1, 1);
-    if (vec3_length_squared(res) > 1)
-    {
-        res = vec3_normalized(res);
-    }
-    return res;
+    double a = rt_random_double(0, 2 * PI);
+    double z = rt_random_double(-1, 1);
+    double r = sqrt(1 - z * z);
+    return vec3(r * cos(a), r * sin(a), z);
 }
 
 // Point layer for vec3_t

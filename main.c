@@ -16,7 +16,7 @@ colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_
     rt_hit_record_t record;
     if (rt_hittable_list_hit_test(list, ray, 0.01, INFINITY, &record))
     {
-        point3_t target = vec3_sum(record.normal, vec3_random_in_unit_sphere());
+        point3_t target = vec3_sum(record.normal, vec3_random_unit_vector());
 
         ray_t new_ray = ray_init(record.p, target);
         return vec3_scale(ray_colour(&new_ray, list, child_rays - 1), 0.5);
@@ -30,7 +30,7 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 16.0 / 9.0;
-    const int IMAGE_WIDTH = 400;
+    const int IMAGE_WIDTH = 1024;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
     const int SAMPLES_PER_PIXEL = 100;
     const int CHILD_RAYS = 50;
