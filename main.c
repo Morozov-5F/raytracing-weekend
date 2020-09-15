@@ -14,7 +14,7 @@ colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_
     }
 
     rt_hit_record_t record;
-    if (rt_hittable_list_hit_test(list, ray, 0, INFINITY, &record))
+    if (rt_hittable_list_hit_test(list, ray, 0.01, INFINITY, &record))
     {
         point3_t target = vec3_sum(record.normal, vec3_random_in_unit_sphere());
 
