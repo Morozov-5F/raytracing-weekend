@@ -28,9 +28,9 @@ int main()
     const double VIEWPORT_WIDTH = ASPECT_RATIO * VIEWPORT_HEIGHT;
     const double FOCAL_LENGTH = 1.0;
 
-    point3_t origin = vec3(0, 0, 0);
-    point3_t horizontal = vec3(VIEWPORT_WIDTH, 0, 0);
-    point3_t vertical = vec3(0, VIEWPORT_HEIGHT, 0);
+    point3_t origin = point3(0, 0, 0);
+    point3_t horizontal = point3(VIEWPORT_WIDTH, 0, 0);
+    point3_t vertical = point3(0, VIEWPORT_HEIGHT, 0);
     point3_t lower_left_corner = origin;
     vec3_sub(&lower_left_corner, vec3_scale(horizontal, 0.5));
     vec3_sub(&lower_left_corner, vec3_scale(vertical, 0.5));

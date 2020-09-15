@@ -93,7 +93,13 @@ static inline vec3_t vec3_lerp(vec3_t from, vec3_t to, double t)
     return vec3_sum(vec3_scale(from, 1 - t), vec3_scale(to, t));
 }
 
+// Colour layer for vec3_t
 typedef vec3_t colour_t;
+
+#define colour3(x, y, z) vec3((x), (y), (z))
+
+// Point layer for vec3_t
 typedef vec3_t point3_t;
+#define point3(x, y, z) vec3((x), (y), (z))
 
 #endif //RAY_TRACING_ONE_WEEK_VEC3_H
