@@ -8,27 +8,27 @@
 #include "rt_vec3.h"
 #include "rt_hittable_shared.h"
 
-struct sphere_s
+struct rt_sphere_s
 {
-    hittable_t base;
+    rt_hittable_t base;
 
     point3_t center;
     double radius;
 };
 
-sphere_t sphere_init(point3_t center, double radius)
+rt_sphere_t sphere_init(point3_t center, double radius)
 {
     assert(radius > 0);
 
-    sphere_t result = {
-            .base.type = HITTABLE_TYPE_SPHERE,
+    rt_sphere_t result = {
+            .base.type = RT_HITTABLE_TYPE_SPHERE,
             .radius = radius,
             .center = center,
     };
     return result;
 }
 
-bool sphere_hit(const sphere_t *sphere, const ray_t *ray, double t_min, double t_max, hit_record_t *record)
+bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
 {
     assert(NULL != sphere);
 
@@ -59,22 +59,22 @@ bool sphere_hit(const sphere_t *sphere, const ray_t *ray, double t_min, double t
         record->t = t;
         record->p = ray_at(*ray, t);
         vec3_t outward_normal = vec3_scale(vec3_diff(record->p, sphere->center), 1.0 / sphere->radius);
-        hit_record_set_front_face(record, ray, &outward_normal);
+        rt_hit_record_set_front_face(record, ray, &outward_normal);
     }
 
     return true;
 }
 
-sphere_t *sphere_new(point3_t center, double radius)
+rt_sphere_t *rt_sphere_new(point3_t center, double radius)
 {
-    sphere_t *sphere = calloc(1, sizeof(sphere_t));
+    rt_sphere_t *sphere = calloc(1, sizeof(rt_sphere_t));
     assert(NULL != sphere);
 
     *sphere = sphere_init(center, radius);
     return sphere;
 }
 
-void sphere_delete(sphere_t *sphere)
+void rt_sphere_delete(rt_sphere_t *sphere)
 {
     free(sphere);
 }

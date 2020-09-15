@@ -15,9 +15,9 @@
 #define PI (double)3.1415926535897932385
 #endif // M_PI
 
-#define DEG_TO_RAD(deg) (((deg) * PI) / 180.0)
+#define RT_DEG_TO_RAD(deg) (((deg) * PI) / 180.0)
 
-static inline double random_double(double min, double max)
+static inline double rt_random_double(double min, double max)
 {
     return min + (max - min) * rand() / (RAND_MAX + 1.0);
 }

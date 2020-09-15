@@ -7,15 +7,15 @@
 
 #include <stdbool.h>
 
-typedef enum hittable_type_e
+typedef enum rt_hittable_type_e
 {
-    HITTABLE_TYPE_UNKNOWN = -1,
-    HITTABLE_TYPE_SPHERE = 0,
-} hittable_type_t;
+    RT_HITTABLE_TYPE_UNKNOWN = -1,
+    RT_HITTABLE_TYPE_SPHERE = 0,
+} rt_hittable_type_t;
 
-struct hittable_s
+struct rt_hittable_s
 {
-    hittable_type_t type;
+    rt_hittable_type_t type;
 };
 
 #endif //RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H

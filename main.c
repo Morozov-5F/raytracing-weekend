@@ -5,10 +5,10 @@
 #include "rt_hittable_list.h"
 #include "rt_camera.h"
 
-colour_t ray_colour(const ray_t *ray, const hittable_list_t *list)
+colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list)
 {
-    hit_record_t record;
-    if (hittable_list_hit_test(list, ray, 0, INFINITY, &record))
+    rt_hit_record_t record;
+    if (rt_hittable_list_hit_test(list, ray, 0, INFINITY, &record))
     {
         return vec3_scale(vec3_sum(record.normal, vec3(1, 1, 1)), 0.5);
     }
@@ -28,10 +28,10 @@ int main()
     rt_camera_t *camera = rt_camera_new();
 
     // World
-    hittable_list_t world;
-    hittable_list_init(&world, 2);
-    hittable_list_add(&world, (hittable_t *)sphere_new(vec3(0, 0, -1), 0.5));
-    hittable_list_add(&world, (hittable_t *)sphere_new(vec3(0, -100.5, -1), 100));
+    rt_hittable_list_t world;
+    rt_hittable_list_init(&world, 2);
+    rt_hittable_list_add(&world, (rt_hittable_t *)rt_sphere_new(vec3(0, 0, -1), 0.5));
+    rt_hittable_list_add(&world, (rt_hittable_t *)rt_sphere_new(vec3(0, -100.5, -1), 100));
 
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -53,7 +53,7 @@ int main()
     fprintf(stderr, "\nDone\n");
 
     // Cleanup
-    hittable_list_deinit(&world);
+    rt_hittable_list_deinit(&world);
     rt_camera_delete(camera);
 
     return 0;

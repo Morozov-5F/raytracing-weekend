@@ -8,21 +8,21 @@
 #include <stdbool.h>
 #include "rtweekend.h"
 
-typedef struct hit_record_s
+typedef struct rt_hit_record_s
 {
     point3_t p;
     vec3_t normal;
     double t;
 
     bool front_face;
-} hit_record_t;
+} rt_hit_record_t;
 
-void hit_record_set_front_face(hit_record_t *record, const ray_t *ray, const vec3_t *outward_normal);
+void rt_hit_record_set_front_face(rt_hit_record_t *record, const ray_t *ray, const vec3_t *outward_normal);
 
-typedef struct hittable_s hittable_t;
+typedef struct rt_hittable_s rt_hittable_t;
 
-bool hittable_hit(const hittable_t *hittable, const ray_t *ray, double t_min, double t_max, hit_record_t *record);
+bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record);
 
-void hittable_delete(hittable_t *hittable);
+void rt_hittable_delete(rt_hittable_t *hittable);
 
 #endif //RAY_TRACING_ONE_WEEK_RT_HITTABLE_H

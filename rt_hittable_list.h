@@ -9,19 +9,19 @@
 #include "rtweekend.h"
 #include "rt_hittable.h"
 
-typedef struct hittable_list_s
+typedef struct rt_hittable_list_s
 {
-    hittable_t **hittables;
+    rt_hittable_t **hittables;
     size_t size;
     size_t capacity;
-} hittable_list_t;
+} rt_hittable_list_t;
 
-void hittable_list_init(hittable_list_t *list, size_t capacity);
+void rt_hittable_list_init(rt_hittable_list_t *list, size_t capacity);
 
-void hittable_list_add(hittable_list_t *list, hittable_t *hittable);
-void hittable_list_clear(hittable_list_t *list);
-void hittable_list_deinit(hittable_list_t *list);
+void rt_hittable_list_add(rt_hittable_list_t *list, rt_hittable_t *hittable);
+void rt_hittable_list_clear(rt_hittable_list_t *list);
+void rt_hittable_list_deinit(rt_hittable_list_t *list);
 
-bool hittable_list_hit_test(const hittable_list_t *list, const ray_t *ray, double t_min, double t_max, hit_record_t *record);
+bool rt_hittable_list_hit_test(const rt_hittable_list_t *list, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record);
 
 #endif //RAY_TRACING_ONE_WEEK_RT_HITTABLE_LIST_H
