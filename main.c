@@ -3,6 +3,7 @@
 #include "rtweekend.h"
 #include "sphere.h"
 #include "hittable_list.h"
+#include "rt_camera.h"
 
 colour_t ray_colour(const ray_t *ray, const hittable_list_t *list)
 {
@@ -24,17 +25,7 @@ int main()
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
 
     // Camera parameters
-    const double VIEWPORT_HEIGHT = 2.0;
-    const double VIEWPORT_WIDTH = ASPECT_RATIO * VIEWPORT_HEIGHT;
-    const double FOCAL_LENGTH = 1.0;
-
-    point3_t origin = point3(0, 0, 0);
-    point3_t horizontal = point3(VIEWPORT_WIDTH, 0, 0);
-    point3_t vertical = point3(0, VIEWPORT_HEIGHT, 0);
-    point3_t lower_left_corner = origin;
-    vec3_sub(&lower_left_corner, vec3_scale(horizontal, 0.5));
-    vec3_sub(&lower_left_corner, vec3_scale(vertical, 0.5));
-    vec3_sub(&lower_left_corner, vec3(0, 0, FOCAL_LENGTH));
+    rt_camera_t *camera = rt_camera_new();
 
     // World
     hittable_list_t world;
@@ -53,12 +44,7 @@ int main()
             double u = (double)i / (IMAGE_WIDTH - 1);
             double v = (double)j / (IMAGE_HEIGHT - 1);
 
-            point3_t ray_direction = lower_left_corner;
-            vec3_add(&ray_direction, vec3_scale(horizontal, u));
-            vec3_add(&ray_direction, vec3_scale(vertical, v));
-            vec3_sub(&ray_direction, origin);
-
-            ray_t ray = ray_init(origin, ray_direction);
+            ray_t ray = rt_camera_get_ray(camera, u, v);
             colour_t pixel = ray_colour(&ray, &world);
             fprintf(stdout, "%d %d %d\n", (int)(pixel.x * 255.99), (int)(pixel.y * 255.99),
                     (int)(pixel.z * 255.99));
@@ -68,6 +54,7 @@ int main()
 
     // Cleanup
     hittable_list_deinit(&world);
+    rt_camera_delete(camera);
 
     return 0;
 }

@@ -6,19 +6,25 @@
       <option name="FUNCTION_CALL_ARGUMENTS_ALIGN_MULTILINE_PARS" value="true" />
     </Objective-C>
     <Objective-C-extensions>
+      <extensions>
+        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
+        <pair source="c" header="h" fileNamingConvention="SNAKE_CASE" />
+        <pair source="cu" header="cuh" fileNamingConvention="NONE" />
+      </extensions>
       <rules>
-        <rule entity="NAMESPACE" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="MACRO" visibility="ANY" specifier="ANY" prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
-        <rule entity="STRUCT" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="ENUM" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="ENUMERATOR" visibility="ANY" specifier="ANY" prefix="" style="PASCAL_CASE" suffix="" />
-        <rule entity="TYPEDEF" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
-        <rule entity="UNION" visibility="ANY" specifier="ANY" prefix="" style="CAMEL_CASE" suffix="" />
+        <rule entity="MACRO" visibility="ANY" specifier="ANY" prefix="RT_" style="SCREAMING_SNAKE_CASE" suffix="" />
+        <rule entity="STRUCT" visibility="ANY" specifier="ANY" prefix="rt_" style="SNAKE_CASE" suffix="_s" />
+        <rule entity="ENUM" visibility="ANY" specifier="ANY" prefix="rt_" style="SNAKE_CASE" suffix="_e" />
+        <rule entity="ENUMERATOR" visibility="ANY" specifier="ANY" prefix="RT_" style="SCREAMING_SNAKE_CASE" suffix="" />
+        <rule entity="TYPEDEF" visibility="ANY" specifier="ANY" prefix="rt_" style="SNAKE_CASE" suffix="_t" />
+        <rule entity="UNION" visibility="ANY" specifier="ANY" prefix="rt_" style="SNAKE_CASE" suffix="_u" />
         <rule entity="STRUCT_MEMBER_FIELD" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="GLOBAL_FUNCTION" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
-        <rule entity="GLOBAL_VARIABLE" visibility="ANY" specifier="STATIC" prefix="" style="SNAKE_CASE" suffix="" />
+        <rule entity="GLOBAL_FUNCTION" visibility="ANY" specifier="ANY" prefix="rt_" style="SNAKE_CASE" suffix="" />
+        <rule entity="GLOBAL_VARIABLE" visibility="ANY" specifier="STATIC" prefix="gs_" style="SNAKE_CASE" suffix="" />
+        <rule entity="GLOBAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="RT_" style="SCREAMING_SNAKE_CASE" suffix="" />
         <rule entity="PARAMETER" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
         <rule entity="LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="SNAKE_CASE" suffix="" />
+        <rule entity="LOCAL_VARIABLE" visibility="ANY" specifier="ANY" prefix="" style="SCREAMING_SNAKE_CASE" suffix="" />
       </rules>
     </Objective-C-extensions>
     <codeStyleSettings language="ObjectiveC">
