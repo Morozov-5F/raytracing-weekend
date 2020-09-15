@@ -106,6 +106,27 @@ static inline vec3_t vec3_random_unit_vector(void)
     return vec3(r * cos(a), r * sin(a), z);
 }
 
+static inline vec3_t vec3_random_in_unit_sphere(void)
+{
+    vec3_t res = vec3_random(-1, 1);
+    if (vec3_length_squared(res) > 1)
+    {
+        res = vec3_normalized(res);
+    }
+    return res;
+}
+
+static inline vec3_t vec3_random_in_hemisphere(const vec3_t* n)
+{
+    vec3_t in_unit_sphere = vec3_random_in_unit_sphere();
+    if (vec3_dot(in_unit_sphere, *n) > 0)
+    {
+        return in_unit_sphere;
+    }
+    return vec3_negate(&in_unit_sphere);
+}
+
+
 // Point layer for vec3_t
 typedef vec3_t point3_t;
 #define point3(x, y, z) vec3((x), (y), (z))
