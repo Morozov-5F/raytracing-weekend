@@ -22,8 +22,9 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 16.0 / 9.0;
-    const int IMAGE_WIDTH = 1024;
+    const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
+    const int SAMPLES_PER_PIXEL = 100;
 
     // Camera parameters
     rt_camera_t *camera = rt_camera_new();
@@ -41,12 +42,16 @@ int main()
         fflush(stderr);
         for (int i = 0; i < IMAGE_WIDTH; ++i)
         {
-            double u = (double)i / (IMAGE_WIDTH - 1);
-            double v = (double)j / (IMAGE_HEIGHT - 1);
+            colour_t pixel = colour3(0, 0, 0);
+            for (int s = 0; s < SAMPLES_PER_PIXEL; ++s)
+            {
+                double u = (double)(i + rt_random_double(0, 1))  / (IMAGE_WIDTH - 1);
+                double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
 
-            ray_t ray = rt_camera_get_ray(camera, u, v);
-            colour_t pixel = ray_colour(&ray, world);
-            rt_write_colour(stdout, pixel);
+                ray_t ray = rt_camera_get_ray(camera, u, v);
+                vec3_add(&pixel, ray_colour(&ray, world));
+            }
+            rt_write_colour(stdout, pixel, SAMPLES_PER_PIXEL);
         }
     }
     fprintf(stderr, "\nDone\n");

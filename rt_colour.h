@@ -13,6 +13,6 @@
 typedef vec3_t colour_t;
 #define colour3(x, y, z) vec3((x), (y), (z))
 
-void rt_write_colour(FILE *stream, colour_t pixel_colour);
+void rt_write_colour(FILE *stream, colour_t pixel_colour, size_t samples_per_pixel);
 
 #endif //RAY_TRACING_ONE_WEEK_RT_COLOUR_H
