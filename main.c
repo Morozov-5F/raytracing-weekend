@@ -5,6 +5,8 @@
 #include "rt_hittable_list.h"
 #include "rt_camera.h"
 #include "rt_colour.h"
+#include "rt_material.h"
+#include "rt_material_diffuse.h"
 
 colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -16,10 +18,13 @@ colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_
     rt_hit_record_t record;
     if (rt_hittable_list_hit_test(list, ray, 0.01, INFINITY, &record))
     {
-        point3_t target = vec3_sum(record.normal, vec3_random_unit_vector());
-
-        ray_t new_ray = ray_init(record.p, target);
-        return vec3_scale(ray_colour(&new_ray, list, child_rays - 1), 0.5);
+        ray_t scattered;
+        colour_t attenuation;
+        if (rt_material_scatter(record.material, &record, &attenuation, &scattered))
+        {
+            return vec3_multiply(attenuation, ray_colour(&scattered, list, child_rays - 1));
+        }
+        return colour3(0, 0, 0);
     }
     point3_t unit_direction = vec3_normalized(ray->direction);
     double t = 0.5 * (unit_direction.y + 1.0);
@@ -38,10 +43,14 @@ int main()
     // Camera parameters
     rt_camera_t *camera = rt_camera_new();
 
+    // Materials
+    rt_material_t *small_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.3, 0.3, 0.3));
+    rt_material_t *big_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.1, 0.1, 0.5));
+
     // World
     rt_hittable_list_t *world = rt_hittable_list_init(2);
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, 0, -1), 0.5));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, -100.5, -1), 100));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, 0, -1), 0.5, small_sphere_material));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, -100.5, -1), 100, big_sphere_material));
 
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -68,6 +77,9 @@ int main()
     // Cleanup
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
+
+    rt_material_delete(small_sphere_material);
+    rt_material_delete(big_sphere_material);
 
     return 0;
 }

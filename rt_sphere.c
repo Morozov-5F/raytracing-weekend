@@ -7,6 +7,7 @@
 #include "rt_sphere.h"
 #include "rt_vec3.h"
 #include "rt_hittable_shared.h"
+#include "rt_material.h"
 
 struct rt_sphere_s
 {
@@ -14,9 +15,10 @@ struct rt_sphere_s
 
     point3_t center;
     double radius;
+    rt_material_t *material;
 };
 
-rt_sphere_t sphere_init(point3_t center, double radius)
+rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
 {
     assert(radius > 0);
 
@@ -24,6 +26,7 @@ rt_sphere_t sphere_init(point3_t center, double radius)
             .base.type = RT_HITTABLE_TYPE_SPHERE,
             .radius = radius,
             .center = center,
+            .material = material,
     };
     return result;
 }
@@ -58,6 +61,7 @@ bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, do
     {
         record->t = t;
         record->p = ray_at(*ray, t);
+        record->material = sphere->material;
         vec3_t outward_normal = vec3_scale(vec3_diff(record->p, sphere->center), 1.0 / sphere->radius);
         rt_hit_record_set_front_face(record, ray, &outward_normal);
     }
@@ -65,12 +69,12 @@ bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, do
     return true;
 }
 
-rt_sphere_t *rt_sphere_new(point3_t center, double radius)
+rt_sphere_t *rt_sphere_new(point3_t center, double radius, rt_material_t *material)
 {
     rt_sphere_t *sphere = calloc(1, sizeof(rt_sphere_t));
     assert(NULL != sphere);
 
-    *sphere = sphere_init(center, radius);
+    *sphere = rt_sphere_init(center, radius, material);
     return sphere;
 }
 
