@@ -28,10 +28,9 @@ int main()
     rt_camera_t *camera = rt_camera_new();
 
     // World
-    rt_hittable_list_t world;
-    rt_hittable_list_init(&world, 2);
-    rt_hittable_list_add(&world, (rt_hittable_t *)rt_sphere_new(vec3(0, 0, -1), 0.5));
-    rt_hittable_list_add(&world, (rt_hittable_t *)rt_sphere_new(vec3(0, -100.5, -1), 100));
+    rt_hittable_list_t *world = rt_hittable_list_init(2);
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, 0, -1), 0.5));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, -100.5, -1), 100));
 
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -45,7 +44,7 @@ int main()
             double v = (double)j / (IMAGE_HEIGHT - 1);
 
             ray_t ray = rt_camera_get_ray(camera, u, v);
-            colour_t pixel = ray_colour(&ray, &world);
+            colour_t pixel = ray_colour(&ray, world);
             fprintf(stdout, "%d %d %d\n", (int)(pixel.x * 255.99), (int)(pixel.y * 255.99),
                     (int)(pixel.z * 255.99));
         }
@@ -53,7 +52,7 @@ int main()
     fprintf(stderr, "\nDone\n");
 
     // Cleanup
-    rt_hittable_list_deinit(&world);
+    rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
 
     return 0;

@@ -5,14 +5,25 @@
 #include <assert.h>
 #include "rt_hittable_list.h"
 
-void rt_hittable_list_init(rt_hittable_list_t *list, size_t capacity)
+struct rt_hittable_list_s
 {
+    rt_hittable_t **hittables;
+    size_t size;
+    size_t capacity;
+};
+
+rt_hittable_list_t *rt_hittable_list_init(size_t capacity)
+{
+    rt_hittable_list_t *list = calloc(1, sizeof(rt_hittable_list_t));
     assert(NULL != list);
+
     list->hittables = calloc(capacity, sizeof(rt_hittable_t *));
     assert(NULL != list->hittables);
 
     list->capacity = capacity;
     list->size = 0;
+
+    return list;
 }
 
 void rt_hittable_list_add(rt_hittable_list_t *list, rt_hittable_t *hittable)
