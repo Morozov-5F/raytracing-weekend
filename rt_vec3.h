@@ -93,6 +93,21 @@ static inline vec3_t vec3_lerp(vec3_t from, vec3_t to, double t)
     return vec3_sum(vec3_scale(from, 1 - t), vec3_scale(to, t));
 }
 
+static inline vec3_t vec3_random(double min, double max)
+{
+    return vec3(rt_random_double(min, max), rt_random_double(min, max), rt_random_double(min, max));
+}
+
+static inline vec3_t vec3_random_in_unit_sphere(void)
+{
+    vec3_t res = vec3_random(-1, 1);
+    if (vec3_length_squared(res) > 1)
+    {
+        res = vec3_normalized(res);
+    }
+    return res;
+}
+
 // Point layer for vec3_t
 typedef vec3_t point3_t;
 #define point3(x, y, z) vec3((x), (y), (z))

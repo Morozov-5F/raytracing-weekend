@@ -6,12 +6,20 @@
 #include "rt_camera.h"
 #include "rt_colour.h"
 
-colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list)
+colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
+    if (child_rays <= 0)
+    {
+        return colour3(0, 0, 0);
+    }
+
     rt_hit_record_t record;
     if (rt_hittable_list_hit_test(list, ray, 0, INFINITY, &record))
     {
-        return vec3_scale(vec3_sum(record.normal, vec3(1, 1, 1)), 0.5);
+        point3_t target = vec3_sum(record.normal, vec3_random_in_unit_sphere());
+
+        ray_t new_ray = ray_init(record.p, target);
+        return vec3_scale(ray_colour(&new_ray, list, child_rays - 1), 0.5);
     }
     point3_t unit_direction = vec3_normalized(ray->direction);
     double t = 0.5 * (unit_direction.y + 1.0);
@@ -25,6 +33,7 @@ int main()
     const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
     const int SAMPLES_PER_PIXEL = 100;
+    const int CHILD_RAYS = 50;
 
     // Camera parameters
     rt_camera_t *camera = rt_camera_new();
@@ -49,7 +58,7 @@ int main()
                 double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
 
                 ray_t ray = rt_camera_get_ray(camera, u, v);
-                vec3_add(&pixel, ray_colour(&ray, world));
+                vec3_add(&pixel, ray_colour(&ray, world, CHILD_RAYS));
             }
             rt_write_colour(stdout, pixel, SAMPLES_PER_PIXEL);
         }
