@@ -126,6 +126,11 @@ static inline vec3_t vec3_random_in_hemisphere(const vec3_t* n)
     return vec3_negate(&in_unit_sphere);
 }
 
+static inline vec3_t vec3_reflect(const vec3_t *vec, const vec3_t *n)
+{
+    double scale = 2 * vec3_dot(*vec, *n);
+    return vec3_diff(*vec, vec3_scale(*n, scale));
+}
 
 // Point layer for vec3_t
 typedef vec3_t point3_t;

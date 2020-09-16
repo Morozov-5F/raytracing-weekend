@@ -7,6 +7,7 @@
 #include "rt_colour.h"
 #include "rt_material.h"
 #include "rt_material_diffuse.h"
+#include "rt_material_metal.h"
 
 colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -20,7 +21,7 @@ colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_
     {
         ray_t scattered;
         colour_t attenuation;
-        if (rt_material_scatter(record.material, &record, &attenuation, &scattered))
+        if (rt_material_scatter(record.material, ray, &record, &attenuation, &scattered))
         {
             return vec3_multiply(attenuation, ray_colour(&scattered, list, child_rays - 1));
         }
@@ -37,21 +38,23 @@ int main()
     const double ASPECT_RATIO = 16.0 / 9.0;
     const int IMAGE_WIDTH = 1024;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 100;
-    const int CHILD_RAYS = 50;
+    const int SAMPLES_PER_PIXEL = 500;
+    const int CHILD_RAYS = 100;
 
     // Camera parameters
     rt_camera_t *camera = rt_camera_new();
 
     // Materials
-    rt_material_t *small_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.5, 0.5, 0.5));
-    rt_material_t *big_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.98, 0.88, 0.96));
-
+    rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
+    rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.7, 0.3, 0.3));
+    rt_material_t *material_left = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.8, 0.8));
+    rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2));
     // World
-    rt_hittable_list_t *world = rt_hittable_list_init(2);
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, 0, -1), 0.5, small_sphere_material));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(vec3(0, -100.5, -1), 100, big_sphere_material));
-
+    rt_hittable_list_t *world = rt_hittable_list_init(4);
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -100.5, -1), 100, material_ground));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, 0, -1), 0.5, material_center));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-1, 0, -1), 0.5, material_left));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(1, 0, -1), 0.5, material_right));
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
     for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
@@ -78,8 +81,10 @@ int main()
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
 
-    rt_material_delete(small_sphere_material);
-    rt_material_delete(big_sphere_material);
+    rt_material_delete(material_ground);
+    rt_material_delete(material_left);
+    rt_material_delete(material_right);
+    rt_material_delete(material_center);
 
     return 0;
 }

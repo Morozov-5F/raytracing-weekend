@@ -25,13 +25,16 @@ rt_material_diffuse_t *rt_mt_diffuse_new(colour_t albedo)
 }
 
 bool
-rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const rt_hit_record_t *hit_record, colour_t *attenuation,
-                      ray_t *scattered_ray)
+rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,
+                      colour_t *attenuation, ray_t *scattered_ray)
 {
     assert(NULL != material);
+    assert(NULL != incoming_ray);
     assert(NULL != hit_record);
     assert(NULL != attenuation);
     assert(NULL != scattered_ray);
+
+    (void)incoming_ray;
 
     vec3_t scatter_direction = vec3_sum(hit_record->normal, vec3_random_unit_vector());
     *scattered_ray = ray_init(hit_record->p, scatter_direction);
