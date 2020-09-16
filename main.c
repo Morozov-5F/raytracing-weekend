@@ -38,8 +38,8 @@ int main()
     const double ASPECT_RATIO = 16.0 / 9.0;
     const int IMAGE_WIDTH = 1024;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 500;
-    const int CHILD_RAYS = 100;
+    const int SAMPLES_PER_PIXEL = 100;
+    const int CHILD_RAYS = 50;
 
     // Camera parameters
     rt_camera_t *camera = rt_camera_new();
@@ -47,8 +47,8 @@ int main()
     // Materials
     rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
     rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.7, 0.3, 0.3));
-    rt_material_t *material_left = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.8, 0.8));
-    rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2));
+    rt_material_t *material_left = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.8, 0.8), 0.3);
+    rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2), 1);
     // World
     rt_hittable_list_t *world = rt_hittable_list_init(4);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -100.5, -1), 100, material_ground));
