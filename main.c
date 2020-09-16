@@ -44,8 +44,8 @@ int main()
     rt_camera_t *camera = rt_camera_new();
 
     // Materials
-    rt_material_t *small_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.3, 0.3, 0.3));
-    rt_material_t *big_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.1, 0.1, 0.5));
+    rt_material_t *small_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.5, 0.5, 0.5));
+    rt_material_t *big_sphere_material = (rt_material_t *)rt_mt_diffuse_new(colour3(0.98, 0.88, 0.96));
 
     // World
     rt_hittable_list_t *world = rt_hittable_list_init(2);
