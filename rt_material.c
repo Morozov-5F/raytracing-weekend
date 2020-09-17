@@ -7,6 +7,7 @@
 #include "rt_material_shared.h"
 #include "rt_material_diffuse.h"
 #include "rt_material_metal.h"
+#include "rt_material_dielectric.h"
 
 bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,
                          colour_t *attenuation, ray_t *scattered_ray)
@@ -23,6 +24,9 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
                                          scattered_ray);
         case RT_MATERIAL_TYPE_METAL:
             return rt_mt_metal_scatter((rt_material_metal_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
+
+        case RT_MATERIAL_TYPE_DIELECTRIC:
+            return rt_mt_dielectric_scatter((rt_material_dielectric_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
 
         default:
             assert(0);
@@ -43,6 +47,10 @@ void rt_material_delete(rt_material_t *material)
         case RT_MATERIAL_TYPE_METAL:
             rt_mt_metal_delete((rt_material_metal_t *)material);
             break;
+        case RT_MATERIAL_TYPE_DIELECTRIC:
+            rt_mt_dielectric_delete((rt_material_dielectric_t *)material);
+            break;
+
         default:
             assert(0);
     }

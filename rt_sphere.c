@@ -20,6 +20,7 @@ struct rt_sphere_s
 
 rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
 {
+    assert(NULL != material);
     assert(radius > 0);
 
     rt_sphere_t result = {
@@ -34,6 +35,7 @@ rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *materi
 bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
 {
     assert(NULL != sphere);
+    assert(NULL != ray);
 
     vec3_t ac = vec3_diff(ray->origin, sphere->center);
     double a = vec3_length_squared(ray->direction);

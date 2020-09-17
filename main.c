@@ -8,6 +8,7 @@
 #include "rt_material.h"
 #include "rt_material_diffuse.h"
 #include "rt_material_metal.h"
+#include "rt_material_dielectric.h"
 
 colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -36,9 +37,9 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 16.0 / 9.0;
-    const int IMAGE_WIDTH = 1024;
+    const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 100;
+    const int SAMPLES_PER_PIXEL = 50;
     const int CHILD_RAYS = 50;
 
     // Camera parameters
@@ -46,7 +47,7 @@ int main()
 
     // Materials
     rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
-    rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.7, 0.3, 0.3));
+    rt_material_t *material_center = (rt_material_t *)rt_mt_dielectric_new(1.5);
     rt_material_t *material_left = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.8, 0.8), 0.3);
     rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2), 1);
     // World
