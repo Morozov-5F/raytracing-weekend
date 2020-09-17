@@ -132,6 +132,15 @@ static inline vec3_t vec3_reflect(const vec3_t *vec, const vec3_t *n)
     return vec3_diff(*vec, vec3_scale(*n, scale));
 }
 
+static inline vec3_t vec3_refract(const vec3_t *vec, const vec3_t *n, double r)
+{
+    double vec_length = vec3_length(*vec);
+    double c = -vec3_dot(*vec, *n) / vec_length;
+
+    double aux = vec_length * (r * c - sqrt(1 - r * r * (1 - c * c)));
+    return vec3_sum(vec3_scale(*vec, r), vec3_scale(*n, aux));
+}
+
 // Point layer for vec3_t
 typedef vec3_t point3_t;
 #define point3(x, y, z) vec3((x), (y), (z))
