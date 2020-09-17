@@ -21,7 +21,6 @@ struct rt_sphere_s
 rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
 {
     assert(NULL != material);
-    assert(radius > 0);
 
     rt_sphere_t result = {
             .base.type = RT_HITTABLE_TYPE_SPHERE,
