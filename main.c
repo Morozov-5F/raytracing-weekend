@@ -10,15 +10,15 @@
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
 
-colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
+static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
     if (child_rays <= 0)
     {
-        return colour3(0, 0, 0);
+        return colour(0, 0, 0);
     }
 
     rt_hit_record_t record;
-    if (rt_hittable_list_hit_test(list, ray, 0.01, INFINITY, &record))
+    if (rt_hittable_list_hit_test(list, ray, 0.001, INFINITY, &record))
     {
         ray_t scattered;
         colour_t attenuation;
@@ -26,41 +26,87 @@ colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_
         {
             return vec3_multiply(attenuation, ray_colour(&scattered, list, child_rays - 1));
         }
-        return colour3(0, 0, 0);
+        return colour(0, 0, 0);
     }
     point3_t unit_direction = vec3_normalized(ray->direction);
     double t = 0.5 * (unit_direction.y + 1.0);
     return vec3_lerp(vec3(1, 1, 1), vec3(0.5, 0.7, 1), t);
 }
 
+static rt_hittable_list_t *random_scene(void)
+{
+    rt_material_t *ground_material = (rt_material_t *)rt_mt_diffuse_new(colour(0.5, 0.5, 0.5));
+
+    rt_hittable_list_t *world = rt_hittable_list_init(4);
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -1000, 0), 1000, ground_material));
+
+    for (int a = -11; a < 11; a++)
+    {
+        for (int b = -11; b < 11; b++)
+        {
+            double material_chooser = rt_random_double(0, 1);
+            point3_t center = vec3(a + 0.9 * rt_random_double(0, 1), 0.2, b + 0.9 * rt_random_double(0, 1));
+
+            if (vec3_length(vec3_diff(center, point3(4, 0.2, 0))) > 0.9)
+            {
+                rt_material_t *sphere_material = NULL;
+                if (material_chooser < 0.8)
+                {
+                    colour_t albedo = vec3_multiply(vec3_random(0, 1), vec3_random(0, 1));
+                    sphere_material = (rt_material_t *)rt_mt_diffuse_new(albedo);
+                }
+                else if (material_chooser < 0.95)
+                {
+                    colour_t albedo = vec3_random(0.5, 1);
+                    double fuzz = rt_random_double(0, 0.5);
+                    sphere_material = (rt_material_t *)rt_mt_metal_new(albedo, fuzz);
+                }
+                else
+                {
+                    sphere_material = (rt_material_t *)rt_mt_dielectric_new(1.5);
+                }
+                rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(center, 0.2, sphere_material));
+                rt_material_delete(sphere_material);
+            }
+        }
+    }
+
+    rt_material_t *material1 = (rt_material_t *)rt_mt_dielectric_new(1.5);
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, 1, 0), 1.0, material1));
+
+    rt_material_t * material2 = (rt_material_t *)rt_mt_diffuse_new(colour(0.4, 0.2, 0.1));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-4, 1, 0), 1.0, material2));
+
+    rt_material_t * material3 = (rt_material_t *)rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(4, 1, 0), 1.0, material3));
+
+    rt_material_delete(material1);
+    rt_material_delete(material2);
+    rt_material_delete(material3);
+    rt_material_delete(ground_material);
+    return world;
+}
+
 int main()
 {
     // Image parameters
-    const double ASPECT_RATIO = 16.0 / 9.0;
-    const int IMAGE_WIDTH = 400;
+    const double ASPECT_RATIO = 3.0 / 2.0;
+    const int IMAGE_WIDTH = 1200;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 1000;
-    const int CHILD_RAYS = 100;
+    const int SAMPLES_PER_PIXEL = 500;
+    const int CHILD_RAYS = 50;
 
     // Camera parameters
+    point3_t look_from = point3(13, 2, 3);
+    point3_t look_at = point3(0, 0, 0);
     vec3_t up = point3(0, 1, 0);
-    point3_t look_from = point3(-2, 2, 1);
-    point3_t look_at = point3(0, 0, -1);
-    double focus_distance = vec3_length(vec3_diff(look_at, look_from));
-    double aperture = 0.5;
+    double focus_distance = 10;
+    double aperture = 0.1;
     rt_camera_t *camera = rt_camera_new(look_from, look_at, up, 20, ASPECT_RATIO, aperture, focus_distance);
 
-    // Materials
-    rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
-    rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.1, 0.2, 0.5));
-    rt_material_t *material_left = (rt_material_t *)rt_mt_dielectric_new(1.5);
-    rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2), 0.0);
     // World
-    rt_hittable_list_t *world = rt_hittable_list_init(4);
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -100.5, -1.0), 100, material_ground));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, 0, -1), 0.5, material_center));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-1, 0, -1), -0.45, material_left));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(1, 0, -1), 0.5, material_right));
+    rt_hittable_list_t *world = random_scene();
+
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
     for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
@@ -69,7 +115,7 @@ int main()
         fflush(stderr);
         for (int i = 0; i < IMAGE_WIDTH; ++i)
         {
-            colour_t pixel = colour3(0, 0, 0);
+            colour_t pixel = colour(0, 0, 0);
             for (int s = 0; s < SAMPLES_PER_PIXEL; ++s)
             {
                 double u = (double)(i + rt_random_double(0, 1)) / (IMAGE_WIDTH - 1);
@@ -86,11 +132,6 @@ int main()
     // Cleanup
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
-
-    rt_material_delete(material_ground);
-    rt_material_delete(material_left);
-    rt_material_delete(material_right);
-    rt_material_delete(material_center);
 
     return 0;
 }

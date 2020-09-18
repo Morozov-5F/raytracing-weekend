@@ -50,10 +50,10 @@ bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, do
 
     double disc_root = sqrt(discriminant_4);
     double t = (-half_b - disc_root) / a;
-    if (t > t_max || t < t_min)
+    if (t >= t_max || t <= t_min)
     {
         t = (-half_b + disc_root) / a;
-        if (t > t_max || t < t_min)
+        if (t >= t_max || t <= t_min)
         {
             return false;
         }

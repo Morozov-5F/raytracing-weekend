@@ -40,7 +40,7 @@ bool rt_mt_dielectric_scatter(const rt_material_dielectric_t *material, const ra
     assert(NULL != attenuation);
     assert(NULL != scattered_ray);
 
-    *attenuation = colour3(1.0, 1.0, 1.0);
+    *attenuation = colour(1.0, 1.0, 1.0);
     double r = hit_record->front_face ? (1.0 / material->refraction_factor) : material->refraction_factor;
 
     vec3_t direction_unit = vec3_normalized(incoming_ray->direction);
