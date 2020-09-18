@@ -9,9 +9,9 @@
 
 typedef struct rt_camera_s rt_camera_t;
 
-rt_camera_t * rt_camera_new(void);
+rt_camera_t *rt_camera_new(point3_t look_from, point3_t look_at, vec3_t up, double vertical_fov, double aspect_ratio);
 
-ray_t rt_camera_get_ray(const rt_camera_t *camera, double u, double v);
+ray_t rt_camera_get_ray(const rt_camera_t *camera, double s, double t);
 
 void rt_camera_delete(rt_camera_t *camera);
 

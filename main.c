@@ -37,24 +37,25 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 16.0 / 9.0;
-    const int IMAGE_WIDTH = 1020;
+    const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 1000;
-    const int CHILD_RAYS = 100;
+    const int SAMPLES_PER_PIXEL = 100;
+    const int CHILD_RAYS = 50;
 
     // Camera parameters
-    rt_camera_t *camera = rt_camera_new();
+    vec3_t up = point3(0, 1, 0);
+    rt_camera_t *camera = rt_camera_new(point3(-2, 2, 1), point3(0, 0, -1), up, 20, ASPECT_RATIO);
 
     // Materials
     rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
-    rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.3, 0.2, 0.5));
+    rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.1, 0.2, 0.5));
     rt_material_t *material_left = (rt_material_t *)rt_mt_dielectric_new(1.5);
-    rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2), 1);
+    rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2), 0.0);
     // World
     rt_hittable_list_t *world = rt_hittable_list_init(4);
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -100.5, -1), 100, material_ground));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -100.5, -1.0), 100, material_ground));
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, 0, -1), 0.5, material_center));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-1, 0, -1), -0.4, material_left));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-1, 0, -1), -0.45, material_left));
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(1, 0, -1), 0.5, material_right));
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -67,7 +68,7 @@ int main()
             colour_t pixel = colour3(0, 0, 0);
             for (int s = 0; s < SAMPLES_PER_PIXEL; ++s)
             {
-                double u = (double)(i + rt_random_double(0, 1))  / (IMAGE_WIDTH - 1);
+                double u = (double)(i + rt_random_double(0, 1)) / (IMAGE_WIDTH - 1);
                 double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
 
                 ray_t ray = rt_camera_get_ray(camera, u, v);
