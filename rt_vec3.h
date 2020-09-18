@@ -126,6 +126,16 @@ static inline vec3_t vec3_random_in_hemisphere(const vec3_t* n)
     return vec3_negate(&in_unit_sphere);
 }
 
+static inline vec3_t vec3_random_in_unit_disc(void)
+{
+    vec3_t res = vec3(rt_random_double(-1, 1), rt_random_double(-1, 1), 0);
+    if (vec3_length_squared(res) > 1)
+    {
+        return vec3_normalized(res);
+    }
+    return res;
+}
+
 static inline vec3_t vec3_reflect(const vec3_t *vec, const vec3_t *n)
 {
     double scale = 2 * vec3_dot(*vec, *n);

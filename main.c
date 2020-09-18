@@ -39,12 +39,16 @@ int main()
     const double ASPECT_RATIO = 16.0 / 9.0;
     const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 100;
-    const int CHILD_RAYS = 50;
+    const int SAMPLES_PER_PIXEL = 1000;
+    const int CHILD_RAYS = 100;
 
     // Camera parameters
     vec3_t up = point3(0, 1, 0);
-    rt_camera_t *camera = rt_camera_new(point3(-2, 2, 1), point3(0, 0, -1), up, 20, ASPECT_RATIO);
+    point3_t look_from = point3(-2, 2, 1);
+    point3_t look_at = point3(0, 0, -1);
+    double focus_distance = vec3_length(vec3_diff(look_at, look_from));
+    double aperture = 0.5;
+    rt_camera_t *camera = rt_camera_new(look_from, look_at, up, 20, ASPECT_RATIO, aperture, focus_distance);
 
     // Materials
     rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
