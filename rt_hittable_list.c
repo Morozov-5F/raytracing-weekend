@@ -59,6 +59,8 @@ void rt_hittable_list_deinit(rt_hittable_list_t *list)
     free(list->hittables);
     list->capacity = 0;
     list->hittables = NULL;
+
+    free(list);
 }
 
 bool rt_hittable_list_hit_test(const rt_hittable_list_t *list, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)

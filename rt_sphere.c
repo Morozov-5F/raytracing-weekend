@@ -28,6 +28,7 @@ rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *materi
             .center = center,
             .material = material,
     };
+    rt_material_claim(material);
     return result;
 }
 
@@ -81,5 +82,7 @@ rt_sphere_t *rt_sphere_new(point3_t center, double radius, rt_material_t *materi
 
 void rt_sphere_delete(rt_sphere_t *sphere)
 {
+    rt_material_delete(sphere->material);
+
     free(sphere);
 }

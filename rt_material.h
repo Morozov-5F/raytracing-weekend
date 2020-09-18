@@ -11,6 +11,8 @@
 
 typedef struct rt_material_s rt_material_t;
 
+void rt_material_claim(rt_material_t *material);
+
 bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,
                          colour_t *attenuation, ray_t *scattered_ray);
 

@@ -5,6 +5,8 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_MATERIAL_SHARED_H
 #define RAY_TRACING_ONE_WEEK_RT_MATERIAL_SHARED_H
 
+#include "rt_material.h"
+
 typedef enum rt_material_type_e
 {
     RT_MATERIAL_TYPE_UNKNOWN = 0,
@@ -17,6 +19,9 @@ typedef enum rt_material_type_e
 struct rt_material_s
 {
     rt_material_type_t type;
+    int refcount;
 };
+
+void rt_material_base_init(rt_material_t *material_base, rt_material_type_t type);
 
 #endif //RAY_TRACING_ONE_WEEK_RT_MATERIAL_SHARED_H

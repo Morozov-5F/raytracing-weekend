@@ -25,7 +25,7 @@ rt_material_dielectric_t *rt_mt_dielectric_new(double refraction_factor)
     rt_material_dielectric_t *material = calloc(1, sizeof(rt_material_dielectric_t));
     assert(NULL != material);
 
-    material->base.type = RT_MATERIAL_TYPE_DIELECTRIC;
+    rt_material_base_init(&material->base, RT_MATERIAL_TYPE_DIELECTRIC);
     material->refraction_factor = refraction_factor;
 
     return material;

@@ -9,6 +9,19 @@
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
 
+void rt_material_base_init(rt_material_t *material_base, rt_material_type_t type)
+{
+    assert(NULL != material_base);
+    material_base->type = type;
+    material_base->refcount = 1;
+}
+
+void rt_material_claim(rt_material_t *material)
+{
+    assert(NULL != material);
+    material->refcount++;
+}
+
 bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,
                          colour_t *attenuation, ray_t *scattered_ray)
 {
@@ -37,7 +50,10 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
 
 void rt_material_delete(rt_material_t *material)
 {
-    assert(NULL != material);
+    if (NULL == material || --(material->refcount) > 0)
+    {
+        return;
+    }
 
     switch (material->type)
     {

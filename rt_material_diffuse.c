@@ -18,7 +18,7 @@ rt_material_diffuse_t *rt_mt_diffuse_new(colour_t albedo)
     rt_material_diffuse_t * material = calloc(1, sizeof(rt_material_diffuse_t));
     assert(NULL != material);
 
-    material->base.type = RT_MATERIAL_TYPE_DIFFUSE_LAMBERTIAN;
+    rt_material_base_init(&material->base, RT_MATERIAL_TYPE_DIFFUSE_LAMBERTIAN);
     material->albedo = albedo;
 
     return material;

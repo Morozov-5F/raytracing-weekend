@@ -20,7 +20,8 @@ rt_material_metal_t *rt_mt_metal_new(colour_t albedo, double fuzziness)
     rt_material_metal_t *material = calloc(1, sizeof(rt_material_metal_t));
     assert(NULL != material);
 
-    material->base.type = RT_MATERIAL_TYPE_METAL;
+    rt_material_base_init(&material->base, RT_MATERIAL_TYPE_METAL);
+
     material->albedo = albedo;
     material->fuzziness = fuzziness > 1 ? 1 : fuzziness;
 
