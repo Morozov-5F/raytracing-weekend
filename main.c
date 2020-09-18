@@ -48,13 +48,13 @@ int main()
     // Materials
     rt_material_t *material_ground = (rt_material_t *)rt_mt_diffuse_new(colour3(0.8, 0.8, 0));
     rt_material_t *material_center = (rt_material_t *)rt_mt_diffuse_new(colour3(0.3, 0.2, 0.5));
-    rt_material_t *material_left = (rt_material_t *)rt_mt_dielectric_new(1.3);
+    rt_material_t *material_left = (rt_material_t *)rt_mt_dielectric_new(1.5);
     rt_material_t *material_right = (rt_material_t *)rt_mt_metal_new(colour3(0.8, 0.6, 0.2), 1);
     // World
     rt_hittable_list_t *world = rt_hittable_list_init(4);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -100.5, -1), 100, material_ground));
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, 0, -1), 0.5, material_center));
-    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-1, 0, -1), 0.5, material_left));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-1, 0, -1), -0.4, material_left));
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(1, 0, -1), 0.5, material_right));
     // Render
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);

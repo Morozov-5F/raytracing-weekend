@@ -46,14 +46,7 @@ bool rt_mt_dielectric_scatter(const rt_material_dielectric_t *material, const ra
     vec3_t direction_unit = vec3_normalized(incoming_ray->direction);
     double cos_theta = fmin(vec3_dot(vec3_negate(&direction_unit), hit_record->normal), 1.0);
     double sin_theta = sqrt(1.0 - cos_theta * cos_theta);
-    if (r * sin_theta > 1.0)
-    {
-        vec3_t reflected = vec3_reflect(&direction_unit, &hit_record->normal);
-        *scattered_ray = ray_init(hit_record->p, reflected);
-        return true;
-    }
-    double reflect_probe = schlick_approximation(cos_theta, r);
-    if (rt_random_double(0, 1) < reflect_probe)
+    if (r * sin_theta > 1.0 || rt_random_double(0, 1) < schlick_approximation(cos_theta, r))
     {
         vec3_t reflected = vec3_reflect(&direction_unit, &hit_record->normal);
         *scattered_ray = ray_init(hit_record->p, reflected);
