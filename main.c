@@ -10,24 +10,58 @@
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
 
+#include <pthread.h>
+#include <errno.h>
+#include <string.h>
+
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays);
 
 static rt_hittable_list_t *random_scene(void);
 
+typedef struct render_params_s
+{
+    const rt_camera_t *camera;
+    const rt_hittable_list_t *world;
+    int samples;
+    int child_rays;
+} render_params_t;
+
+typedef struct render_thread_params_s
+{
+    colour_t *local_image;
+    int width;
+    int height;
+
+    int thread_id;
+    pthread_t thread_handle;
+
+    render_params_t render_params;
+} render_thread_params_t;
+
 static void *render_thread(void *params);
 
 static void
-render(colour_t *image, int width, int height, const rt_camera_t *camera, rt_hittable_list_t *world, int samples,
-       int child_rays);
+render_fn(colour_t *image, int width, int height, const render_params_t *render_params, bool output_progress);
 
 int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 400;
+    const int IMAGE_WIDTH = 1200;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 20;
     const int CHILD_RAYS = 50;
+
+    const int NUMBER_OF_CORES = 6;
+    const int NUMBER_OF_WORKER_THREADS = NUMBER_OF_CORES - 1;
+    const int SAMPLES_PER_CORE = 50;
+
+    fprintf(stderr, "Rendering parameters:\n");
+    fprintf(stderr, "  Image width:  %d\n", IMAGE_WIDTH);
+    fprintf(stderr, "  Image height: %d\n", IMAGE_HEIGHT);
+    fprintf(stderr, "  Number of cores:   %d\n", NUMBER_OF_CORES);
+    fprintf(stderr, "  Number of threads: %d\n", NUMBER_OF_WORKER_THREADS);
+    fprintf(stderr, "  Samples per core:  %d\n", SAMPLES_PER_CORE);
+    fprintf(stderr, "  Total samples:     %d\n", SAMPLES_PER_CORE * NUMBER_OF_CORES);
 
     colour_t *image = calloc(IMAGE_WIDTH * IMAGE_HEIGHT, sizeof(colour_t));
 
@@ -43,7 +77,36 @@ int main()
     rt_hittable_list_t *world = random_scene();
 
     // Render
-    render(image, IMAGE_WIDTH, IMAGE_HEIGHT, camera, world, SAMPLES_PER_PIXEL, CHILD_RAYS);
+    render_params_t render_params = {
+            .world = world,
+            .camera = camera,
+            .samples = SAMPLES_PER_CORE,
+            .child_rays = CHILD_RAYS
+    };
+
+    render_thread_params_t thread_params[NUMBER_OF_WORKER_THREADS];
+    for (int i = 0; i < NUMBER_OF_WORKER_THREADS; ++i)
+    {
+        thread_params[i].local_image = calloc(IMAGE_WIDTH * IMAGE_HEIGHT, sizeof(colour_t));
+        thread_params[i].width = IMAGE_WIDTH;
+        thread_params[i].height = IMAGE_HEIGHT;
+        thread_params[i].render_params = render_params;
+        thread_params[i].thread_id = i + 1;
+
+        // Spawn threads to render image
+        if (pthread_create(&thread_params[i].thread_handle, NULL, render_thread, &thread_params[i]))
+        {
+            fprintf(stderr, "Unable to create a thread: %s", strerror(errno));
+            exit(1);
+        }
+    }
+
+    render_fn(image, IMAGE_WIDTH, IMAGE_HEIGHT, &render_params, true);
+
+    for (int i = 0; i < NUMBER_OF_WORKER_THREADS; ++i)
+    {
+        pthread_join(thread_params[i].thread_handle, NULL);
+    }
 
     // Output
     fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
@@ -51,12 +114,22 @@ int main()
     {
         for (int i = 0; i < IMAGE_WIDTH; ++i)
         {
-            rt_write_colour(stdout, image[i + j * IMAGE_WIDTH], SAMPLES_PER_PIXEL);
+            for (int c = 0; c < NUMBER_OF_WORKER_THREADS; ++c)
+            {
+                vec3_add(&image[i + j * IMAGE_WIDTH], thread_params[c].local_image[i + j * IMAGE_WIDTH]);
+            }
+            rt_write_colour(stdout, image[i + j * IMAGE_WIDTH], SAMPLES_PER_CORE * NUMBER_OF_CORES);
         }
     }
     fprintf(stderr, "\nDone\n");
 
     // Cleanup
+    free(image);
+    for (int i = 0; i < NUMBER_OF_WORKER_THREADS; ++i)
+    {
+        free(thread_params[i].local_image);
+    }
+
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
 
@@ -140,24 +213,35 @@ rt_hittable_list_t *random_scene(void)
 
 static void *render_thread(void *params)
 {
+    render_thread_params_t *thread_params = params;
 
+    srand(thread_params->thread_id);
+    render_fn(thread_params->local_image, thread_params->width, thread_params->height, &thread_params->render_params,
+              false);
+    return NULL;
 }
 
-void
-render(colour_t *image, int width, int height, const rt_camera_t *camera, rt_hittable_list_t *world, int samples, int child_rays)
+void render_fn(colour_t *image, int width, int height, const render_params_t *render_params, bool output_progress)
 {
     for (int j = height - 1; j >= 0; --j)
     {
+        if (output_progress)
+        {
+            fprintf(stderr, "\rScanlines remaining: %d", j);
+            fflush(stderr);
+        }
+
         for (int i = 0; i < width; ++i)
         {
             image[i + j * width] = colour(0, 0, 0);
-            for (int s = 0; s < samples; ++s)
+            for (int s = 0; s < render_params->samples; ++s)
             {
                 double u = (double)(i + rt_random_double(0, 1)) / (width - 1);
                 double v = (double)(j + rt_random_double(0, 1)) / (height - 1);
 
-                ray_t ray = rt_camera_get_ray(camera, u, v);
-                vec3_add(&image[i + j * width], ray_colour(&ray, world, child_rays));
+                ray_t ray = rt_camera_get_ray(render_params->camera, u, v);
+                vec3_add(&image[i + j * width],
+                         ray_colour(&ray, render_params->world, render_params->child_rays));
             }
         }
     }
