@@ -10,8 +10,7 @@
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
 
-#include <pthread.h>
-#include <errno.h>
+#include <omp.h>
 #include <string.h>
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays);
@@ -26,20 +25,6 @@ typedef struct render_params_s
     int child_rays;
 } render_params_t;
 
-typedef struct render_thread_params_s
-{
-    colour_t *local_image;
-    int width;
-    int height;
-
-    int thread_id;
-    pthread_t thread_handle;
-
-    render_params_t render_params;
-} render_thread_params_t;
-
-static void *render_thread(void *params);
-
 static void
 render_fn(colour_t *image, int width, int height, const render_params_t *render_params, bool output_progress);
 
@@ -51,19 +36,15 @@ int main()
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
     const int CHILD_RAYS = 50;
 
-    const int NUMBER_OF_CORES = 6;
-    const int NUMBER_OF_WORKER_THREADS = NUMBER_OF_CORES - 1;
-    const int SAMPLES_PER_CORE = 50;
+    const int NUMBER_OF_CORES = 2;
+    const int SAMPLES_PER_CORE = 60;
 
     fprintf(stderr, "Rendering parameters:\n");
     fprintf(stderr, "  Image width:  %d\n", IMAGE_WIDTH);
     fprintf(stderr, "  Image height: %d\n", IMAGE_HEIGHT);
     fprintf(stderr, "  Number of cores:   %d\n", NUMBER_OF_CORES);
-    fprintf(stderr, "  Number of threads: %d\n", NUMBER_OF_WORKER_THREADS);
     fprintf(stderr, "  Samples per core:  %d\n", SAMPLES_PER_CORE);
     fprintf(stderr, "  Total samples:     %d\n", SAMPLES_PER_CORE * NUMBER_OF_CORES);
-
-    colour_t *image = calloc(IMAGE_WIDTH * IMAGE_HEIGHT, sizeof(colour_t));
 
     // Camera parameters
     point3_t look_from = point3(13, 2, 3);
@@ -84,28 +65,19 @@ int main()
             .child_rays = CHILD_RAYS
     };
 
-    render_thread_params_t thread_params[NUMBER_OF_WORKER_THREADS];
-    for (int i = 0; i < NUMBER_OF_WORKER_THREADS; ++i)
+    colour_t *core_images[NUMBER_OF_CORES];
+    for (int i = 0; i < NUMBER_OF_CORES; ++i)
     {
-        thread_params[i].local_image = calloc(IMAGE_WIDTH * IMAGE_HEIGHT, sizeof(colour_t));
-        thread_params[i].width = IMAGE_WIDTH;
-        thread_params[i].height = IMAGE_HEIGHT;
-        thread_params[i].render_params = render_params;
-        thread_params[i].thread_id = i + 1;
-
-        // Spawn threads to render image
-        if (pthread_create(&thread_params[i].thread_handle, NULL, render_thread, &thread_params[i]))
-        {
-            fprintf(stderr, "Unable to create a thread: %s", strerror(errno));
-            exit(1);
-        }
+        core_images[i] = calloc(IMAGE_WIDTH * IMAGE_HEIGHT, sizeof(colour_t));
     }
 
-    render_fn(image, IMAGE_WIDTH, IMAGE_HEIGHT, &render_params, true);
-
-    for (int i = 0; i < NUMBER_OF_WORKER_THREADS; ++i)
+#pragma omp parallel default(none) shared(IMAGE_WIDTH, IMAGE_HEIGHT, core_images, render_params) num_threads(NUMBER_OF_CORES)
     {
-        pthread_join(thread_params[i].thread_handle, NULL);
+        int thread_id = omp_get_thread_num();
+        srand(thread_id);
+
+        render_fn(core_images[thread_id], IMAGE_WIDTH, IMAGE_HEIGHT,
+                  &render_params, omp_get_thread_num() == 0);
     }
 
     // Output
@@ -114,20 +86,19 @@ int main()
     {
         for (int i = 0; i < IMAGE_WIDTH; ++i)
         {
-            for (int c = 0; c < NUMBER_OF_WORKER_THREADS; ++c)
+            for (int c = 1; c < NUMBER_OF_CORES - 1; ++c)
             {
-                vec3_add(&image[i + j * IMAGE_WIDTH], thread_params[c].local_image[i + j * IMAGE_WIDTH]);
+                vec3_add(&core_images[0][i + j * IMAGE_WIDTH], core_images[c][i + j * IMAGE_WIDTH]);
             }
-            rt_write_colour(stdout, image[i + j * IMAGE_WIDTH], SAMPLES_PER_CORE * NUMBER_OF_CORES);
+            rt_write_colour(stdout, core_images[0][i + j * IMAGE_WIDTH], SAMPLES_PER_CORE * NUMBER_OF_CORES);
         }
     }
     fprintf(stderr, "\nDone\n");
 
     // Cleanup
-    free(image);
-    for (int i = 0; i < NUMBER_OF_WORKER_THREADS; ++i)
+    for (int i = 0; i < NUMBER_OF_CORES; ++i)
     {
-        free(thread_params[i].local_image);
+        free(core_images[i]);
     }
 
     rt_hittable_list_deinit(world);
@@ -211,16 +182,6 @@ rt_hittable_list_t *random_scene(void)
     return world;
 }
 
-static void *render_thread(void *params)
-{
-    render_thread_params_t *thread_params = params;
-
-    srand(thread_params->thread_id);
-    render_fn(thread_params->local_image, thread_params->width, thread_params->height, &thread_params->render_params,
-              false);
-    return NULL;
-}
-
 void render_fn(colour_t *image, int width, int height, const render_params_t *render_params, bool output_progress)
 {
     for (int j = height - 1; j >= 0; --j)
@@ -240,8 +201,7 @@ void render_fn(colour_t *image, int width, int height, const render_params_t *re
                 double v = (double)(j + rt_random_double(0, 1)) / (height - 1);
 
                 ray_t ray = rt_camera_get_ray(render_params->camera, u, v);
-                vec3_add(&image[i + j * width],
-                         ray_colour(&ray, render_params->world, render_params->child_rays));
+                vec3_add(&image[i + j * width], ray_colour(&ray, render_params->world, render_params->child_rays));
             }
         }
     }

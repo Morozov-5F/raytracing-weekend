@@ -3,6 +3,9 @@ project(ray_tracing_one_week C)
 
 set(CMAKE_C_STANDARD 11)
 
+find_package(OpenMP)
+
 add_executable(ray_tracing_one_week rt_hittable.c rt_sphere.c rt_hittable_list.c main.c rt_camera.c rt_colour.c rt_material.c rt_hit.c rt_material_diffuse.c rt_material_metal.c rt_material_dielectric.c)
-target_compile_options(ray_tracing_one_week PUBLIC -Wall -Wextra -Winline)
-target_link_libraries(ray_tracing_one_week m pthread)
+target_compile_options(ray_tracing_one_week PUBLIC -Wall -Wextra -Winline ${OpenMP_C_FLAGS})
+target_link_libraries(ray_tracing_one_week m ${OpenMP_C_LIBRARIES})
+target_include_directories(ray_tracing_one_week PUBLIC ${OpenMP_C_INCLUDE_DIRS})
