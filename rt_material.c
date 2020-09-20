@@ -8,6 +8,7 @@
 #include "rt_material_diffuse.h"
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
+#include "rt_material_diffuse_light.h"
 
 void rt_material_base_init(rt_material_t *material_base, rt_material_type_t type)
 {
@@ -33,13 +34,16 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
     switch (material->type)
     {
         case RT_MATERIAL_TYPE_DIFFUSE_LAMBERTIAN:
-            return rt_mt_diffuse_scatter((rt_material_diffuse_t *)material, incoming_ray, hit_record, attenuation,
+            return rt_mt_diffuse_scatter((const rt_material_diffuse_t *)material, incoming_ray, hit_record, attenuation,
                                          scattered_ray);
         case RT_MATERIAL_TYPE_METAL:
-            return rt_mt_metal_scatter((rt_material_metal_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
+            return rt_mt_metal_scatter((const rt_material_metal_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
 
         case RT_MATERIAL_TYPE_DIELECTRIC:
-            return rt_mt_dielectric_scatter((rt_material_dielectric_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
+            return rt_mt_dielectric_scatter((const rt_material_dielectric_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
+
+        case RT_MATERIAL_TYPE_DIFFUSE_LIGHT:
+            return rt_mt_diffuse_light_scatter((const rt_material_diffuse_light_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
 
         default:
             assert(0);
@@ -47,6 +51,17 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
 
     return false;
 }
+
+colour_t rt_material_emitted(const rt_material_t *material)
+{
+    if (material->type == RT_MATERIAL_TYPE_DIFFUSE_LIGHT)
+    {
+        return rt_mt_diffuse_light_emitted((const rt_material_diffuse_light_t *)material);
+    }
+
+    return colour(0, 0, 0);
+}
+
 
 void rt_material_delete(rt_material_t *material)
 {
@@ -65,6 +80,9 @@ void rt_material_delete(rt_material_t *material)
             break;
         case RT_MATERIAL_TYPE_DIELECTRIC:
             rt_mt_dielectric_delete((rt_material_dielectric_t *)material);
+            break;
+        case RT_MATERIAL_TYPE_DIFFUSE_LIGHT:
+            rt_mt_diffuse_light_delete((rt_material_diffuse_light_t *)material);
             break;
 
         default:

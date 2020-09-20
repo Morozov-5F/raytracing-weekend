@@ -9,6 +9,7 @@
 #include "rt_material_diffuse.h"
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
+#include "rt_material_diffuse_light.h"
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -18,19 +19,19 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int
     }
 
     rt_hit_record_t record;
-    if (rt_hittable_list_hit_test(list, ray, 0.001, INFINITY, &record))
+    if (!rt_hittable_list_hit_test(list, ray, 0.001, INFINITY, &record))
     {
-        ray_t scattered;
-        colour_t attenuation;
-        if (rt_material_scatter(record.material, ray, &record, &attenuation, &scattered))
-        {
-            return vec3_multiply(attenuation, ray_colour(&scattered, list, child_rays - 1));
-        }
         return colour(0, 0, 0);
     }
-    point3_t unit_direction = vec3_normalized(ray->direction);
-    double t = 0.5 * (unit_direction.y + 1.0);
-    return vec3_lerp(vec3(1, 1, 1), vec3(0.5, 0.7, 1), t);
+    ray_t scattered;
+    colour_t attenuation;
+    colour_t emitted = rt_material_emitted(record.material);
+
+    if (!rt_material_scatter(record.material, ray, &record, &attenuation, &scattered))
+    {
+        return emitted;
+    }
+    return vec3_sum(emitted, vec3_multiply(attenuation, ray_colour(&scattered, list, child_rays - 1)));
 }
 
 static rt_hittable_list_t *random_scene(void)
@@ -80,10 +81,14 @@ static rt_hittable_list_t *random_scene(void)
     rt_material_t * material3 = (rt_material_t *)rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(4, 1, 0), 1.0, material3));
 
+    rt_material_t *light_material = (rt_material_t *)rt_mt_diffuse_light_new(colour(4, 4, 4));
+    rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-6, 10, 0), 3, light_material));
+
     rt_material_delete(material1);
     rt_material_delete(material2);
     rt_material_delete(material3);
     rt_material_delete(ground_material);
+    rt_material_delete(light_material);
     return world;
 }
 
@@ -91,7 +96,7 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 1200;
+    const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
     const int SAMPLES_PER_PIXEL = 500;
     const int CHILD_RAYS = 50;
