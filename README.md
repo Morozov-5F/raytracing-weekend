@@ -11,7 +11,7 @@ Apart from core raytracer, I've decided to add some other features:
 * Parallel rendering using pthread and OpenMP. They are located in the [parallel-rendering](https://github.com/Morozov-5F/raytracing-weekend/tree/parallel-rendering) and [parallel-openmp](https://github.com/Morozov-5F/raytracing-weekend/tree/parallel-openmp) branches of the repo.
 * Lighting. I didn't use shadow rays I just casted a lot of rays per pixel and hoped for the best. Sample code is located in the [lighting-test](https://github.com/Morozov-5F/raytracing-weekend/tree/lighting-test) branch. Here's how the render looks:
 
-    ![Image with lighting](/images/lighting_sample.jpg)
+![Image with lighting](/images/lighting_sample.jpg)
 
 I've selected C because I wanted some challenge and I think I got some. I decided to make vector and ray routines completely inlined to remove some overhead from function calls. I could have gone with macros but I thought the inlines will suit better. Because of that I recommend building the code with all optimizations enabled.
 
