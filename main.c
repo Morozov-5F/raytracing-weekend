@@ -96,9 +96,9 @@ int main()
 {
     // Image parameters
     const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 400;
+    const int IMAGE_WIDTH = 1200;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 500;
+    const int SAMPLES_PER_PIXEL = 1200;
     const int CHILD_RAYS = 50;
 
     // Camera parameters

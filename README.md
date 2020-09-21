@@ -3,6 +3,9 @@ Simple path rendered written in modern C. Based on first book from https://githu
 
 This project uses [PPM image format](https://en.wikipedia.org/wiki/Netpbm#PPM_example) to simplify image output routines. This is far from optimal but should work.
 
+This branch adds the light sources to the base renderer. I don't do shadow rays, I just increase the number of rays per pixel and hope for the best.
+The image below took 1 hour 36 minutes to render on my PC. 
+
 ![Sample image](/images/img.jpg)
 
 # Building
