@@ -1,3 +1,10 @@
+/**
+ * Copyright (c) 2020, Evgeniy Morozov
+ * All rights reserved.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 #include <stdio.h>
 
 #include "rtweekend.h"
@@ -54,14 +61,12 @@ static rt_hittable_list_t *random_scene(void)
                 {
                     colour_t albedo = vec3_multiply(vec3_random(0, 1), vec3_random(0, 1));
                     sphere_material = (rt_material_t *)rt_mt_diffuse_new(albedo);
-                }
-                else if (material_chooser < 0.95)
+                } else if (material_chooser < 0.95)
                 {
                     colour_t albedo = vec3_random(0.5, 1);
                     double fuzz = rt_random_double(0, 0.5);
                     sphere_material = (rt_material_t *)rt_mt_metal_new(albedo, fuzz);
-                }
-                else
+                } else
                 {
                     sphere_material = (rt_material_t *)rt_mt_dielectric_new(1.5);
                 }
@@ -74,10 +79,10 @@ static rt_hittable_list_t *random_scene(void)
     rt_material_t *material1 = (rt_material_t *)rt_mt_dielectric_new(1.5);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, 1, 0), 1.0, material1));
 
-    rt_material_t * material2 = (rt_material_t *)rt_mt_diffuse_new(colour(0.4, 0.2, 0.1));
+    rt_material_t *material2 = (rt_material_t *)rt_mt_diffuse_new(colour(0.4, 0.2, 0.1));
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(-4, 1, 0), 1.0, material2));
 
-    rt_material_t * material3 = (rt_material_t *)rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
+    rt_material_t *material3 = (rt_material_t *)rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(4, 1, 0), 1.0, material3));
 
     rt_material_delete(material1);
