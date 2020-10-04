@@ -16,6 +16,7 @@
 #include "rt_material_diffuse.h"
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
+#include <string.h>
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -44,7 +45,7 @@ static rt_hittable_list_t *random_scene(void)
 {
     rt_material_t *ground_material = (rt_material_t *)rt_mt_diffuse_new(colour(0.5, 0.5, 0.5));
 
-    rt_hittable_list_t *world = rt_hittable_list_init(4);
+    rt_hittable_list_t *world = rt_hittable_list_init(500);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -1000, 0), 1000, ground_material));
 
     for (int a = -11; a < 11; a++)
@@ -92,13 +93,13 @@ static rt_hittable_list_t *random_scene(void)
     return world;
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
     // Image parameters
     const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 1200;
+    const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 500;
+    const int SAMPLES_PER_PIXEL = 40;
     const int CHILD_RAYS = 50;
 
     // Camera parameters
@@ -112,8 +113,19 @@ int main()
     // World
     rt_hittable_list_t *world = random_scene();
 
+    FILE *out_file = stdout;
+    if (argc == 2)
+    {
+        out_file = fopen(argv[1], "w");
+        if (NULL == out_file)
+        {
+            fprintf(stderr, "Unable to open file %s: %s", argv[1], strerror(errno));
+            goto cleanup;
+        }
+    }
+
     // Render
-    fprintf(stdout, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
+    fprintf(out_file, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
     for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
     {
         fprintf(stderr, "\rScanlines remaining: %d", j);
@@ -129,11 +141,12 @@ int main()
                 ray_t ray = rt_camera_get_ray(camera, u, v);
                 vec3_add(&pixel, ray_colour(&ray, world, CHILD_RAYS));
             }
-            rt_write_colour(stdout, pixel, SAMPLES_PER_PIXEL);
+            rt_write_colour(out_file, pixel, SAMPLES_PER_PIXEL);
         }
     }
     fprintf(stderr, "\nDone\n");
 
+cleanup:
     // Cleanup
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
