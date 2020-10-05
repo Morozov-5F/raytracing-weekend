@@ -17,6 +17,7 @@
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
 #include <string.h>
+#include <errno.h>
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
