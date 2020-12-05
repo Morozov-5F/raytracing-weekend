@@ -52,7 +52,6 @@ jobs:
       run: ./ray_tracing_one_week > $SAMPLE_FILE_NAME
 
     - name: Upload Samle Image
-      working-directory: ${{runner.workspace}}/build
       uses: actions/upload-artifact@v2
       with:
         name: sample_image.ppm
