@@ -95,3 +95,35 @@ bool rt_hittable_list_hit_test(const rt_hittable_list_t *list, const ray_t *ray,
 
     return hit_occurred;
 }
+
+bool rt_hittable_list_bb(const rt_hittable_list_t *list, double time0, double time1, rt_aabb_t *out_bb)
+{
+    assert(NULL != list);
+    assert(NULL != out_bb);
+
+    if (list->size == 0)
+    {
+        return false;
+    }
+
+    rt_aabb_t temp_box;
+    bool first_box = true;
+    for (size_t i = 0; i < list->size; ++i)
+    {
+        if (!rt_hittable_bb(list->hittables[i], time0, time1, &temp_box))
+        {
+            return false;
+        }
+
+        if (first_box)
+        {
+            *out_bb = temp_box;
+            first_box = false;
+            continue;
+        }
+
+        *out_bb = rt_aabb_surrounding_bb(*out_bb, temp_box);
+    }
+
+    return true;
+}
