@@ -8,7 +8,7 @@
 #include <assert.h>
 #include "rt_colour.h"
 
-#include "rtweekend.h"
+#include "rt_weekend.h"
 
 #define RT_MAKE_COLOUR_COMPONENT(c) (int)(256 * rt_clamp((c), 0.0, 0.999))
 

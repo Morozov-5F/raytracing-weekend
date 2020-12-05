@@ -5,8 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#ifndef RAY_TRACING_ONE_WEEK_RTWEEKEND_H
-#define RAY_TRACING_ONE_WEEK_RTWEEKEND_H
+#ifndef RAY_TRACING_ONE_WEEK_RT_WEEKEND_H
+#define RAY_TRACING_ONE_WEEK_RT_WEEKEND_H
 
 #include <stdlib.h>
 #include <limits.h>
@@ -35,4 +35,4 @@ static inline double rt_clamp(double x, double min, double max)
 #include "rt_vec3.h"
 #include "rt_ray.h"
 
-#endif //RAY_TRACING_ONE_WEEK_RTWEEKEND_H
+#endif//RAY_TRACING_ONE_WEEK_RT_WEEKEND_H

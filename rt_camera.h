@@ -9,7 +9,7 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_CAMERA_H
 #define RAY_TRACING_ONE_WEEK_RT_CAMERA_H
 
-#include "rtweekend.h"
+#include "rt_weekend.h"
 
 typedef struct rt_camera_s rt_camera_t;
 

@@ -8,9 +8,9 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_MATERIAL_DIFFUSE_H
 #define RAY_TRACING_ONE_WEEK_RT_MATERIAL_DIFFUSE_H
 
-#include <stdbool.h>
-#include "rt_colour.h"
+#include "../rt_colour.h"
 #include "rt_material.h"
+#include <stdbool.h>
 
 typedef struct rt_material_diffuse_s rt_material_diffuse_t;
 

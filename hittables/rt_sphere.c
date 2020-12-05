@@ -5,12 +5,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+#include "rt_sphere.h"
+#include "../materials/rt_material.h"
+#include "../rt_vec3.h"
+#include "rt_hittable_shared.h"
 #include <assert.h>
 #include <stdlib.h>
-#include "rt_sphere.h"
-#include "rt_vec3.h"
-#include "rt_hittable_shared.h"
-#include "rt_material.h"
 
 struct rt_sphere_s
 {

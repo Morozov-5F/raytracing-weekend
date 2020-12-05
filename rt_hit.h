@@ -8,8 +8,8 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_HIT_H
 #define RAY_TRACING_ONE_WEEK_RT_HIT_H
 
+#include "rt_weekend.h"
 #include <stdbool.h>
-#include "rtweekend.h"
 
 typedef struct rt_hit_record_s
 {

@@ -11,7 +11,7 @@
 
 #include <stdio.h>
 
-#include "rtweekend.h"
+#include "rt_weekend.h"
 
 // Colour layer for vec3_t
 typedef vec3_t colour_t;

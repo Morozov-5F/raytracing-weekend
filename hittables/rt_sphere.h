@@ -10,9 +10,9 @@
 
 #include <stdbool.h>
 
+#include "../materials/rt_material.h"
+#include "../rt_weekend.h"
 #include "rt_hittable.h"
-#include "rtweekend.h"
-#include "rt_material.h"
 
 typedef struct rt_sphere_s rt_sphere_t;
 

@@ -8,10 +8,10 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_HITTABLE_H
 #define RAY_TRACING_ONE_WEEK_RT_HITTABLE_H
 
+#include "../rt_weekend.h"
 #include <stdbool.h>
-#include "rtweekend.h"
 
-#include "rt_hit.h"
+#include "../rt_hit.h"
 
 typedef struct rt_hittable_s rt_hittable_t;
 

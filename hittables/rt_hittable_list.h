@@ -8,9 +8,9 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_HITTABLE_LIST_H
 #define RAY_TRACING_ONE_WEEK_RT_HITTABLE_LIST_H
 
-#include <stdlib.h>
-#include "rtweekend.h"
+#include "../rt_weekend.h"
 #include "rt_hittable.h"
+#include <stdlib.h>
 
 typedef struct rt_hittable_list_s rt_hittable_list_t;
 

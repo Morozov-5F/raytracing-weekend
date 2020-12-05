@@ -7,17 +7,17 @@
 
 #include <stdio.h>
 
-#include "rtweekend.h"
-#include "rt_sphere.h"
-#include "rt_hittable_list.h"
+#include "hittables/rt_hittable_list.h"
+#include "hittables/rt_sphere.h"
+#include "materials/rt_material.h"
+#include "materials/rt_material_dielectric.h"
+#include "materials/rt_material_diffuse.h"
+#include "materials/rt_material_metal.h"
 #include "rt_camera.h"
 #include "rt_colour.h"
-#include "rt_material.h"
-#include "rt_material_diffuse.h"
-#include "rt_material_metal.h"
-#include "rt_material_dielectric.h"
-#include <string.h>
+#include "rt_weekend.h"
 #include <errno.h>
+#include <string.h>
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
