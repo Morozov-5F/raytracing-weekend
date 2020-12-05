@@ -30,7 +30,9 @@ static inline vec3_t vec3(double x, double y, double z)
 }
 
 static inline vec3_t vec3_negate(const vec3_t *v)
-{ return vec3(-v->x, -v->y, -v->z); }
+{
+    return vec3(-v->x, -v->y, -v->z);
+}
 
 static inline void vec3_add(vec3_t *a, vec3_t b)
 {
@@ -54,31 +56,43 @@ static inline void vec3_scale_in_place(vec3_t *a, double scalar)
 }
 
 static inline double vec3_length_squared(vec3_t v)
-{ return v.x * v.x + v.y * v.y + v.z * v.z; }
+{
+    return v.x * v.x + v.y * v.y + v.z * v.z;
+}
 
 static inline double vec3_length(vec3_t v)
-{ return sqrt(vec3_length_squared(v)); }
+{
+    return sqrt(vec3_length_squared(v));
+}
 
 static inline vec3_t vec3_sum(vec3_t a, vec3_t b)
-{ return vec3(a.x + b.x, a.y + b.y, a.z + b.z); }
+{
+    return vec3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
 
 static inline vec3_t vec3_diff(vec3_t a, vec3_t b)
-{ return vec3(a.x - b.x, a.y - b.y, a.z - b.z); }
+{
+    return vec3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
 
 static inline vec3_t vec3_multiply(vec3_t a, vec3_t b)
-{ return vec3(a.x * b.x, a.y * b.y, a.z * b.z); }
+{
+    return vec3(a.x * b.x, a.y * b.y, a.z * b.z);
+}
 
 static inline vec3_t vec3_scale(vec3_t a, double s)
-{ return vec3(a.x * s, a.y * s, a.z * s); }
+{
+    return vec3(a.x * s, a.y * s, a.z * s);
+}
 
 static inline double vec3_dot(vec3_t a, vec3_t b)
-{ return a.x * b.x + a.y * b.y + a.z * b.z; }
+{
+    return a.x * b.x + a.y * b.y + a.z * b.z;
+}
 
 static inline vec3_t vec3_cross(vec3_t a, vec3_t b)
 {
-    return vec3(a.y * b.z - a.z * b.y,
-                a.z * b.x - a.x * b.z,
-                a.x * b.y - a.y * b.x);
+    return vec3(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
 }
 
 static inline vec3_t vec3_normalized(vec3_t a)
@@ -123,7 +137,7 @@ static inline vec3_t vec3_random_in_unit_sphere(void)
     return res;
 }
 
-static inline vec3_t vec3_random_in_hemisphere(const vec3_t* n)
+static inline vec3_t vec3_random_in_hemisphere(const vec3_t *n)
 {
     vec3_t in_unit_sphere = vec3_random_in_unit_sphere();
     if (vec3_dot(in_unit_sphere, *n) > 0)
@@ -162,4 +176,4 @@ static inline vec3_t vec3_refract(const vec3_t *vec, const vec3_t *n, double r)
 typedef vec3_t point3_t;
 #define point3(x, y, z) vec3((x), (y), (z))
 
-#endif //RAY_TRACING_ONE_WEEK_RT_VEC3_H
+#endif // RAY_TRACING_ONE_WEEK_RT_VEC3_H

@@ -39,10 +39,12 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
             return rt_mt_diffuse_scatter((rt_material_diffuse_t *)material, incoming_ray, hit_record, attenuation,
                                          scattered_ray);
         case RT_MATERIAL_TYPE_METAL:
-            return rt_mt_metal_scatter((rt_material_metal_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
+            return rt_mt_metal_scatter((rt_material_metal_t *)material, incoming_ray, hit_record, attenuation,
+                                       scattered_ray);
 
         case RT_MATERIAL_TYPE_DIELECTRIC:
-            return rt_mt_dielectric_scatter((rt_material_dielectric_t *)material, incoming_ray, hit_record, attenuation, scattered_ray);
+            return rt_mt_dielectric_scatter((rt_material_dielectric_t *)material, incoming_ray, hit_record, attenuation,
+                                            scattered_ray);
 
         default:
             assert(0);

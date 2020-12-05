@@ -63,12 +63,14 @@ static rt_hittable_list_t *random_scene(void)
                 {
                     colour_t albedo = vec3_multiply(vec3_random(0, 1), vec3_random(0, 1));
                     sphere_material = (rt_material_t *)rt_mt_diffuse_new(albedo);
-                } else if (material_chooser < 0.95)
+                }
+                else if (material_chooser < 0.95)
                 {
                     colour_t albedo = vec3_random(0.5, 1);
                     double fuzz = rt_random_double(0, 0.5);
                     sphere_material = (rt_material_t *)rt_mt_metal_new(albedo, fuzz);
-                } else
+                }
+                else
                 {
                     sphere_material = (rt_material_t *)rt_mt_dielectric_new(1.5);
                 }

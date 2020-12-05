@@ -21,4 +21,4 @@ struct rt_hittable_s
     rt_hittable_type_t type;
 };
 
-#endif //RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H
+#endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H

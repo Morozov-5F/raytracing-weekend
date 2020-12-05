@@ -20,6 +20,7 @@ void rt_hittable_list_add(rt_hittable_list_t *list, rt_hittable_t *hittable);
 void rt_hittable_list_clear(rt_hittable_list_t *list);
 void rt_hittable_list_deinit(rt_hittable_list_t *list);
 
-bool rt_hittable_list_hit_test(const rt_hittable_list_t *list, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record);
+bool rt_hittable_list_hit_test(const rt_hittable_list_t *list, const ray_t *ray, double t_min, double t_max,
+                               rt_hit_record_t *record);
 
-#endif //RAY_TRACING_ONE_WEEK_RT_HITTABLE_LIST_H
+#endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_LIST_H

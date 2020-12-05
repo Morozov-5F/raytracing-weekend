@@ -21,4 +21,4 @@ void rt_sphere_delete(rt_sphere_t *sphere);
 
 bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record);
 
-#endif //RAY_TRACING_ONE_WEEK_RT_SPHERE_H
+#endif // RAY_TRACING_ONE_WEEK_RT_SPHERE_H

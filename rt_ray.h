@@ -26,4 +26,4 @@ static inline point3_t ray_at(ray_t ray, double t)
     return vec3_sum(ray.origin, vec3_scale(ray.direction, t));
 }
 
-#endif //RAY_TRACING_ONE_WEEK_RT_RAY_H
+#endif // RAY_TRACING_ONE_WEEK_RT_RAY_H

@@ -21,4 +21,4 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
 
 void rt_material_delete(rt_material_t *material);
 
-#endif //RAY_TRACING_ONE_WEEK_RT_MATERIAL_H
+#endif // RAY_TRACING_ONE_WEEK_RT_MATERIAL_H

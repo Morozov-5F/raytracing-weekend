@@ -18,7 +18,7 @@
 #define PI (double)3.1415926535897932385
 #endif // M_PI
 
-#define RT_DEG_TO_RAD(deg) (((deg) * PI) / 180.0)
+#define RT_DEG_TO_RAD(deg) (((deg)*PI) / 180.0)
 
 static inline double rt_random_double(double min, double max)
 {
@@ -27,12 +27,14 @@ static inline double rt_random_double(double min, double max)
 
 static inline double rt_clamp(double x, double min, double max)
 {
-    if (x < min) return min;
-    if (x > max) return max;
+    if (x < min)
+        return min;
+    if (x > max)
+        return max;
     return x;
 }
 
 #include "rt_vec3.h"
 #include "rt_ray.h"
 
-#endif//RAY_TRACING_ONE_WEEK_RT_WEEKEND_H
+#endif // RAY_TRACING_ONE_WEEK_RT_WEEKEND_H

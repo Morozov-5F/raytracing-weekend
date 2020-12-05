@@ -9,7 +9,7 @@ include(CheckLibraryExists)
 CHECK_LIBRARY_EXISTS(m cos "" HAVE_LIB_M)
 if (HAVE_LIB_M)
     set(EXTRA_LIBS ${EXTRA_LIBS} m)
-endif()
+endif ()
 
 add_executable(ray_tracing_one_week hittables/rt_hittable.c hittables/rt_sphere.c hittables/rt_hittable_list.c main.c rt_camera.c rt_colour.c materials/rt_material.c rt_hit.c materials/rt_material_diffuse.c materials/rt_material_metal.c materials/rt_material_dielectric.c)
 target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:

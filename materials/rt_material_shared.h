@@ -18,7 +18,6 @@ typedef enum rt_material_type_e
     RT_MATERIAL_TYPE_DIELECTRIC = 3,
 } rt_material_type_t;
 
-
 struct rt_material_s
 {
     rt_material_type_t type;
@@ -27,4 +26,4 @@ struct rt_material_s
 
 void rt_material_base_init(rt_material_t *material_base, rt_material_type_t type);
 
-#endif //RAY_TRACING_ONE_WEEK_RT_MATERIAL_SHARED_H
+#endif // RAY_TRACING_ONE_WEEK_RT_MATERIAL_SHARED_H

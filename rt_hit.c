@@ -17,4 +17,3 @@ void rt_hit_record_set_front_face(rt_hit_record_t *record, const ray_t *ray, con
     record->front_face = vec3_dot(*outward_normal, ray->direction) < 0;
     record->normal = record->front_face ? *outward_normal : vec3_negate(outward_normal);
 }
-

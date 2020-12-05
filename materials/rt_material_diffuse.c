@@ -18,7 +18,7 @@ struct rt_material_diffuse_s
 
 rt_material_diffuse_t *rt_mt_diffuse_new(colour_t albedo)
 {
-    rt_material_diffuse_t * material = calloc(1, sizeof(rt_material_diffuse_t));
+    rt_material_diffuse_t *material = calloc(1, sizeof(rt_material_diffuse_t));
     assert(NULL != material);
 
     rt_material_base_init(&material->base, RT_MATERIAL_TYPE_DIFFUSE_LAMBERTIAN);
@@ -27,9 +27,8 @@ rt_material_diffuse_t *rt_mt_diffuse_new(colour_t albedo)
     return material;
 }
 
-bool
-rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,
-                      colour_t *attenuation, ray_t *scattered_ray)
+bool rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *incoming_ray,
+                           const rt_hit_record_t *hit_record, colour_t *attenuation, ray_t *scattered_ray)
 {
     assert(NULL != material);
     assert(NULL != incoming_ray);

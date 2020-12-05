@@ -26,10 +26,10 @@ rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *materi
     assert(NULL != material);
 
     rt_sphere_t result = {
-            .base.type = RT_HITTABLE_TYPE_SPHERE,
-            .radius = radius,
-            .center = center,
-            .material = material,
+        .base.type = RT_HITTABLE_TYPE_SPHERE,
+        .radius = radius,
+        .center = center,
+        .material = material,
     };
     rt_material_claim(material);
     return result;
