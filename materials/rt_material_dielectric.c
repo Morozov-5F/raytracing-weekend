@@ -52,11 +52,11 @@ bool rt_mt_dielectric_scatter(const rt_material_dielectric_t *material, const ra
     if (r * sin_theta > 1.0 || rt_random_double(0, 1) < schlick_approximation(cos_theta, r))
     {
         vec3_t reflected = vec3_reflect(&direction_unit, &hit_record->normal);
-        *scattered_ray = ray_init(hit_record->p, reflected);
+        *scattered_ray = ray_init(hit_record->p, reflected, 0);
         return true;
     }
     vec3_t refracted = vec3_refract(&direction_unit, &hit_record->normal, r);
-    *scattered_ray = ray_init(hit_record->p, refracted);
+    *scattered_ray = ray_init(hit_record->p, refracted, 0);
 
     return true;
 }

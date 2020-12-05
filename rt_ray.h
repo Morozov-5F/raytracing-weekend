@@ -12,11 +12,12 @@ typedef struct ray_s
 {
     point3_t origin;
     vec3_t direction;
+    double time;
 } ray_t;
 
-static inline ray_t ray_init(vec3_t origin, vec3_t direction)
+static inline ray_t ray_init(vec3_t origin, vec3_t direction, double time)
 {
-    ray_t result = {origin, direction};
+    ray_t result = {origin, direction, time};
     return result;
 }
 

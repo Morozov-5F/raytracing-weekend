@@ -109,7 +109,7 @@ int main(int argc, char const *argv[])
     vec3_t up = point3(0, 1, 0);
     double focus_distance = 10;
     double aperture = 0.1;
-    rt_camera_t *camera = rt_camera_new(look_from, look_at, up, 20, ASPECT_RATIO, aperture, focus_distance);
+    rt_camera_t *camera = rt_camera_new(look_from, look_at, up, 20, ASPECT_RATIO, aperture, focus_distance, 0, 0);
 
     // World
     rt_hittable_list_t *world = random_scene();
