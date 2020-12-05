@@ -5,6 +5,7 @@ on: [push]
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
+  SAMPLE_FILE_NAME: sample_image.ppm
 
 jobs:
   build:
@@ -44,3 +45,15 @@ jobs:
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C $BUILD_TYPE
+
+    - name: Render Sample Image
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: ./ray_tracing_one_week > $SAMPLE_FILE_NAME
+
+    - name: Upload Samle Image
+      working-directory: ${{runner.workspace}}/build
+      uses: actions/upload-artifact@v2
+      with:
+        name: sample_image.ppm
+        path: ${{runner.workspace}}/build/$SAMPLE_FILE_NAME
