@@ -37,4 +37,6 @@ int rt_hittable_box_cmp_y(const void *a, const void *b);
 
 int rt_hittable_box_cmp_z(const void *a, const void *b);
 
+void rt_get_sphere_uv(const point3_t *p, double *u, double *v);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H
