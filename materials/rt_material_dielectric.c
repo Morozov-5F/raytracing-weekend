@@ -56,7 +56,7 @@ bool rt_mt_dielectric_scatter(const rt_material_dielectric_t *material, const ra
         return true;
     }
     vec3_t refracted = vec3_refract(&direction_unit, &hit_record->normal, r);
-    *scattered_ray = ray_init(hit_record->p, refracted, 0);
+    *scattered_ray = ray_init(hit_record->p, refracted, incoming_ray->time);
 
     return true;
 }

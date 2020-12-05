@@ -39,7 +39,7 @@ bool rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *i
     (void)incoming_ray;
 
     vec3_t scatter_direction = vec3_sum(hit_record->normal, vec3_random_unit_vector());
-    *scattered_ray = ray_init(hit_record->p, scatter_direction, 0);
+    *scattered_ray = ray_init(hit_record->p, scatter_direction, incoming_ray->time);
     *attenuation = material->albedo;
 
     return true;

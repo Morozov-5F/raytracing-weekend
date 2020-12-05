@@ -44,7 +44,7 @@ bool rt_mt_metal_scatter(const rt_material_metal_t *material, const ray_t *incom
     {
         vec3_add(&reflected, vec3_scale(vec3_random_in_unit_sphere(), material->fuzziness));
     }
-    *scattered_ray = ray_init(hit_record->p, reflected, 0);
+    *scattered_ray = ray_init(hit_record->p, reflected, incoming_ray->time);
     *attenuation = material->albedo;
 
     return vec3_dot(scattered_ray->direction, hit_record->normal) > 0;
