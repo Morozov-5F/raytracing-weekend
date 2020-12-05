@@ -10,10 +10,17 @@
 #define INTERSECTION_FOR_COMPONENT(component, aabb, ray, t_min, t_max)                                                 \
     do                                                                                                                 \
     {                                                                                                                  \
-        double __t0_pre__ = ((aabb)->min.component - (ray)->origin.component) / (ray)->direction.component,            \
-               __t1_pre__ = ((aabb)->max.component - (ray)->origin.component) / (ray)->direction.component;            \
-        t_min = fmax(fmin(__t0_pre__, __t1_pre__), (t_min));                                                           \
-        t_max = fmin(fmax(__t0_pre__, __t1_pre__), (t_max));                                                           \
+        double inv_direction = 1.0 / (ray)->direction.component;                                                       \
+        double __t0__ = ((aabb)->min.component - (ray)->origin.component) * inv_direction,                             \
+               __t1__ = ((aabb)->max.component - (ray)->origin.component) * inv_direction;                             \
+        if (inv_direction < 0)                                                                                         \
+        {                                                                                                              \
+            double __buf__ = __t0__;                                                                                   \
+            __t0__ = __t1__;                                                                                           \
+            __t1__ = __buf__;                                                                                          \
+        }                                                                                                              \
+        t_min = __t0__ > t_min ? __t0__ : t_min;                                                                       \
+        t_max = __t1__ < t_max ? __t1__ : t_max;                                                                       \
         if ((t_max) <= (t_min))                                                                                        \
         {                                                                                                              \
             return false;                                                                                              \

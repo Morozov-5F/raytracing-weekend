@@ -8,8 +8,7 @@
 #define RAY_TRACING_ONE_WEEK_RT_AABB_H
 
 #include <stdbool.h>
-#include "rt_vec3.h"
-#include "rt_ray.h"
+#include "rt_weekend.h"
 
 typedef struct rt_aabb_s
 {
