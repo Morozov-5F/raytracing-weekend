@@ -14,6 +14,7 @@ typedef enum rt_hittable_type_e
 {
     RT_HITTABLE_TYPE_UNKNOWN = -1,
     RT_HITTABLE_TYPE_SPHERE = 0,
+    RT_HITTABLE_TYPE_MOVING_SPHERE = 1,
 } rt_hittable_type_t;
 
 struct rt_hittable_s

@@ -6,8 +6,6 @@
  */
 
 #include "rt_sphere.h"
-#include "../materials/rt_material.h"
-#include "../rt_vec3.h"
 #include "rt_hittable_shared.h"
 #include <assert.h>
 #include <stdlib.h>
@@ -21,7 +19,7 @@ struct rt_sphere_s
     rt_material_t *material;
 };
 
-rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
+static rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
 {
     assert(NULL != material);
 
@@ -38,12 +36,39 @@ rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *materi
 bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
 {
     assert(NULL != sphere);
+    return rt_sphere_hit_test_generic(sphere->center, sphere->radius, sphere->material, ray, t_min, t_max, record);
+}
+
+rt_sphere_t *rt_sphere_new(point3_t center, double radius, rt_material_t *material)
+{
+    rt_sphere_t *sphere = calloc(1, sizeof(rt_sphere_t));
+    assert(NULL != sphere);
+
+    *sphere = rt_sphere_init(center, radius, material);
+    return sphere;
+}
+
+void rt_sphere_delete(rt_sphere_t *sphere)
+{
+    if (NULL == sphere)
+    {
+        return;
+    }
+
+    rt_material_delete(sphere->material);
+
+    free(sphere);
+}
+
+bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *material, const ray_t *ray, double t_min,
+                                double t_max, rt_hit_record_t *record)
+{
     assert(NULL != ray);
 
-    vec3_t ac = vec3_diff(ray->origin, sphere->center);
+    vec3_t ac = vec3_diff(ray->origin, center);
     double a = vec3_length_squared(ray->direction);
     double half_b = vec3_dot(ray->direction, ac);
-    double c = vec3_length_squared(ac) - sphere->radius * sphere->radius;
+    double c = vec3_length_squared(ac) - radius * radius;
 
     double discriminant_4 = half_b * half_b - a * c;
     if (discriminant_4 < 0) // No intersection
@@ -66,26 +91,10 @@ bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, do
     {
         record->t = t;
         record->p = ray_at(*ray, t);
-        record->material = sphere->material;
-        vec3_t outward_normal = vec3_scale(vec3_diff(record->p, sphere->center), 1.0 / sphere->radius);
+        record->material = material;
+        vec3_t outward_normal = vec3_scale(vec3_diff(record->p, center), 1.0 / radius);
         rt_hit_record_set_front_face(record, ray, &outward_normal);
     }
 
     return true;
-}
-
-rt_sphere_t *rt_sphere_new(point3_t center, double radius, rt_material_t *material)
-{
-    rt_sphere_t *sphere = calloc(1, sizeof(rt_sphere_t));
-    assert(NULL != sphere);
-
-    *sphere = rt_sphere_init(center, radius, material);
-    return sphere;
-}
-
-void rt_sphere_delete(rt_sphere_t *sphere)
-{
-    rt_material_delete(sphere->material);
-
-    free(sphere);
 }
