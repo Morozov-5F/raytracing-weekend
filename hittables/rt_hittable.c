@@ -24,7 +24,7 @@ bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_m
         case RT_HITTABLE_TYPE_MOVING_SPHERE:
             return rt_moving_sphere_hit((const rt_moving_sphere_t *)hittable, ray, t_min, t_max, record);
         case RT_HITTABLE_TYPE_BVH_NODE:
-            return rt_bvh_node_hit((const rt_bvh_node_t*)hittable, ray, t_min, t_max, record);
+            return rt_bvh_node_hit((const rt_bvh_node_t *)hittable, ray, t_min, t_max, record);
         default:
             assert(0);
     }
@@ -39,9 +39,11 @@ void rt_hittable_delete(rt_hittable_t *hittable)
             rt_sphere_delete((rt_sphere_t *)hittable);
             break;
         case RT_HITTABLE_TYPE_MOVING_SPHERE:
-            rt_moving_sphere_delete((rt_moving_sphere_t*)hittable);
+            rt_moving_sphere_delete((rt_moving_sphere_t *)hittable);
+            break;
         case RT_HITTABLE_TYPE_BVH_NODE:
-            rt_bvh_node_delete((rt_bvh_node_t*)hittable);
+            rt_bvh_node_delete((rt_bvh_node_t *)hittable);
+            break;
         default:
             assert(0);
     }
@@ -52,11 +54,11 @@ bool rt_hittable_bb(const rt_hittable_t *hittable, double time0, double time1, r
     switch (hittable->type)
     {
         case RT_HITTABLE_TYPE_SPHERE:
-            return rt_sphere_bb((const rt_sphere_t*)hittable, time0, time1, out_bb);
+            return rt_sphere_bb((const rt_sphere_t *)hittable, time0, time1, out_bb);
         case RT_HITTABLE_TYPE_MOVING_SPHERE:
             return rt_moving_sphere_bb((const rt_moving_sphere_t *)hittable, time0, time1, out_bb);
         case RT_HITTABLE_TYPE_BVH_NODE:
-            return rt_bvh_node_bb((const rt_bvh_node_t*)hittable, time0, time1, out_bb);
+            return rt_bvh_node_bb((const rt_bvh_node_t *)hittable, time0, time1, out_bb);
         default:
             assert(0);
     }
@@ -69,16 +71,17 @@ int rt_hittable_box_cmp_x(const void *a, const void *b)
 
     rt_aabb_t box_a, box_b;
 
-    if (!rt_hittable_bb(a, 0, 0, &box_a) || !rt_hittable_bb(b, 0, 0, &box_b))
+    if (!rt_hittable_bb(*(const rt_hittable_t *const *)a, 0, 0, &box_a) ||
+        !rt_hittable_bb(*(const rt_hittable_t *const *)b, 0, 0, &box_b))
     {
         assert(0);
     }
 
-    if (box_a.min.x > box_a.min.x)
+    if (box_a.min.x > box_b.min.x)
     {
         return 1;
     }
-    else if (box_a.min.x < box_a.min.x)
+    else if (box_a.min.x < box_b.min.x)
     {
         return -1;
     }
@@ -91,16 +94,17 @@ int rt_hittable_box_cmp_y(const void *a, const void *b)
 
     rt_aabb_t box_a, box_b;
 
-    if (!rt_hittable_bb(a, 0, 0, &box_a) || !rt_hittable_bb(b, 0, 0, &box_b))
+    if (!rt_hittable_bb(*(const rt_hittable_t *const *)a, 0, 0, &box_a) ||
+        !rt_hittable_bb(*(const rt_hittable_t *const *)b, 0, 0, &box_b))
     {
         assert(0);
     }
 
-    if (box_a.min.y > box_a.min.y)
+    if (box_a.min.y > box_b.min.y)
     {
         return 1;
     }
-    else if (box_a.min.y < box_a.min.y)
+    else if (box_a.min.y < box_b.min.y)
     {
         return -1;
     }
@@ -113,16 +117,17 @@ int rt_hittable_box_cmp_z(const void *a, const void *b)
 
     rt_aabb_t box_a, box_b;
 
-    if (!rt_hittable_bb(a, 0, 0, &box_a) || !rt_hittable_bb(b, 0, 0, &box_b))
+    if (!rt_hittable_bb(*(const rt_hittable_t *const *)a, 0, 0, &box_a) ||
+        !rt_hittable_bb(*(const rt_hittable_t *const *)b, 0, 0, &box_b))
     {
         assert(0);
     }
 
-    if (box_a.min.z > box_a.min.z)
+    if (box_a.min.z > box_b.min.z)
     {
         return 1;
     }
-    else if (box_a.min.z < box_a.min.z)
+    else if (box_a.min.z < box_b.min.z)
     {
         return -1;
     }

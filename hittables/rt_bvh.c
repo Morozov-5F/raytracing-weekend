@@ -37,8 +37,11 @@ void rt_bvh_node_delete(rt_bvh_node_t *bvh_node)
         return;
     }
 
+    if (bvh_node->left != bvh_node->right)
+    {
+        rt_hittable_delete(bvh_node->right);
+    }
     rt_hittable_delete(bvh_node->left);
-    rt_hittable_delete(bvh_node->right);
 
     free(bvh_node);
 }
@@ -55,7 +58,7 @@ bool rt_bvh_node_hit(const rt_bvh_node_t *bvh_node, const ray_t *ray, double t_m
     }
 
     bool hit_left = rt_hittable_hit(bvh_node->left, ray, t_min, t_max, record);
-    bool hit_right = rt_hittable_hit(bvh_node->right, ray, t_min, t_max, record);
+    bool hit_right = rt_hittable_hit(bvh_node->right, ray, t_min, hit_left ? record->t : t_max, record);
 
     return hit_left || hit_right;
 }
@@ -96,7 +99,7 @@ static rt_bvh_node_t *bvh_make_node(rt_hittable_t **hittable_array, size_t start
     }
     else if (number_of_objects == 2)
     {
-        if (cmp(hittable_array[start], hittable_array[start + 1]) < 0)
+        if (cmp(hittable_array + start, hittable_array + start + 1) < 0)
         {
             result->left = hittable_array[start];
             result->right = hittable_array[start + 1];
@@ -109,19 +112,21 @@ static rt_bvh_node_t *bvh_make_node(rt_hittable_t **hittable_array, size_t start
     }
     else
     {
-        qsort(hittable_array, number_of_objects, sizeof(rt_hittable_t *), cmp);
+        qsort(hittable_array + start, number_of_objects, sizeof(rt_hittable_t *), cmp);
         size_t middle = start + number_of_objects / 2;
 
         result->left = (rt_hittable_t *)bvh_make_node(hittable_array, start, middle, time0, time1);
         result->right = (rt_hittable_t *)bvh_make_node(hittable_array, middle, end, time0, time1);
     }
 
-    rt_aabb_t box_left = { 0 }, box_right = { 0 };
-    if (!rt_hittable_bb(result->left, time0, time1, &box_left) || !rt_hittable_bb(result->right, time0, time1, &box_right))
+    rt_aabb_t box_left = {0}, box_right = {0};
+    if (!rt_hittable_bb(result->left, time0, time1, &box_left) ||
+        !rt_hittable_bb(result->right, time0, time1, &box_right))
     {
         assert(0);
     }
 
+    result->base.type = RT_HITTABLE_TYPE_BVH_NODE;
     result->time_start = time0;
     result->time_end = time1;
     result->box = rt_aabb_surrounding_bb(box_left, box_right);

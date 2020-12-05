@@ -104,8 +104,9 @@ bool rt_sphere_bb(const rt_sphere_t *sphere, double time0, double time1, rt_aabb
     assert(NULL != sphere);
     assert(NULL != out_bb);
 
-    out_bb->min = vec3_diff(sphere->center, vec3(sphere->radius, sphere->radius, sphere->radius));
-    out_bb->max = vec3_sum(sphere->center, vec3(sphere->radius, sphere->radius, sphere->radius));
+    vec3_t offset = vec3(sphere->radius, sphere->radius, sphere->radius);
+    out_bb->min = vec3_diff(sphere->center, offset);
+    out_bb->max = vec3_sum(sphere->center, offset);
 
     return true;
 }

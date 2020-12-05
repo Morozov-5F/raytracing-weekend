@@ -19,6 +19,7 @@
 #include <errno.h>
 #include <string.h>
 #include <rt_moving_sphere.h>
+#include <rt_bvh.h>
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -102,7 +103,14 @@ static rt_hittable_list_t *random_scene(void)
     rt_material_delete(material2);
     rt_material_delete(material3);
     rt_material_delete(ground_material);
-    return world;
+
+    // TODO: Deal with the world memory leaking later: add reference counting for all the hittables like I did with
+    //  materials.
+    rt_hittable_list_t *result = rt_hittable_list_init(1);
+    rt_bvh_node_t *node = rt_bvh_node_new(world, 0.0, 1.0);
+    rt_hittable_list_add(result, (rt_hittable_t *)node);
+
+    return result;
 }
 
 int main(int argc, char const *argv[])
@@ -111,7 +119,7 @@ int main(int argc, char const *argv[])
     const double ASPECT_RATIO = 3.0 / 2.0;
     const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 40;
+    const int SAMPLES_PER_PIXEL = 100;
     const int CHILD_RAYS = 50;
 
     // Camera parameters

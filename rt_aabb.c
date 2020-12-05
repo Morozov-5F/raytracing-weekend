@@ -56,9 +56,9 @@ rt_aabb_t rt_aabb_surrounding_bb(rt_aabb_t a, rt_aabb_t b)
             fmin(a.min.z, b.min.z),
         },
         .max = {
-            fmin(a.max.x, b.max.x),
-            fmin(a.max.y, b.max.y),
-            fmin(a.max.z, b.max.z),
+            fmax(a.max.x, b.max.x),
+            fmax(a.max.y, b.max.y),
+            fmax(a.max.z, b.max.z),
         }
     };
     return result;
