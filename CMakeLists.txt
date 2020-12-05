@@ -16,5 +16,5 @@ target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Cla
         -Wall -Wextra -Winline>
         $<$<CXX_COMPILER_ID:MSVC>:
         /WX /W4>)
-target_include_directories(ray_tracing_one_week PRIVATE materials hittables)
+target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables)
 target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS})

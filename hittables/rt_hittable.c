@@ -41,3 +41,17 @@ void rt_hittable_delete(rt_hittable_t *hittable)
             assert(0);
     }
 }
+
+bool rt_hittable_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb)
+{
+    switch (hittable->type)
+    {
+        case RT_HITTABLE_TYPE_SPHERE:
+            return rt_sphere_bb((const rt_sphere_t*)hittable, time0, time1, out_bb);
+        case RT_HITTABLE_TYPE_MOVING_SPHERE:
+            return rt_moving_sphere_bb((const rt_moving_sphere_t *)hittable, time0, time1, out_bb);
+        default:
+            assert(0);
+    }
+    return false;
+}

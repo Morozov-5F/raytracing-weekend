@@ -20,4 +20,6 @@ rt_aabb_t rt_aabb(point3_t a, point3_t b);
 
 bool rt_aabb_hit(const rt_aabb_t *aabb, double t_min, double t_max, const ray_t *ray);
 
+rt_aabb_t rt_aabb_surrounding_bb(rt_aabb_t a, rt_aabb_t b);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_AABB_H

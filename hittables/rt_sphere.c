@@ -98,3 +98,14 @@ bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *m
 
     return true;
 }
+
+bool rt_sphere_bb(const rt_sphere_t *sphere, double time0, double time1, rt_aabb_t *out_bb)
+{
+    assert(NULL != sphere);
+    assert(NULL != out_bb);
+
+    out_bb->min = vec3_diff(sphere->center, vec3(sphere->radius, sphere->radius, sphere->radius));
+    out_bb->max = vec3_sum(sphere->center, vec3(sphere->radius, sphere->radius, sphere->radius));
+
+    return true;
+}

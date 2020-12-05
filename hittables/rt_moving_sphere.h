@@ -19,4 +19,6 @@ void rt_moving_sphere_delete(rt_moving_sphere_t *moving_sphere);
 bool rt_moving_sphere_hit(const rt_moving_sphere_t *moving_sphere, const ray_t *ray, double t_min, double t_max,
                           rt_hit_record_t *record);
 
+bool rt_moving_sphere_bb(const rt_moving_sphere_t *moving_sphere, double time0, double time1, rt_aabb_t *out_bb);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_MOVING_SPHERE_H

@@ -9,6 +9,7 @@
 #define RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H
 
 #include <stdbool.h>
+#include "rt_hittable.h"
 
 typedef enum rt_hittable_type_e
 {

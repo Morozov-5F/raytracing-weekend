@@ -46,3 +46,20 @@ bool rt_aabb_hit(const rt_aabb_t *aabb, double t_min, double t_max, const ray_t 
 
     return true;
 }
+
+rt_aabb_t rt_aabb_surrounding_bb(rt_aabb_t a, rt_aabb_t b)
+{
+    rt_aabb_t result = {
+        .min = {
+            fmin(a.min.x, b.min.x),
+            fmin(a.min.y, b.min.y),
+            fmin(a.min.z, b.min.z),
+        },
+        .max = {
+            fmin(a.max.x, b.max.x),
+            fmin(a.max.y, b.max.y),
+            fmin(a.max.z, b.max.z),
+        }
+    };
+    return result;
+}

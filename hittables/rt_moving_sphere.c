@@ -76,6 +76,27 @@ bool rt_moving_sphere_hit(const rt_moving_sphere_t *moving_sphere, const ray_t *
                                       record);
 }
 
+bool rt_moving_sphere_bb(const rt_moving_sphere_t *moving_sphere, double time0, double time1, rt_aabb_t *out_bb)
+{
+    assert(NULL != moving_sphere);
+    assert(NULL != out_bb);
+
+    vec3_t offset = vec3(moving_sphere->radius, moving_sphere->radius, moving_sphere->radius);
+
+    rt_aabb_t a = {
+        .min = vec3_diff(get_center_at_time(moving_sphere, time0), offset),
+        .max = vec3_sum(get_center_at_time(moving_sphere, time0), offset),
+    };
+    rt_aabb_t b = {
+        .min = vec3_diff(get_center_at_time(moving_sphere, time1), offset),
+        .max = vec3_sum(get_center_at_time(moving_sphere, time1), offset),
+    };
+
+    *out_bb = rt_aabb_surrounding_bb(a, b);
+
+    return true;
+}
+
 static point3_t get_center_at_time(const rt_moving_sphere_t *moving_sphere, double time)
 {
     assert(NULL != moving_sphere);
