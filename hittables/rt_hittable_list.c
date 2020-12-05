@@ -127,3 +127,17 @@ bool rt_hittable_list_bb(const rt_hittable_list_t *list, double time0, double ti
 
     return true;
 }
+
+size_t rt_hittable_list_get_size(const rt_hittable_list_t *list)
+{
+    assert(NULL != list);
+
+    return list->size;
+}
+
+rt_hittable_t **rt_hittable_list_get_underlying_container(const rt_hittable_list_t *list)
+{
+    assert(NULL != list);
+
+    return list->hittables;
+}

@@ -25,4 +25,8 @@ bool rt_hittable_list_hit_test(const rt_hittable_list_t *list, const ray_t *ray,
 
 bool rt_hittable_list_bb(const rt_hittable_list_t *list, double time0, double time1, rt_aabb_t *out_bb);
 
+size_t rt_hittable_list_get_size(const rt_hittable_list_t *list);
+
+rt_hittable_t **rt_hittable_list_get_underlying_container(const rt_hittable_list_t *list);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_LIST_H

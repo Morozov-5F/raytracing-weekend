@@ -9,6 +9,7 @@
 #define RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H
 
 #include <stdbool.h>
+#include <rt_material.h>
 #include "rt_hittable.h"
 
 typedef enum rt_hittable_type_e
@@ -23,5 +24,17 @@ struct rt_hittable_s
 {
     rt_hittable_type_t type;
 };
+
+bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *material, const ray_t *ray, double t_min,
+                                double t_max, rt_hit_record_t *record);
+
+
+typedef int(*rt_hittable_compare_fn)(const void *a, const void *b);
+
+int rt_hittable_box_cmp_x(const void *a, const void *b);
+
+int rt_hittable_box_cmp_y(const void *a, const void *b);
+
+int rt_hittable_box_cmp_z(const void *a, const void *b);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_SHARED_H

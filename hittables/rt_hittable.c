@@ -62,3 +62,69 @@ bool rt_hittable_bb(const rt_hittable_t *hittable, double time0, double time1, r
     }
     return false;
 }
+
+int rt_hittable_box_cmp_x(const void *a, const void *b)
+{
+    assert(NULL != a && NULL != b);
+
+    rt_aabb_t box_a, box_b;
+
+    if (!rt_hittable_bb(a, 0, 0, &box_a) || !rt_hittable_bb(b, 0, 0, &box_b))
+    {
+        assert(0);
+    }
+
+    if (box_a.min.x > box_a.min.x)
+    {
+        return 1;
+    }
+    else if (box_a.min.x < box_a.min.x)
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int rt_hittable_box_cmp_y(const void *a, const void *b)
+{
+    assert(NULL != a && NULL != b);
+
+    rt_aabb_t box_a, box_b;
+
+    if (!rt_hittable_bb(a, 0, 0, &box_a) || !rt_hittable_bb(b, 0, 0, &box_b))
+    {
+        assert(0);
+    }
+
+    if (box_a.min.y > box_a.min.y)
+    {
+        return 1;
+    }
+    else if (box_a.min.y < box_a.min.y)
+    {
+        return -1;
+    }
+    return 0;
+}
+
+int rt_hittable_box_cmp_z(const void *a, const void *b)
+{
+    assert(NULL != a && NULL != b);
+
+    rt_aabb_t box_a, box_b;
+
+    if (!rt_hittable_bb(a, 0, 0, &box_a) || !rt_hittable_bb(b, 0, 0, &box_b))
+    {
+        assert(0);
+    }
+
+    if (box_a.min.z > box_a.min.z)
+    {
+        return 1;
+    }
+    else if (box_a.min.z < box_a.min.z)
+    {
+        return -1;
+    }
+    return 0;
+}
