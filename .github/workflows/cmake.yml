@@ -5,7 +5,7 @@ on: [push]
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-  SAMPLE_FILE_NAME: sample_image.ppm
+  
 
 jobs:
   build:
@@ -17,6 +17,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+
+    - name: Install ImageMagic
+      run: sudo apt install -y imagemagick
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
@@ -49,10 +52,15 @@ jobs:
     - name: Render Sample Image
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ./ray_tracing_one_week > $SAMPLE_FILE_NAME
+      run: ./ray_tracing_one_week > sample_image.ppm
+
+    - name: Convert Sample Image to PNG
+      working-directory: ${{runner.workspace}}/build
+      shell: bash
+      run: magick convert sample_image.ppm sample_image.png
 
     - name: Upload Samle Image
       uses: actions/upload-artifact@v2
       with:
         name: sample_image.ppm
-        path: ${{runner.workspace}}/build/$SAMPLE_FILE_NAME
+        path: ${{runner.workspace}}/build/sample_image.png
