@@ -19,6 +19,9 @@ typedef struct rt_hit_record_s
 
     double t;
 
+    double u;
+    double v;
+
     bool front_face;
 } rt_hit_record_t;
 
