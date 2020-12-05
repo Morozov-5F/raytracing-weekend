@@ -18,6 +18,7 @@
 #include "rt_weekend.h"
 #include <errno.h>
 #include <string.h>
+#include <rt_moving_sphere.h>
 
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
 {
@@ -58,23 +59,31 @@ static rt_hittable_list_t *random_scene(void)
 
             if (vec3_length(vec3_diff(center, point3(4, 0.2, 0))) > 0.9)
             {
+                rt_hittable_t *object_to_add = NULL;
                 rt_material_t *sphere_material = NULL;
                 if (material_chooser < 0.8)
                 {
                     colour_t albedo = vec3_multiply(vec3_random(0, 1), vec3_random(0, 1));
                     sphere_material = (rt_material_t *)rt_mt_diffuse_new(albedo);
+                    point3_t end_center = vec3_sum(center, vec3(0, rt_random_double(0, 0.5), 0));
+
+                    object_to_add = (rt_hittable_t *)rt_moving_sphere_new(center, end_center, 0.0, 1.0, 0.2, sphere_material);
                 }
                 else if (material_chooser < 0.95)
                 {
                     colour_t albedo = vec3_random(0.5, 1);
                     double fuzz = rt_random_double(0, 0.5);
                     sphere_material = (rt_material_t *)rt_mt_metal_new(albedo, fuzz);
+
+                    object_to_add = (rt_hittable_t *)rt_sphere_new(center, 0.2, sphere_material);
                 }
                 else
                 {
                     sphere_material = (rt_material_t *)rt_mt_dielectric_new(1.5);
+
+                    object_to_add = (rt_hittable_t *)rt_sphere_new(center, 0.2, sphere_material);
                 }
-                rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(center, 0.2, sphere_material));
+                rt_hittable_list_add(world, object_to_add);
                 rt_material_delete(sphere_material);
             }
         }
@@ -111,7 +120,7 @@ int main(int argc, char const *argv[])
     vec3_t up = point3(0, 1, 0);
     double focus_distance = 10;
     double aperture = 0.1;
-    rt_camera_t *camera = rt_camera_new(look_from, look_at, up, 20, ASPECT_RATIO, aperture, focus_distance, 0, 0);
+    rt_camera_t *camera = rt_camera_new(look_from, look_at, up, 20, ASPECT_RATIO, aperture, focus_distance, 0.0, 1.0);
 
     // World
     rt_hittable_list_t *world = random_scene();
