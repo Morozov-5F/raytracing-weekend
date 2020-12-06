@@ -11,7 +11,9 @@
 
 typedef struct rt_texture_sc_s rt_texture_sc_t;
 
-rt_texture_sc_t *rt_texture_sc_new(double red, double green, double blue);
+rt_texture_sc_t *rt_texture_sc_new(colour_t colour);
+
+rt_texture_sc_t *rt_texture_sc_new_with_components(double red, double green, double blue);
 
 colour_t rt_texture_sc_value(const rt_texture_sc_t *texture_sc, double u, double v, const vec3_t *p);
 

@@ -21,10 +21,7 @@ struct rt_material_diffuse_s
 
 rt_material_diffuse_t *rt_mt_diffuse_new_with_albedo(colour_t albedo)
 {
-    rt_texture_t *texture = (rt_texture_t *)rt_texture_sc_new(albedo.x, albedo.y, albedo.z);
-    rt_material_diffuse_t *result = rt_mt_diffuse_new_with_texture(texture);
-    rt_texture_delete(texture);
-    return result;
+    return rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_sc_new_with_components(albedo.x, albedo.y, albedo.z));
 }
 
 rt_material_diffuse_t *rt_mt_diffuse_new_with_texture(rt_texture_t *texture)
@@ -32,7 +29,7 @@ rt_material_diffuse_t *rt_mt_diffuse_new_with_texture(rt_texture_t *texture)
     rt_material_diffuse_t *material = calloc(1, sizeof(rt_material_diffuse_t));
     assert(NULL != material);
 
-    material->texture = rt_texture_claim(texture);
+    material->texture = texture;
     rt_material_base_init(&material->base, RT_MATERIAL_TYPE_DIFFUSE_LAMBERTIAN);
     return material;
 }
