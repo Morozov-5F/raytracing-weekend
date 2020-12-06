@@ -36,7 +36,7 @@ rt_moving_sphere_t rt_moving_sphere_init(point3_t center_start, point3_t center_
         .center_end = center_end,
         .time_start = time_start,
         .time_end = time_end,
-        .material = rt_material_claim(material),
+        .material = material,
     };
     rt_hittable_init(&result.base, RT_HITTABLE_TYPE_MOVING_SPHERE);
     return result;

@@ -88,7 +88,6 @@ static rt_hittable_list_t *random_scene(void)
                     object_to_add = (rt_hittable_t *)rt_sphere_new(center, 0.2, sphere_material);
                 }
                 rt_hittable_list_add(world, object_to_add);
-                rt_material_delete(sphere_material);
             }
         }
     }
@@ -101,11 +100,6 @@ static rt_hittable_list_t *random_scene(void)
 
     rt_material_t *material3 = (rt_material_t *)rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(4, 1, 0), 1.0, material3));
-
-    rt_material_delete(material1);
-    rt_material_delete(material2);
-    rt_material_delete(material3);
-    rt_material_delete(ground_material);
 
     // TODO: Deal with the world memory leaking later: add reference counting for all the hittables like I did with
     //  materials.
