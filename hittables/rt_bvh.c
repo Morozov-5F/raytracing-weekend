@@ -92,7 +92,7 @@ static rt_bvh_node_t *bvh_make_node(rt_hittable_t **hittable_array, size_t start
 
     if (number_of_objects == 1)
     {
-        result->left = result->right = hittable_array[start];
+        result->left = result->right = rt_hittable_claim(hittable_array[start]);
     }
     else if (number_of_objects == 2)
     {
