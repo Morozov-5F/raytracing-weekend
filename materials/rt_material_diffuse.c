@@ -19,14 +19,21 @@ struct rt_material_diffuse_s
     rt_texture_t *texture;
 };
 
-rt_material_diffuse_t *rt_mt_diffuse_new(colour_t albedo)
+rt_material_diffuse_t *rt_mt_diffuse_new_with_albedo(colour_t albedo)
+{
+    rt_texture_t *texture = (rt_texture_t *)rt_texture_sc_new(albedo.x, albedo.y, albedo.z);
+    rt_material_diffuse_t *result = rt_mt_diffuse_new_with_texture(texture);
+    rt_texture_delete(texture);
+    return result;
+}
+
+rt_material_diffuse_t *rt_mt_diffuse_new_with_texture(rt_texture_t *texture)
 {
     rt_material_diffuse_t *material = calloc(1, sizeof(rt_material_diffuse_t));
     assert(NULL != material);
 
+    material->texture = rt_texture_claim(texture);
     rt_material_base_init(&material->base, RT_MATERIAL_TYPE_DIFFUSE_LAMBERTIAN);
-    material->texture = (rt_texture_t *)rt_texture_sc_new(albedo.x, albedo.y, albedo.z);
-
     return material;
 }
 
@@ -50,6 +57,11 @@ bool rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *i
 
 void rt_mt_diffuse_delete(rt_material_diffuse_t *diffuse)
 {
-    free(diffuse->texture);
+    if (NULL == diffuse)
+    {
+        return;
+    }
+
+    rt_texture_delete(diffuse->texture);
     free(diffuse);
 }

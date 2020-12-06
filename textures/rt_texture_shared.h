@@ -18,6 +18,9 @@ typedef enum rt_texture_type_e
 struct rt_texture_s
 {
     rt_texture_type_t type;
+    int refcount;
 };
+
+void rt_texture_init(rt_texture_t *texture, rt_texture_type_t type);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_TEXTURE_SHARED_H

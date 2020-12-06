@@ -19,10 +19,12 @@ void rt_material_base_init(rt_material_t *material_base, rt_material_type_t type
     material_base->refcount = 1;
 }
 
-void rt_material_claim(rt_material_t *material)
+rt_material_t *rt_material_claim(rt_material_t *material)
 {
     assert(NULL != material);
     material->refcount++;
+
+    return material;
 }
 
 bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,

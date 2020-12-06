@@ -26,10 +26,9 @@ static rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t 
     rt_sphere_t result = {
         .radius = radius,
         .center = center,
-        .material = material,
+        .material = rt_material_claim(material),
     };
     rt_hittable_init(&result.base, RT_HITTABLE_TYPE_SPHERE);
-    rt_material_claim(material);
     return result;
 }
 

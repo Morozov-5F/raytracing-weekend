@@ -20,8 +20,8 @@ rt_texture_sc_t *rt_texture_sc_new(double red, double green, double blue)
     rt_texture_sc_t *result = calloc(1, sizeof(rt_texture_sc_t));
     assert(NULL != result);
 
-    result->base.type = RT_TEXTURE_TYPE_SOLID_COLOUR;
     result->colour = colour(red, green, blue);
+    rt_texture_init(&result->base, RT_TEXTURE_TYPE_SOLID_COLOUR);
 
     return result;
 }
@@ -29,7 +29,6 @@ rt_texture_sc_t *rt_texture_sc_new(double red, double green, double blue)
 colour_t rt_texture_sc_value(const rt_texture_sc_t *texture_sc, double u, double v, const vec3_t *p)
 {
     assert(NULL != texture_sc);
-    ;
     return texture_sc->colour;
 }
 
