@@ -31,7 +31,6 @@ rt_moving_sphere_t rt_moving_sphere_init(point3_t center_start, point3_t center_
     assert(NULL != material);
 
     rt_moving_sphere_t result = {
-        .base.type = RT_HITTABLE_TYPE_MOVING_SPHERE,
         .radius = radius,
         .center_start = center_start,
         .center_end = center_end,
@@ -39,6 +38,7 @@ rt_moving_sphere_t rt_moving_sphere_init(point3_t center_start, point3_t center_
         .time_end = time_end,
         .material = material,
     };
+    rt_hittable_init(&result.base, RT_HITTABLE_TYPE_MOVING_SPHERE);
     rt_material_claim(material);
     return result;
 }

@@ -110,6 +110,8 @@ static rt_hittable_list_t *random_scene(void)
     rt_bvh_node_t *node = rt_bvh_node_new(world, 0.0, 1.0);
     rt_hittable_list_add(result, (rt_hittable_t *)node);
 
+    rt_hittable_list_deinit(world);
+
     return result;
 }
 

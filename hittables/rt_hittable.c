@@ -31,8 +31,20 @@ bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_m
     return false;
 }
 
+rt_hittable_t *rt_hittable_claim(rt_hittable_t *hittable)
+{
+    hittable->refcount++;
+
+    return hittable;
+}
+
 void rt_hittable_delete(rt_hittable_t *hittable)
 {
+    if (--hittable->refcount > 0)
+    {
+        return;
+    }
+
     switch (hittable->type)
     {
         case RT_HITTABLE_TYPE_SPHERE:
@@ -132,4 +144,12 @@ int rt_hittable_box_cmp_z(const void *a, const void *b)
         return -1;
     }
     return 0;
+}
+
+void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type)
+{
+    assert(NULL != hittable);
+
+    hittable->refcount = 1;
+    hittable->type = type;
 }

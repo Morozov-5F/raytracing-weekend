@@ -16,9 +16,6 @@ struct rt_bvh_node_s
 
     rt_hittable_t *left;
     rt_hittable_t *right;
-
-    double time_start;
-    double time_end;
 };
 
 static rt_bvh_node_t *bvh_make_node(rt_hittable_t **hittable_array, size_t start, size_t end, double time0,
@@ -101,13 +98,13 @@ static rt_bvh_node_t *bvh_make_node(rt_hittable_t **hittable_array, size_t start
     {
         if (cmp(hittable_array + start, hittable_array + start + 1) < 0)
         {
-            result->left = hittable_array[start];
-            result->right = hittable_array[start + 1];
+            result->left = rt_hittable_claim(hittable_array[start]);
+            result->right = rt_hittable_claim(hittable_array[start + 1]);
         }
         else
         {
-            result->left = hittable_array[start + 1];
-            result->right = hittable_array[start];
+            result->left = rt_hittable_claim(hittable_array[start + 1]);
+            result->right = rt_hittable_claim(hittable_array[start]);
         }
     }
     else
@@ -126,10 +123,8 @@ static rt_bvh_node_t *bvh_make_node(rt_hittable_t **hittable_array, size_t start
         assert(0);
     }
 
-    result->base.type = RT_HITTABLE_TYPE_BVH_NODE;
-    result->time_start = time0;
-    result->time_end = time1;
     result->box = rt_aabb_surrounding_bb(box_left, box_right);
+    rt_hittable_init(&result->base, RT_HITTABLE_TYPE_BVH_NODE);
 
     return result;
 }

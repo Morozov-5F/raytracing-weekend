@@ -23,11 +23,14 @@ typedef enum rt_hittable_type_e
 struct rt_hittable_s
 {
     rt_hittable_type_t type;
+    int refcount;
 };
 
 bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *material, const ray_t *ray, double t_min,
                                 double t_max, rt_hit_record_t *record);
 
+
+void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type);
 
 typedef int(*rt_hittable_compare_fn)(const void *a, const void *b);
 
