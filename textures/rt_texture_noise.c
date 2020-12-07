@@ -36,6 +36,7 @@ colour_t rt_texture_noise_value(const rt_texture_noise_t *texture_noise, double 
 
     colour_t base = colour(1.0, 1.0, 1.0);
     return vec3_scale(base, rt_perlin_noise(texture_noise->perlin, *p));
+//    return vec3_scale(base, rt_perlin_blocky_noise(texture_noise->perlin, *p));
 }
 
 void rt_texture_noise_delete(rt_texture_noise_t *texture_noise)
