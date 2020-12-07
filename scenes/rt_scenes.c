@@ -100,3 +100,16 @@ rt_hittable_list_t *rt_scene_two_spheres(void)
 
     return objects;
 }
+
+rt_hittable_list_t *rt_scene_two_perlin_spheres(void)
+{
+    rt_material_t *checker = (rt_material_t *)rt_mt_diffuse_new_with_texture(
+        (rt_texture_t *)rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(2);
+
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, -1000, 0), 1000, checker));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 2, 0), 2, rt_material_claim(checker)));
+
+    return objects;
+}
