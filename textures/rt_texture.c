@@ -7,6 +7,7 @@
 #include "rt_texture.h"
 #include "rt_texture_solid_colour.h"
 #include "rt_texture_checker_pattern.h"
+#include "rt_texture_noise.h"
 #include <rt_texture_shared.h>
 #include <assert.h>
 
@@ -23,6 +24,10 @@ colour_t rt_texture_value(const rt_texture_t *texture, double u, double v, const
 
         case RT_TEXTURE_TYPE_CHECKER:
             result = rt_texture_cp_value((const rt_texture_cp_t *)texture, u, v, p);
+            break;
+
+        case RT_TEXTURE_TYPE_NOISE:
+            result = rt_texture_noise_value((const rt_texture_noise_t *)texture, u, v, p);
             break;
 
         default:
@@ -56,6 +61,10 @@ void rt_texture_delete(rt_texture_t *texture)
 
         case RT_TEXTURE_TYPE_CHECKER:
             rt_texture_cp_delete((rt_texture_cp_t *)texture);
+            break;
+
+        case RT_TEXTURE_TYPE_NOISE:
+            rt_texture_noise_delete((rt_texture_noise_t *)texture);
             break;
 
         default:
