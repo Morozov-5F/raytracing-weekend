@@ -11,7 +11,6 @@
 struct rt_perlin_s
 {
     int tile_size;
-    int cells_in_tile;
 
     double *randoms;
     int *x;
@@ -29,7 +28,6 @@ rt_perlin_t *rt_perlin_new(void)
     assert(NULL != result);
 
     result->tile_size = 255;
-    result->cells_in_tile = 4;
 
     result->x = generate_permutation(result->tile_size);
     result->y = generate_permutation(result->tile_size);

@@ -14,15 +14,18 @@ struct rt_texture_noise_s
 {
     rt_texture_t base;
     rt_perlin_t *perlin;
+
+    int intensity;
 };
 
-rt_texture_noise_t *rt_texture_noise_new(void)
+rt_texture_noise_t *rt_texture_noise_new(int intensity)
 {
-    rt_texture_noise_t * result = calloc(1, sizeof(rt_texture_noise_t));
+    rt_texture_noise_t *result = calloc(1, sizeof(rt_texture_noise_t));
     assert(NULL != result);
 
     result->perlin = rt_perlin_new();
     assert(NULL != result->perlin);
+    result->intensity = intensity;
 
     rt_texture_init(&result->base, RT_TEXTURE_TYPE_NOISE);
 
@@ -35,8 +38,8 @@ colour_t rt_texture_noise_value(const rt_texture_noise_t *texture_noise, double 
     assert(NULL != p);
 
     colour_t base = colour(1.0, 1.0, 1.0);
-    return vec3_scale(base, rt_perlin_noise(texture_noise->perlin, *p));
-//    return vec3_scale(base, rt_perlin_blocky_noise(texture_noise->perlin, *p));
+    return vec3_scale(base, rt_perlin_noise(texture_noise->perlin, vec3_scale(*p, texture_noise->intensity)));
+    //    return vec3_scale(base, rt_perlin_blocky_noise(texture_noise->perlin, *p));
 }
 
 void rt_texture_noise_delete(rt_texture_noise_t *texture_noise)

@@ -104,7 +104,7 @@ rt_hittable_list_t *rt_scene_two_spheres(void)
 
 rt_hittable_list_t *rt_scene_two_perlin_spheres(void)
 {
-    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_noise_new());
+    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_noise_new(4));
 
     rt_hittable_list_t *objects = rt_hittable_list_init(2);
 
