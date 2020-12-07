@@ -53,6 +53,10 @@ double rt_perlin_noise(const rt_perlin_t *perlin, point3_t point)
     double dy = point.y - floor(point.y);
     double dz = point.z - floor(point.z);
 
+    dx = dx * dx * (3 - 2 * dx);
+    dy = dy * dy * (3 - 2 * dy);
+    dz = dz * dz * (3 - 2 * dz);
+
     int i = (int)floor(point.x);
     int j = (int)floor(point.y);
     int k = (int)floor(point.z);
