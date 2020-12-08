@@ -38,7 +38,9 @@ colour_t rt_texture_noise_value(const rt_texture_noise_t *texture_noise, double 
     assert(NULL != p);
 
     colour_t base = colour(1.0, 1.0, 1.0);
-    return vec3_scale(base, rt_perlin_turbulence(texture_noise->perlin, vec3_scale(*p, texture_noise->intensity), 7));
+
+    double turbulence = rt_perlin_turbulence(texture_noise->perlin, *p, 7);
+    return vec3_scale(base, 0.5 * (1.0 + sin(texture_noise->intensity * p->z + 10 * turbulence)));
 }
 
 void rt_texture_noise_delete(rt_texture_noise_t *texture_noise)
