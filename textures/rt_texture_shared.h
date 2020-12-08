@@ -15,6 +15,7 @@ typedef enum rt_texture_type_e
     RT_TEXTURE_TYPE_SOLID_COLOUR,
     RT_TEXTURE_TYPE_CHECKER,
     RT_TEXTURE_TYPE_NOISE,
+    RT_TEXTURE_TYPE_IMAGE,
 } rt_texture_type_t;
 
 struct rt_texture_s
