@@ -24,7 +24,7 @@ if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
             -finline-funcitons>
             $<$<CXX_COMPILER_ID:MSVC>:
             /Ob>)
-endif()
+endif ()
 
-target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures)
+target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures deps)
 target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS})
