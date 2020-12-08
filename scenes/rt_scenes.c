@@ -21,6 +21,7 @@
 #include <rt_texture.h>
 #include <rt_texture_checker_pattern.h>
 #include <rt_texture_noise.h>
+#include <rt_texture_image.h>
 
 rt_hittable_list_t *rt_scene_random(void)
 {
@@ -110,6 +111,18 @@ rt_hittable_list_t *rt_scene_two_perlin_spheres(void)
 
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, -1000, 0), 1000, noisy));
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 2, 0), 2, rt_material_claim(noisy)));
+
+    return objects;
+}
+
+rt_hittable_list_t *rt_scene_earth(void)
+{
+    rt_material_t *earth_material = (rt_material_t *)rt_mt_diffuse_new_with_texture(
+        (rt_texture_t *)rt_texture_image_new("assets/textures/earth_projection.jpg"));
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(1);
+
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 0, 0), 2, earth_material));
 
     return objects;
 }

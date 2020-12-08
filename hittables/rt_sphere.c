@@ -94,7 +94,7 @@ bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *m
         vec3_t outward_normal = vec3_scale(vec3_diff(record->p, center), 1.0 / radius);
         rt_hit_record_set_front_face(record, ray, &outward_normal);
 
-        rt_get_sphere_uv(&record->p, &record->u, &record->v);
+        rt_get_sphere_uv(&outward_normal, &record->u, &record->v);
     }
 
     return true;
@@ -121,6 +121,6 @@ void rt_get_sphere_uv(const point3_t *p, double *u, double *v)
     double theta = acos(-p->y);
     double phi = atan2(-p->z, p->x) + PI;
 
-    *u = theta / PI;
-    *v = phi / (2 * PI);
+    *u = phi / (2 * PI);
+    *v = theta / PI;
 }

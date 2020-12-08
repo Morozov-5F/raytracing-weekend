@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_TWO_PERLIN_SPHERES;
+    rt_scene_id_t scene_id = RT_SCENE_EARTH;
 
     // Select a scene from a pre-defined one
     switch (scene_id)
@@ -83,6 +83,14 @@ int main(int argc, char const *argv[])
             vertical_fov = 20.0;
 
             world = rt_scene_two_perlin_spheres();
+            break;
+
+        case RT_SCENE_EARTH:
+            look_from = point3(13, 2, 3);
+            look_at = point3(0, 0, 0);
+            vertical_fov = 20.0;
+
+            world = rt_scene_earth();
             break;
     }
 
