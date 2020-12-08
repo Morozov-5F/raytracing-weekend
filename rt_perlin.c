@@ -78,6 +78,22 @@ double rt_perlin_blocky_noise(const rt_perlin_t *perlin, point3_t point)
     return 1.0;
 }
 
+double rt_perlin_turbulence(const rt_perlin_t *perlin, point3_t p, int depth)
+{
+    double accum = 0.0;
+    vec3_t temp_p = p;
+    double weight = 1.0;
+
+    for (int i = 0; i < depth; i++)
+    {
+        accum += weight * rt_perlin_noise(perlin, temp_p);
+        weight *= 0.5;
+        vec3_scale_in_place(&temp_p, 2);
+    }
+
+    return fabs(accum);
+}
+
 void rt_perlin_delete(rt_perlin_t *perlin)
 {
     if (NULL == perlin)
@@ -134,7 +150,7 @@ static double_t perlin_interpolation(vec3_t c[2][2][2], double u, double v, doub
             {
                 vec3_t weight = vec3(u - i, v - j, w - k);
                 accum += (i * uu + (1 - i) * (1 - uu)) * (j * vv + (1 - j) * (1 - vv)) * (k * ww + (1 - k) * (1 - ww)) *
-                        vec3_dot(c[i][j][k], weight);
+                         vec3_dot(c[i][j][k], weight);
             }
         }
     }

@@ -17,6 +17,8 @@ double rt_perlin_noise(const rt_perlin_t *perlin, point3_t point);
 
 double rt_perlin_blocky_noise(const rt_perlin_t *perlin, point3_t point);
 
+double rt_perlin_turbulence(const rt_perlin_t *perlin, point3_t p, int depth);
+
 void rt_perlin_delete(rt_perlin_t *perlin);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_PERLIN_H
