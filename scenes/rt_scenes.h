@@ -15,6 +15,7 @@ typedef enum rt_scene_id_s
     RT_SCENE_TWO_SPHERES,
     RT_SCENE_TWO_PERLIN_SPHERES,
     RT_SCENE_EARTH,
+    RT_SCENE_LIGHT_SAMPLE,
 } rt_scene_id_t;
 
 rt_hittable_list_t *rt_scene_random(void);
@@ -24,5 +25,7 @@ rt_hittable_list_t *rt_scene_two_spheres(void);
 rt_hittable_list_t *rt_scene_two_perlin_spheres(void);
 
 rt_hittable_list_t *rt_scene_earth(void);
+
+rt_hittable_list_t *rt_scene_light_sample(void);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_SCENES_H

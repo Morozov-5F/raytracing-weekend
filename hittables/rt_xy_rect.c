@@ -24,8 +24,8 @@ rt_xy_rect_t *rt_xy_rect_new(point3_t top_left, double width, double height, rt_
     result->x0 = top_left.x;
     result->y0 = top_left.y;
     result->k = top_left.z;
-    result->x1 = result->x1 + width;
-    result->y1 = result->y1 + height;
+    result->x1 = result->x0 + width;
+    result->y1 = result->y0 + height;
 
     rt_hittable_init(&result->base, RT_HITTABLE_TYPE_XY_RECT);
 

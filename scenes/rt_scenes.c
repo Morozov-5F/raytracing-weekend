@@ -12,6 +12,7 @@
 #include <rt_material_diffuse.h>
 #include <rt_material_metal.h>
 #include <rt_material_dielectric.h>
+#include <rt_material_diffuse_light.h>
 
 #include <rt_hittable.h>
 #include <rt_sphere.h>
@@ -22,6 +23,7 @@
 #include <rt_texture_checker_pattern.h>
 #include <rt_texture_noise.h>
 #include <rt_texture_image.h>
+#include <rt_xy_rect.h>
 
 rt_hittable_list_t *rt_scene_random(void)
 {
@@ -123,6 +125,21 @@ rt_hittable_list_t *rt_scene_earth(void)
     rt_hittable_list_t *objects = rt_hittable_list_init(1);
 
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 0, 0), 2, earth_material));
+
+    return objects;
+}
+
+rt_hittable_list_t *rt_scene_light_sample(void)
+{
+    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_noise_new(4));
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(3);
+
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, -1000, 0), 1000, noisy));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 2, 0), 2, rt_material_claim(noisy)));
+
+    rt_material_t *diffuse_light = (rt_material_t *)rt_mt_dl_new_with_albedo(colour(0.7, 0.8, 0.6), 4);
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_xy_rect_new(point3(3, 1, -2), 2, 2, diffuse_light));
 
     return objects;
 }

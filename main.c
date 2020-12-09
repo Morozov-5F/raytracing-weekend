@@ -46,8 +46,8 @@ int main(int argc, char const *argv[])
     const double ASPECT_RATIO = 3.0 / 2.0;
     const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 100;
-    const int CHILD_RAYS = 50;
+    const int SAMPLES_PER_PIXEL = 1000;
+    const int CHILD_RAYS = 100;
 
     // Declare Camera parameters
     point3_t look_from, look_at;
@@ -56,8 +56,8 @@ int main(int argc, char const *argv[])
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_TWO_PERLIN_SPHERES;
-    rt_skybox_t *skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
+    rt_scene_id_t scene_id = RT_SCENE_LIGHT_SAMPLE;
+    rt_skybox_t *skybox = NULL;
 
     // Select a scene from a pre-defined one
     switch (scene_id)
@@ -68,6 +68,7 @@ int main(int argc, char const *argv[])
             aperture = 0.1;
             vertical_fov = 20.0;
 
+            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_random();
             break;
 
@@ -76,6 +77,7 @@ int main(int argc, char const *argv[])
             look_at = point3(0, 0, 0);
             vertical_fov = 20.0;
 
+            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_two_spheres();
             break;
 
@@ -84,6 +86,7 @@ int main(int argc, char const *argv[])
             look_at = point3(0, 0, 0);
             vertical_fov = 20.0;
 
+            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_two_perlin_spheres();
             break;
 
@@ -92,7 +95,17 @@ int main(int argc, char const *argv[])
             look_at = point3(0, 0, 0);
             vertical_fov = 20.0;
 
+            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_earth();
+            break;
+
+        case RT_SCENE_LIGHT_SAMPLE:
+            look_from = point3(26, 3, 6);
+            look_at = point3(0, 2, 0);
+            vertical_fov = 20.0;
+
+            skybox = rt_skybox_new_background(colour(0, 0, 0));
+            world = rt_scene_light_sample();
             break;
     }
 

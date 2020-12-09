@@ -14,19 +14,21 @@ struct rt_material_dl_s
     rt_material_t base;
 
     rt_texture_t *texture;
+    double intensity;
 };
 
-rt_material_dl_t *rt_mt_dl_new_with_albedo(colour_t albedo)
+rt_material_dl_t *rt_mt_dl_new_with_albedo(colour_t albedo, double intensity)
 {
-    return rt_mt_dl_new_with_texture((rt_texture_t *)rt_texture_sc_new(albedo));
+    return rt_mt_dl_new_with_texture((rt_texture_t *)rt_texture_sc_new(albedo), intensity);
 }
 
-rt_material_dl_t *rt_mt_dl_new_with_texture(rt_texture_t *texture)
+rt_material_dl_t *rt_mt_dl_new_with_texture(rt_texture_t *texture, double intensity)
 {
     rt_material_dl_t *result = calloc(1, sizeof(rt_material_dl_t));
     assert(NULL != result);
 
     result->texture = texture;
+    result->intensity = intensity;
     rt_material_base_init(&result->base, RT_MATERIAL_TYPE_DIFFUSE_LIGHT);
 
     return result;
@@ -41,7 +43,7 @@ bool rt_mt_dl_scatter(const rt_material_dl_t *material, const ray_t *incoming_ra
 colour_t rt_mt_dl_emit(const rt_material_dl_t *material, double u, double v, const point3_t *p)
 {
     assert(NULL != material);
-    return rt_texture_value(material->texture, u, v, p);
+    return vec3_scale(rt_texture_value(material->texture, u, v, p), material->intensity);
 }
 
 void rt_mt_dl_delete(rt_material_dl_t *material)

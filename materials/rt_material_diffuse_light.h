@@ -14,8 +14,8 @@
 
 typedef struct rt_material_dl_s rt_material_dl_t;
 
-rt_material_dl_t *rt_mt_dl_new_with_albedo(colour_t albedo);
-rt_material_dl_t *rt_mt_dl_new_with_texture(rt_texture_t *texture);
+rt_material_dl_t *rt_mt_dl_new_with_albedo(colour_t albedo, double intensity);
+rt_material_dl_t *rt_mt_dl_new_with_texture(rt_texture_t *texture, double intensity);
 
 bool rt_mt_dl_scatter(const rt_material_dl_t *material, const ray_t *incoming_ray,
                            const rt_hit_record_t *hit_record, colour_t *attenuation, ray_t *scattered_ray);
