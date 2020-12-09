@@ -12,11 +12,12 @@
 #include "rt_camera.h"
 #include "rt_colour.h"
 #include "rt_weekend.h"
+#include "rt_skybox_simple.h"
 #include <errno.h>
 #include <string.h>
 #include <scenes/rt_scenes.h>
 
-static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int child_rays)
+static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, rt_skybox_t *skybox, int child_rays)
 {
     if (child_rays <= 0)
     {
@@ -24,19 +25,18 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, int
     }
 
     rt_hit_record_t record;
-    if (rt_hittable_list_hit_test(list, ray, 0.001, INFINITY, &record))
+    if (!rt_hittable_list_hit_test(list, ray, 0.001, INFINITY, &record))
     {
-        ray_t scattered;
-        colour_t attenuation;
-        if (rt_material_scatter(record.material, ray, &record, &attenuation, &scattered))
-        {
-            return vec3_multiply(attenuation, ray_colour(&scattered, list, child_rays - 1));
-        }
-        return colour(0, 0, 0);
+        return rt_skybox_value(skybox, ray);
     }
-    point3_t unit_direction = vec3_normalized(ray->direction);
-    double t = 0.5 * (unit_direction.y + 1.0);
-    return vec3_lerp(vec3(1, 1, 1), vec3(0.5, 0.7, 1), t);
+
+    ray_t scattered;
+    colour_t attenuation;
+    if (rt_material_scatter(record.material, ray, &record, &attenuation, &scattered))
+    {
+        return vec3_multiply(attenuation, ray_colour(&scattered, list, skybox, child_rays - 1));
+    }
+    return colour(0, 0, 0);
 }
 
 int main(int argc, char const *argv[])
@@ -50,12 +50,13 @@ int main(int argc, char const *argv[])
 
     // Declare Camera parameters
     point3_t look_from, look_at;
-    vec3_t up =  point3(0, 1, 0);
+    vec3_t up = point3(0, 1, 0);
     double focus_distance = 10.0, aperture = 0.0, vertical_fov = 40.0;
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_EARTH;
+    rt_scene_id_t scene_id = RT_SCENE_TWO_PERLIN_SPHERES;
+    rt_skybox_t *skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
 
     // Select a scene from a pre-defined one
     switch (scene_id)
@@ -122,7 +123,7 @@ int main(int argc, char const *argv[])
                 double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
 
                 ray_t ray = rt_camera_get_ray(camera, u, v);
-                vec3_add(&pixel, ray_colour(&ray, world, CHILD_RAYS));
+                vec3_add(&pixel, ray_colour(&ray, world, skybox, CHILD_RAYS));
             }
             rt_write_colour(out_file, pixel, SAMPLES_PER_PIXEL);
         }
@@ -132,6 +133,7 @@ cleanup:
     // Cleanup
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
+    rt_skybox_delete(skybox);
 
     return 0;
 }

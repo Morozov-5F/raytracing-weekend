@@ -11,7 +11,7 @@ if (HAVE_LIB_M)
     set(EXTRA_LIBS ${EXTRA_LIBS} m)
 endif ()
 
-add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.c
+add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.c rt_skybox_simple.c
                # Materials
                materials/rt_material.c rt_hit.c materials/rt_material_diffuse.c materials/rt_material_metal.c
                materials/rt_material_dielectric.c materials/rt_material_diffuse_light.c
