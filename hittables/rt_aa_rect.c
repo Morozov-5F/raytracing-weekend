@@ -19,8 +19,8 @@ struct rt_aa_rect_s
     vec3_t outward_normal;
 };
 
-rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, point3_t top_left, double width, double height,
-                             rt_material_t *material)
+rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double axis1_max, double axis2_min,
+                             double axis2_max, double k, rt_material_t *material)
 {
     rt_aa_rect_t *result = calloc(1, sizeof(rt_aa_rect_t));
     assert(NULL != result);
@@ -53,11 +53,11 @@ rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, point3_t top_left, double w
             assert(0);
     }
 
-    result->axis1_min = vec3_get_axis(&top_left, result->axis_1);
-    result->axis2_min = vec3_get_axis(&top_left, result->axis_2);
-    result->k = vec3_get_axis(&top_left, result->axis_k);
-    result->axis1_max = result->axis1_min + width;
-    result->axis2_max = result->axis2_min + height;
+    result->axis1_min = axis1_min;
+    result->axis2_min = axis2_min;
+    result->k = k;
+    result->axis1_max = axis1_max;
+    result->axis2_max = axis2_max;
 
     rt_hittable_init(&result->base, RT_HITTABLE_TYPE_AA_RECT);
 

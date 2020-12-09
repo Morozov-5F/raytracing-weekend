@@ -12,6 +12,7 @@
 #include "rt_moving_sphere.h"
 #include "rt_bvh.h"
 #include "rt_aa_rect.h"
+#include "rt_box.h"
 
 bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
                      rt_hit_record_t *record)
@@ -28,6 +29,8 @@ bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_m
             return rt_bvh_node_hit((const rt_bvh_node_t *)hittable, ray, t_min, t_max, record);
         case RT_HITTABLE_TYPE_AA_RECT:
             return rt_aa_rect_hit((const rt_aa_rect_t *)hittable, ray, t_min, t_max, record);
+        case RT_HITTABLE_TYPE_BOX:
+            return rt_box_hit((const rt_box_t *)hittable, ray, t_min, t_max, record);
         default:
             assert(0);
     }
@@ -58,8 +61,12 @@ void rt_hittable_delete(rt_hittable_t *hittable)
             break;
         case RT_HITTABLE_TYPE_BVH_NODE:
             rt_bvh_node_delete((rt_bvh_node_t *)hittable);
+            break;
         case RT_HITTABLE_TYPE_AA_RECT:
             rt_aa_rect_delete((rt_aa_rect_t *)hittable);
+            break;
+        case RT_HITTABLE_TYPE_BOX:
+            rt_box_delete((rt_box_t *)hittable);
             break;
         default:
             assert(0);
@@ -78,6 +85,8 @@ bool rt_hittable_bb(const rt_hittable_t *hittable, double time0, double time1, r
             return rt_bvh_node_bb((const rt_bvh_node_t *)hittable, time0, time1, out_bb);
         case RT_HITTABLE_TYPE_AA_RECT:
             return rt_aa_rect_bb((const rt_aa_rect_t *)hittable, time0, time1, out_bb);
+        case RT_HITTABLE_TYPE_BOX:
+            return rt_box_bb((const rt_box_t *)hittable, time0, time1, out_bb);
         default:
             assert(0);
     }

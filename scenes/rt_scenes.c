@@ -24,6 +24,7 @@
 #include <rt_texture_noise.h>
 #include <rt_texture_image.h>
 #include <rt_aa_rect.h>
+#include <rt_box.h>
 
 rt_hittable_list_t *rt_scene_random(void)
 {
@@ -139,29 +140,34 @@ rt_hittable_list_t *rt_scene_light_sample(void)
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 2, 0), 2, rt_material_claim(noisy)));
 
     rt_material_t *diffuse_light = (rt_material_t *)rt_mt_dl_new_with_albedo(colour(0.7, 0.8, 0.6), 4);
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xy(point3(3, 1, -2), 2, 2, diffuse_light));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xy(3, 5, 1, 3, -2, diffuse_light));
 
     return objects;
 }
 rt_hittable_list_t *rt_scene_cornell_box(void)
 {
-    rt_hittable_list_t *objects = rt_hittable_list_init(6);
+    rt_hittable_list_t *objects = rt_hittable_list_init(8);
 
     rt_material_t *red = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.65, 0.05, 0.05));
     rt_material_t *green = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.12, 0.45, 0.15));
     rt_material_t *white = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.73, 0.73, 0.73));
 
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_yz(point3(555, 0, 0), 555, 555, green));
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_yz(point3(0, 0, 0), 555, 555, red));
+    // Walls
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_yz(0, 555, 0, 555, 555, green));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_yz(0, 555, 0, 555, 0, red));
 
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(point3(0, 0, 0), 555, 555, white));
-    rt_hittable_list_add(objects,
-                         (rt_hittable_t *)rt_aa_rect_new_xz(point3(0, 555, 0), 555, 555, rt_material_claim(white)));
-    rt_hittable_list_add(objects,
-                         (rt_hittable_t *)rt_aa_rect_new_xy(point3(0, 0, 555), 555, 555, rt_material_claim(white)));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(0, 555, 0, 555, 0, white));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(0, 555, 0, 555, 555, rt_material_claim(white)));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xy(0, 555, 0, 555, 555, rt_material_claim(white)));
+    // Boxes
+    rt_hittable_list_add(
+        objects, (rt_hittable_t *)rt_box_new(point3(130, 0, 65), point3(295, 165, 230), rt_material_claim(white)));
+    rt_hittable_list_add(
+        objects, (rt_hittable_t *)rt_box_new(point3(265, 0, 295), point3(430, 330, 460), rt_material_claim(white)));
 
+    // Light source
     rt_material_t *diffuse_light = (rt_material_t *)rt_mt_dl_new_with_albedo(colour(1, 1, 1), 15);
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(point3(213, 554, 227), 130, 105, diffuse_light));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(213, 343, 227, 332, 554, diffuse_light));
 
     return objects;
 }

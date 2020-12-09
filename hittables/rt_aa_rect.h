@@ -20,21 +20,25 @@ typedef enum rt_aa_rect_type_e
 
 typedef struct rt_aa_rect_s rt_aa_rect_t;
 
-rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, point3_t top_left, double width, double height, rt_material_t *material);
+rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double axis1_max, double axis2_min,
+                             double axis2_max, double k, rt_material_t *material);
 
-static inline rt_aa_rect_t *rt_aa_rect_new_xy(point3_t top_left, double width, double height, rt_material_t *material)
+static inline rt_aa_rect_t *rt_aa_rect_new_xy(double x0, double x1, double y0, double y1, double k,
+                                              rt_material_t *material)
 {
-    return rt_aa_rect_new(RT_AA_RECT_TYPE_XY, top_left, width, height, material);
+    return rt_aa_rect_new(RT_AA_RECT_TYPE_XY, x0, x1, y0, y1, k, material);
 }
 
-static inline rt_aa_rect_t *rt_aa_rect_new_yz(point3_t top_left, double width, double height, rt_material_t *material)
+static inline rt_aa_rect_t *rt_aa_rect_new_yz(double y0, double y1, double z0, double z1, double k,
+                                              rt_material_t *material)
 {
-    return rt_aa_rect_new(RT_AA_RECT_TYPE_YZ, top_left, width, height, material);
+    return rt_aa_rect_new(RT_AA_RECT_TYPE_YZ, y0, y1, z0, z1, k, material);
 }
 
-static inline rt_aa_rect_t *rt_aa_rect_new_xz(point3_t top_left, double width, double height, rt_material_t *material)
+static inline rt_aa_rect_t *rt_aa_rect_new_xz(double x0, double x1, double z0, double z1, double k,
+                                              rt_material_t *material)
 {
-    return rt_aa_rect_new(RT_AA_RECT_TYPE_XZ, top_left, width, height, material);
+    return rt_aa_rect_new(RT_AA_RECT_TYPE_XZ, x0, x1, z0, z1, k, material);
 }
 
 void rt_aa_rect_delete(rt_aa_rect_t *rect);
