@@ -18,6 +18,7 @@ typedef enum rt_hittable_type_e
     RT_HITTABLE_TYPE_SPHERE = 0,
     RT_HITTABLE_TYPE_MOVING_SPHERE,
     RT_HITTABLE_TYPE_BVH_NODE,
+    RT_HITTABLE_TYPE_XY_RECT,
 } rt_hittable_type_t;
 
 struct rt_hittable_s
