@@ -32,11 +32,12 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, rt_
 
     ray_t scattered;
     colour_t attenuation;
+    colour_t emitted = rt_material_emit(record.material, record.u, record.v, &record.p);
     if (rt_material_scatter(record.material, ray, &record, &attenuation, &scattered))
     {
-        return vec3_multiply(attenuation, ray_colour(&scattered, list, skybox, child_rays - 1));
+        return vec3_sum(emitted, vec3_multiply(attenuation, ray_colour(&scattered, list, skybox, child_rays - 1)));
     }
-    return colour(0, 0, 0);
+    return emitted;
 }
 
 int main(int argc, char const *argv[])
