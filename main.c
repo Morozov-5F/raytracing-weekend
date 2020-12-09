@@ -43,8 +43,8 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, rt_
 int main(int argc, char const *argv[])
 {
     // Image parameters
-    const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 400;
+    const double ASPECT_RATIO = 3.0 / 3.0;
+    const int IMAGE_WIDTH = 300;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
     const int SAMPLES_PER_PIXEL = 100;
     const int CHILD_RAYS = 50;
@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_LIGHT_SAMPLE;
+    rt_scene_id_t scene_id = RT_SCENE_CORNELL_BOX;
     rt_skybox_t *skybox = NULL;
 
     // Select a scene from a pre-defined one
@@ -106,6 +106,15 @@ int main(int argc, char const *argv[])
 
             skybox = rt_skybox_new_background(colour(0, 0, 0));
             world = rt_scene_light_sample();
+            break;
+
+        case RT_SCENE_CORNELL_BOX:
+            look_from = point3(278, 278, -800);
+            look_at = point3(278, 278, 0);
+            vertical_fov = 40.0;
+
+            skybox = rt_skybox_new_background(colour(0, 0, 0));
+            world = rt_scene_cornell_box();
             break;
     }
 
