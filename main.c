@@ -46,8 +46,8 @@ int main(int argc, char const *argv[])
     const double ASPECT_RATIO = 3.0 / 2.0;
     const int IMAGE_WIDTH = 400;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 1000;
-    const int CHILD_RAYS = 100;
+    const int SAMPLES_PER_PIXEL = 100;
+    const int CHILD_RAYS = 50;
 
     // Declare Camera parameters
     point3_t look_from, look_at;

@@ -23,7 +23,7 @@
 #include <rt_texture_checker_pattern.h>
 #include <rt_texture_noise.h>
 #include <rt_texture_image.h>
-#include <rt_xy_rect.h>
+#include <rt_aa_rect.h>
 
 rt_hittable_list_t *rt_scene_random(void)
 {
@@ -139,7 +139,7 @@ rt_hittable_list_t *rt_scene_light_sample(void)
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(0, 2, 0), 2, rt_material_claim(noisy)));
 
     rt_material_t *diffuse_light = (rt_material_t *)rt_mt_dl_new_with_albedo(colour(0.7, 0.8, 0.6), 4);
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_xy_rect_new(point3(3, 1, -2), 2, 2, diffuse_light));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xy(point3(3, 1, -2), 2, 2, diffuse_light));
 
     return objects;
 }
