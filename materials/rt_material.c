@@ -11,6 +11,7 @@
 #include "rt_material_diffuse.h"
 #include "rt_material_metal.h"
 #include "rt_material_dielectric.h"
+#include "rt_material_diffuse_light.h"
 
 void rt_material_base_init(rt_material_t *material_base, rt_material_type_t type)
 {
@@ -48,11 +49,30 @@ bool rt_material_scatter(const rt_material_t *material, const ray_t *incoming_ra
             return rt_mt_dielectric_scatter((rt_material_dielectric_t *)material, incoming_ray, hit_record, attenuation,
                                             scattered_ray);
 
+        case RT_MATERIAL_TYPE_DIFFUSE_LIGHT:
+            return rt_mt_dl_scatter((rt_material_dl_t *)material, incoming_ray, hit_record, attenuation,
+                                    scattered_ray);
         default:
             assert(0);
     }
 
     return false;
+}
+
+colour_t rt_material_emit(const rt_material_t *material, double u, double v, const point3_t *p)
+{
+    assert(NULL != material);
+
+    switch (material->type)
+    {
+        case RT_MATERIAL_TYPE_DIFFUSE_LIGHT:
+            return rt_mt_dl_emit((rt_material_dl_t *)material, u, v, p);
+
+        default:
+            break;
+    }
+
+    return colour(0, 0, 0);
 }
 
 void rt_material_delete(rt_material_t *material)
@@ -72,6 +92,10 @@ void rt_material_delete(rt_material_t *material)
             break;
         case RT_MATERIAL_TYPE_DIELECTRIC:
             rt_mt_dielectric_delete((rt_material_dielectric_t *)material);
+            break;
+
+        case RT_MATERIAL_TYPE_DIFFUSE_LIGHT:
+            rt_mt_dl_delete((rt_material_dl_t *)material);
             break;
 
         default:

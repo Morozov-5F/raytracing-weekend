@@ -14,7 +14,7 @@ endif ()
 add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.c
                # Materials
                materials/rt_material.c rt_hit.c materials/rt_material_diffuse.c materials/rt_material_metal.c
-               materials/rt_material_dielectric.c
+               materials/rt_material_dielectric.c materials/rt_material_diffuse_light.c
                # Hittables
                hittables/rt_hittable.c hittables/rt_sphere.c hittables/rt_hittable_list.c main.c hittables/rt_moving_sphere.c
                hittables/rt_bvh.c
