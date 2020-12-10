@@ -36,5 +36,6 @@ static inline double rt_clamp(double x, double min, double max)
 
 #include "rt_vec3.h"
 #include "rt_ray.h"
+#include "rt_matrix3.h"
 
 #endif // RAY_TRACING_ONE_WEEK_RT_WEEKEND_H
