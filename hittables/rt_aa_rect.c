@@ -79,15 +79,15 @@ bool rt_aa_rect_hit(const rt_aa_rect_t *rect, const ray_t *ray, double t_min, do
     assert(NULL != rect);
     assert(NULL != ray);
 
-    double t = (rect->k - vec3_get_axis(&ray->origin, rect->axis_k)) / vec3_get_axis(&ray->direction, rect->axis_k);
+    double t = (rect->k - ray->origin.components[rect->axis_k]) / ray->origin.components[rect->axis_k];
     if (t >= t_max || t <= t_min)
     {
         return false;
     }
 
     point3_t hit = ray_at(*ray, t);
-    double hit_axis_1 = vec3_get_axis(&hit, rect->axis_1);
-    double hit_axis_2 = vec3_get_axis(&hit, rect->axis_2);
+    double hit_axis_1 = hit.components[rect->axis_1];
+    double hit_axis_2 = hit.components[rect->axis_2];
     if (hit_axis_1 < rect->axis1_min || hit_axis_1 > rect->axis1_max || hit_axis_2 < rect->axis2_min ||
         hit_axis_2 > rect->axis2_max)
     {
@@ -113,14 +113,14 @@ bool rt_aa_rect_bb(const rt_aa_rect_t *rect, double time0, double time1, rt_aabb
     assert(NULL != rect);
     assert(NULL != out_bb);
 
-    vec3_set_axis(&out_bb->min, rect->axis_1, rect->axis1_min);
-    vec3_set_axis(&out_bb->max, rect->axis_1, rect->axis1_max);
+    out_bb->min.components[rect->axis_1] = rect->axis1_min;
+    out_bb->max.components[rect->axis_1] = rect->axis1_max;
 
-    vec3_set_axis(&out_bb->min, rect->axis_2, rect->axis2_min);
-    vec3_set_axis(&out_bb->max, rect->axis_2, rect->axis2_max);
+    out_bb->min.components[rect->axis_2] = rect->axis2_min;
+    out_bb->max.components[rect->axis_2] = rect->axis2_max;
 
-    vec3_set_axis(&out_bb->min, rect->axis_k, rect->k - 0.0001);
-    vec3_set_axis(&out_bb->max, rect->axis_k, rect->k + 0.0001);
+    out_bb->min.components[rect->axis_k] = rect->k - 0.0001;
+    out_bb->max.components[rect->axis_k] = rect->k + 0.0001;
 
     return true;
 }

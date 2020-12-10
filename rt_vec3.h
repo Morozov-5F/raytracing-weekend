@@ -21,31 +21,22 @@ typedef enum vec3_axis_e
     VEC3_AXIS_Z = 2,
 } vec3_axis_t;
 
-struct vec3_s
+union vec3_u
 {
-    double x;
-    double y;
-    double z;
+    double components[3];
+    struct {
+        double x;
+        double y;
+        double z;
+    };
 };
 
-typedef struct vec3_s vec3_t;
+typedef union vec3_u vec3_t;
 
 static inline vec3_t vec3(double x, double y, double z)
 {
     vec3_t result = {.x = x, .y = y, .z = z};
     return result;
-}
-
-static inline double vec3_get_axis(const vec3_t *v, vec3_axis_t axis)
-{
-    const double *vec_as_array = (const double *)v;
-    return vec_as_array[axis];
-}
-
-static inline void vec3_set_axis(vec3_t *v, vec3_axis_t axis, double value)
-{
-    double *vec_as_array = (double *)v;
-    vec_as_array[axis] = value;
 }
 
 static inline vec3_t vec3_negate(const vec3_t *v)
