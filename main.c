@@ -46,7 +46,7 @@ int main(int argc, char const *argv[])
     const double ASPECT_RATIO = 3.0 / 3.0;
     const int IMAGE_WIDTH = 300;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 400;
+    const int SAMPLES_PER_PIXEL = 200;
     const int CHILD_RAYS = 50;
 
     // Declare Camera parameters
@@ -111,10 +111,19 @@ int main(int argc, char const *argv[])
         case RT_SCENE_CORNELL_BOX:
             look_from = point3(278, 278, -800);
             look_at = point3(278, 278, 0);
-            vertical_fov = 40.0;
 
             skybox = rt_skybox_new_background(colour(0, 0, 0));
+//            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_cornell_box();
+            break;
+
+        case RT_SCENE_INSTANCE_TEST:
+            look_from = point3(0, 5, -20);
+            look_at = point3(0, 0, 0);
+            vertical_fov = 20.0;
+
+            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
+            world = rt_scene_instance_test();
             break;
     }
 

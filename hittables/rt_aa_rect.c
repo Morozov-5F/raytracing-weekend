@@ -79,7 +79,7 @@ bool rt_aa_rect_hit(const rt_aa_rect_t *rect, const ray_t *ray, double t_min, do
     assert(NULL != rect);
     assert(NULL != ray);
 
-    double t = (rect->k - ray->origin.components[rect->axis_k]) / ray->origin.components[rect->axis_k];
+    double t = (rect->k - ray->origin.components[rect->axis_k]) / ray->direction.components[rect->axis_k];
     if (t >= t_max || t <= t_min)
     {
         return false;

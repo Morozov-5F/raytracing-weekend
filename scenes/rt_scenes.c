@@ -25,6 +25,7 @@
 #include <rt_texture_image.h>
 #include <rt_aa_rect.h>
 #include <rt_box.h>
+#include <rt_instance.h>
 
 rt_hittable_list_t *rt_scene_random(void)
 {
@@ -144,6 +145,7 @@ rt_hittable_list_t *rt_scene_light_sample(void)
 
     return objects;
 }
+
 rt_hittable_list_t *rt_scene_cornell_box(void)
 {
     rt_hittable_list_t *objects = rt_hittable_list_init(8);
@@ -160,14 +162,50 @@ rt_hittable_list_t *rt_scene_cornell_box(void)
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(0, 555, 0, 555, 555, rt_material_claim(white)));
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xy(0, 555, 0, 555, 555, rt_material_claim(white)));
     // Boxes
-    rt_hittable_list_add(
-        objects, (rt_hittable_t *)rt_box_new(point3(130, 0, 65), point3(295, 165, 230), rt_material_claim(white)));
-    rt_hittable_list_add(
-        objects, (rt_hittable_t *)rt_box_new(point3(265, 0, 295), point3(430, 330, 460), rt_material_claim(white)));
+    rt_instance_t *box1 =
+        rt_instance_new((rt_hittable_t *)rt_box_new(point3(0, 0, 0), point3(165, 330, 165), rt_material_claim(white)));
+    rt_instance_rotate_y(box1, 15);
+    rt_instance_translate(box1, vec3(265, 0, 295));
+    rt_hittable_list_add(objects, (rt_hittable_t *)box1);
+
+    rt_instance_t *box2 =
+        rt_instance_new((rt_hittable_t *)rt_box_new(point3(0, 0, 0), point3(165, 165, 165), rt_material_claim(white)));
+    rt_instance_rotate_y(box2, -18);
+    rt_instance_translate(box2, vec3(130, 0, 65));
+    rt_hittable_list_add(objects, (rt_hittable_t *)box2);
 
     // Light source
     rt_material_t *diffuse_light = (rt_material_t *)rt_mt_dl_new_with_albedo(colour(1, 1, 1), 15);
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(213, 343, 227, 332, 554, diffuse_light));
 
-    return objects;
+    rt_bvh_node_t *bvh = rt_bvh_node_new(objects, 0, 1);
+    rt_hittable_list_t *result = rt_hittable_list_init(1);
+    rt_hittable_list_add(result, (rt_hittable_t *)bvh);
+
+    rt_hittable_list_deinit(objects);
+
+    return result;
+}
+
+rt_hittable_list_t *rt_scene_instance_test(void)
+{
+    rt_material_t *green = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.12, 0.45, 0.15));
+    rt_material_t *red = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.65, 0.05, 0.05));
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(2);
+
+    rt_box_t *box = rt_box_new(point3(-1, -1, -1), point3(1, 1, 1), green);
+    rt_instance_t *instance = rt_instance_new((rt_hittable_t *)box);
+    rt_instance_rotate_y(instance, 0);
+    rt_instance_translate(instance, point3(1, 0, 0));
+
+    rt_hittable_list_add(objects, (rt_hittable_t *)instance);
+    rt_hittable_list_add(objects,
+                         (rt_hittable_t *)rt_box_new(point3(-0.25, -0.25, -0.25), point3(0.25, 0.25, 0.25), red));
+
+    rt_bvh_node_t *bvh = rt_bvh_node_new(objects, 0, 1);
+    rt_hittable_list_t *result = rt_hittable_list_init(1);
+    rt_hittable_list_add(result, (rt_hittable_t *)bvh);
+
+    return result;
 }
