@@ -15,10 +15,10 @@ struct rt_texture_noise_s
     rt_texture_t base;
     rt_perlin_t *perlin;
 
-    int intensity;
+    double intensity;
 };
 
-rt_texture_noise_t *rt_texture_noise_new(int intensity)
+rt_texture_noise_t *rt_texture_noise_new(double intensity)
 {
     rt_texture_noise_t *result = calloc(1, sizeof(rt_texture_noise_t));
     assert(NULL != result);

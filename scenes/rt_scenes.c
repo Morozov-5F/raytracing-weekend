@@ -84,8 +84,6 @@ rt_hittable_list_t *rt_scene_random(void)
     rt_material_t *material3 = (rt_material_t *)rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(4, 1, 0), 1.0, material3));
 
-    // TODO: Deal with the world memory leaking later: add reference counting for all the hittables like I did with
-    //  materials.
     rt_hittable_list_t *result = rt_hittable_list_init(1);
     rt_bvh_node_t *node = rt_bvh_node_new(world, 0.0, 1.0);
     rt_hittable_list_add(result, (rt_hittable_t *)node);
@@ -231,7 +229,8 @@ rt_hittable_list_t *rt_scene_cornell_box_smoke_boxes(void)
         rt_instance_new((rt_hittable_t *)rt_box_new(point3(0, 0, 0), point3(165, 330, 165), rt_material_claim(white)));
     rt_instance_rotate_y(box1, 15);
     rt_instance_translate(box1, vec3(265, 0, 295));
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_const_medium_new_with_colour((rt_hittable_t *)box1, 0.01, colour(0.0, 0.0, 0.0)));
+    rt_hittable_list_add(
+        objects, (rt_hittable_t *)rt_const_medium_new_with_colour((rt_hittable_t *)box1, 0.01, colour(0.0, 0.0, 0.0)));
 
     rt_instance_t *box2 =
         rt_instance_new((rt_hittable_t *)rt_box_new(point3(0, 0, 0), point3(165, 165, 165), rt_material_claim(white)));
@@ -246,10 +245,101 @@ rt_hittable_list_t *rt_scene_cornell_box_smoke_boxes(void)
 
     rt_bvh_node_t *bvh = rt_bvh_node_new(objects, 0, 1);
     rt_hittable_list_t *result = rt_hittable_list_init(1);
-    rt_hittable_list_add(
-        result, (rt_hittable_t *)bvh);
+    rt_hittable_list_add(result, (rt_hittable_t *)bvh);
 
     rt_hittable_list_deinit(objects);
 
     return result;
+}
+
+rt_hittable_list_t *rt_scene_showcase(void)
+{
+    const int BOXES_PER_SIDE = 20;
+
+    // Add ground boxes
+    rt_hittable_list_t *ground_boxes = rt_hittable_list_init(BOXES_PER_SIDE * BOXES_PER_SIDE);
+    rt_material_t *ground = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.48, 0.83, 0.53));
+
+    for (int i = 0; i < BOXES_PER_SIDE; ++i)
+    {
+        for (int j = 0; j < BOXES_PER_SIDE; ++j)
+        {
+            double w = 100.0;
+            double x0 = -1000.0 + i * w;
+            double z0 = -1000.0 + j * w;
+            double y0 = 0.0;
+            double x1 = x0 + w;
+            double y1 = rt_random_double(1, 101);
+            double z1 = z0 + w;
+
+            rt_hittable_list_add(ground_boxes, (rt_hittable_t *)rt_box_new(point3(x0, y0, z0), point3(x1, y1, z1),
+                                                                           rt_material_claim(ground)));
+        }
+    }
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(20);
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_bvh_node_new(ground_boxes, 0, 1));
+
+    // Add a light source
+    rt_material_t *light = (rt_material_t *)rt_mt_dl_new_with_albedo(colour(1, 1, 1), 7);
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_aa_rect_new_xz(123, 423, 147, 412, 554, light));
+
+    // Add a moving sphere
+    point3_t center1 = point3(400, 400, 200);
+    point3_t center2 = vec3_sum(center1, vec3(30, 0, 0));
+
+    rt_material_t *moving_sphere_material = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(0.7, 0.3, 0.1));
+    rt_hittable_list_add(objects,
+                         (rt_hittable_t *)rt_moving_sphere_new(center1, center2, 0, 1, 50, moving_sphere_material));
+
+    // Add glass sphere
+    rt_hittable_list_add(
+        objects, (rt_hittable_t *)rt_sphere_new(point3(260, 150, 45), 50, (rt_material_t *)rt_mt_dielectric_new(1.5)));
+
+    // Add metal sphere
+    rt_sphere_t *metal_sphere =
+        rt_sphere_new(point3(0, 150, 145), 50, (rt_material_t *)rt_mt_metal_new(colour(0.8, 0.8, 0.9), 1.0));
+    rt_hittable_list_add(objects, (rt_hittable_t *)metal_sphere);
+
+    // Sphere with glossy surface and fog inside
+    rt_sphere_t *boundary = rt_sphere_new(point3(360, 150, 145), 70, (rt_material_t *)rt_mt_dielectric_new(1.5));
+    rt_hittable_list_add(objects, (rt_hittable_t *)boundary);
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_const_medium_new_with_colour((rt_hittable_t *)boundary, 0.2,
+                                                                                   colour(0.2, 0.4, 0.9)));
+
+    // Global fog and distortion
+    boundary = rt_sphere_new(point3(0, 0, 0), 5000, (rt_material_t *)rt_mt_dielectric_new(1.5));
+    rt_hittable_list_add(
+        objects, (rt_hittable_t *)rt_const_medium_new_with_colour((rt_hittable_t *)boundary, 0.0001, colour(1, 1, 1)));
+
+    // Add Earth
+    rt_material_t *earth = (rt_material_t *)rt_mt_diffuse_new_with_texture(
+        (rt_texture_t *)rt_texture_image_new("assets/textures/earth_projection.jpg"));
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(400, 200, 400), 100, earth));
+
+    // Add Perlin noise texture
+    rt_texture_t *perlin = (rt_texture_t *)rt_texture_noise_new(0.1);
+    rt_hittable_list_add(objects,
+                         (rt_hittable_t *)rt_sphere_new(point3(220, 280, 300), 80,
+                                                        (rt_material_t *)rt_mt_diffuse_new_with_texture(perlin)));
+
+    const int NUMBER_OF_SPHERES = 1000;
+    rt_hittable_list_t *spheres = rt_hittable_list_init(NUMBER_OF_SPHERES);
+    rt_material_t *white = (rt_material_t *)rt_mt_diffuse_new_with_albedo(colour(.73, .73, .73));
+
+    for (int i = 0; i < NUMBER_OF_SPHERES; ++i)
+    {
+        rt_hittable_list_add(spheres, (rt_hittable_t *)rt_sphere_new(vec3_random(0, 165), 10, white));
+    }
+
+    rt_instance_t *spheres_instance = rt_instance_new((rt_hittable_t *)rt_bvh_node_new(spheres, 0, 1));
+    rt_instance_rotate_y(spheres_instance, 15);
+    rt_instance_translate(spheres_instance, point3(-100, 270, 395));
+    rt_hittable_list_add(objects, (rt_hittable_t *)spheres_instance);
+
+    rt_material_delete(ground);
+    rt_hittable_list_deinit(ground_boxes);
+    rt_hittable_list_deinit(spheres);
+
+    return objects;
 }

@@ -39,6 +39,8 @@ bool rt_mt_metal_scatter(const rt_material_metal_t *material, const ray_t *incom
     assert(NULL != attenuation);
     assert(NULL != scattered_ray);
 
+    bool debug = rt_random_double(0, 1) < 0.0001;
+
     vec3_t reflected = vec3_reflect(&incoming_ray->direction, &hit_record->normal);
     if (material->fuzziness > 0)
     {

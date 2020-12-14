@@ -11,7 +11,7 @@
 
 typedef struct rt_texture_noise_s rt_texture_noise_t;
 
-rt_texture_noise_t *rt_texture_noise_new(int intensity);
+rt_texture_noise_t *rt_texture_noise_new(double intensity);
 
 colour_t rt_texture_noise_value(const rt_texture_noise_t *texture_noise, double u, double v, const vec3_t *p);
 

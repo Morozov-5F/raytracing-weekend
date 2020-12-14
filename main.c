@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_CORNELL_SMOKE;
+    rt_scene_id_t scene_id = RT_SCENE_SHOWCASE;
     rt_skybox_t *skybox = NULL;
 
     // Select a scene from a pre-defined one
@@ -131,6 +131,14 @@ int main(int argc, char const *argv[])
 
             skybox = rt_skybox_new_background(colour(0, 0, 0));
             world = rt_scene_cornell_box_smoke_boxes();
+            break;
+
+        case RT_SCENE_SHOWCASE:
+            look_from = point3(478, 278, -600);
+            look_at = point3(278, 278, 0);
+
+            skybox = rt_skybox_new_background(colour(0, 0, 0));
+            world = rt_scene_showcase();
             break;
     }
 
