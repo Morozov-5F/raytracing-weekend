@@ -59,8 +59,11 @@ bool rt_const_medium_hit(const rt_const_medium_t *medium, const ray_t *ray, doub
 
     rt_hit_record_t hit1, hit2;
 
-    if (!rt_hittable_hit(medium->boundary, ray, -INFINITY, INFINITY, &hit1) ||
-        !rt_hittable_hit(medium->boundary, ray, hit1.t + 0.0001, INFINITY, &hit2))
+    if (!rt_hittable_hit(medium->boundary, ray, -INFINITY, INFINITY, &hit1))
+    {
+        return false;
+    }
+    if (!rt_hittable_hit(medium->boundary, ray, hit1.t + 0.0001, INFINITY, &hit2))
     {
         return false;
     }
@@ -85,7 +88,7 @@ bool rt_const_medium_hit(const rt_const_medium_t *medium, const ray_t *ray, doub
     }
 
     double ray_length = vec3_length(ray->direction);
-    double dist_inside_bound = (hit2.t - hit1.t) / ray_length;
+    double dist_inside_bound = (hit2.t - hit1.t) * ray_length;
     double hit_distance = medium->inv_neg_density * log(rt_random_double(0.0, 1.0));
 
     if (hit_distance > dist_inside_bound)
