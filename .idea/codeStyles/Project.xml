@@ -8,8 +8,8 @@
     </Objective-C>
     <Objective-C-extensions>
       <extensions>
-        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
         <pair source="c" header="h" fileNamingConvention="SNAKE_CASE" />
+        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
         <pair source="cu" header="cuh" fileNamingConvention="NONE" />
       </extensions>
       <rules>
