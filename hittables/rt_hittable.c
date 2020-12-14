@@ -14,6 +14,7 @@
 #include "rt_aa_rect.h"
 #include "rt_box.h"
 #include "rt_instance.h"
+#include "rt_const_medium.h"
 
 bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
                      rt_hit_record_t *record)
@@ -34,6 +35,8 @@ bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_m
             return rt_box_hit((const rt_box_t *)hittable, ray, t_min, t_max, record);
         case RT_HITTABLE_TYPE_INSTANCE:
             return rt_instance_hit((const rt_instance_t *)hittable, ray, t_min, t_max, record);
+        case RT_HITTABLE_CONSTANT_MEDIUM:
+            return rt_const_medium_hit((const rt_const_medium_t *)hittable, ray, t_min, t_max, record);
         default:
             assert(0);
     }
@@ -74,6 +77,9 @@ void rt_hittable_delete(rt_hittable_t *hittable)
         case RT_HITTABLE_TYPE_INSTANCE:
             rt_instance_delete((rt_instance_t *)hittable);
             break;
+        case RT_HITTABLE_CONSTANT_MEDIUM:
+            rt_const_medium_delete((rt_const_medium_t *)hittable);
+            break;
         default:
             assert(0);
     }
@@ -95,6 +101,8 @@ bool rt_hittable_bb(const rt_hittable_t *hittable, double time0, double time1, r
             return rt_box_bb((const rt_box_t *)hittable, time0, time1, out_bb);
         case RT_HITTABLE_TYPE_INSTANCE:
             return rt_instance_bb((const rt_instance_t *)hittable, time0, time1, out_bb);
+        case RT_HITTABLE_CONSTANT_MEDIUM:
+            return rt_const_medium_bb((const rt_const_medium_t *)hittable, time0, time1, out_bb);
         default:
             assert(0);
     }

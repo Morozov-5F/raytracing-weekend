@@ -21,6 +21,7 @@ typedef enum rt_hittable_type_e
     RT_HITTABLE_TYPE_AA_RECT,
     RT_HITTABLE_TYPE_BOX,
     RT_HITTABLE_TYPE_INSTANCE,
+    RT_HITTABLE_CONSTANT_MEDIUM,
 } rt_hittable_type_t;
 
 struct rt_hittable_s

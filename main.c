@@ -113,7 +113,6 @@ int main(int argc, char const *argv[])
             look_at = point3(278, 278, 0);
 
             skybox = rt_skybox_new_background(colour(0, 0, 0));
-//            skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_cornell_box();
             break;
 

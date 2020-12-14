@@ -17,7 +17,7 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                materials/rt_material_dielectric.c materials/rt_material_diffuse_light.c
                # Hittables
                hittables/rt_hittable.c hittables/rt_sphere.c hittables/rt_hittable_list.c main.c hittables/rt_moving_sphere.c
-               hittables/rt_bvh.c hittables/rt_aa_rect.c hittables/rt_box.c hittables/rt_instance.c
+               hittables/rt_bvh.c hittables/rt_aa_rect.c hittables/rt_box.c hittables/rt_instance.c hittables/rt_const_medium.c
                # Textures
                textures/rt_texture.c textures/rt_texture_solid_colour.c textures/rt_texture_checker_pattern.c
                textures/rt_texture_noise.c textures/rt_texture_image.c
