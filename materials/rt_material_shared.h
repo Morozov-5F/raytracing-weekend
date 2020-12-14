@@ -17,6 +17,7 @@ typedef enum rt_material_type_e
     RT_MATERIAL_TYPE_METAL = 2,
     RT_MATERIAL_TYPE_DIELECTRIC = 3,
     RT_MATERIAL_TYPE_DIFFUSE_LIGHT = 4,
+    RT_MATERUAL_TYPE_ISOTROPIC = 5,
 } rt_material_type_t;
 
 struct rt_material_s
