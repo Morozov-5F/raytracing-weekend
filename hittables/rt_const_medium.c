@@ -8,7 +8,7 @@
 #include <assert.h>
 #include "rt_const_medium.h"
 #include "rt_hittable_shared.h"
-#include "rt_material_isotropic.h"
+#include "rt_material.h"
 
 struct rt_const_medium_s
 {
@@ -27,7 +27,7 @@ rt_const_medium_t *rt_const_medium_new_with_texture(rt_hittable_t *hittable, dou
 
     result->boundary = hittable;
     result->inv_neg_density = -1.0 / density;
-    result->phase_function = (rt_material_t *)rt_mt_iso_new_with_texture(texture);
+    result->phase_function = rt_mt_iso_new_with_texture(texture);
 
     rt_hittable_init(&result->base, RT_HITTABLE_CONSTANT_MEDIUM);
 
