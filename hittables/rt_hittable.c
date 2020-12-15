@@ -8,39 +8,31 @@
 #include <assert.h>
 #include "rt_hittable.h"
 #include "rt_hittable_shared.h"
-#include "rt_sphere.h"
-#include "rt_moving_sphere.h"
-#include "rt_bvh.h"
-#include "rt_aa_rect.h"
-#include "rt_box.h"
-#include "rt_instance.h"
-#include "rt_const_medium.h"
+
+static bool hit_base(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                     rt_hit_record_t *record);
+static bool bb_base(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb);
+static void delete_base(rt_hittable_t *hittable);
+
+void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type, rt_hittable_hit_fn hit_fn,
+                      rt_hittable_bb_fn bb_fn, rt_hittable_delete_fn delete_fn)
+{
+    assert(NULL != hittable);
+
+    hittable->refcount = 1;
+    hittable->type = type;
+
+    hittable->hit = hit_fn ? hit_fn : hit_base;
+    hittable->bb = bb_fn ? bb_fn : bb_base;
+    hittable->delete = delete_fn ? delete_fn : delete_base;
+}
 
 bool rt_hittable_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
                      rt_hit_record_t *record)
 {
     assert(NULL != hittable);
 
-    switch (hittable->type)
-    {
-        case RT_HITTABLE_TYPE_SPHERE:
-            return rt_sphere_hit((const rt_sphere_t *)hittable, ray, t_min, t_max, record);
-        case RT_HITTABLE_TYPE_MOVING_SPHERE:
-            return rt_moving_sphere_hit((const rt_moving_sphere_t *)hittable, ray, t_min, t_max, record);
-        case RT_HITTABLE_TYPE_BVH_NODE:
-            return rt_bvh_node_hit((const rt_bvh_node_t *)hittable, ray, t_min, t_max, record);
-        case RT_HITTABLE_TYPE_AA_RECT:
-            return rt_aa_rect_hit((const rt_aa_rect_t *)hittable, ray, t_min, t_max, record);
-        case RT_HITTABLE_TYPE_BOX:
-            return rt_box_hit((const rt_box_t *)hittable, ray, t_min, t_max, record);
-        case RT_HITTABLE_TYPE_INSTANCE:
-            return rt_instance_hit((const rt_instance_t *)hittable, ray, t_min, t_max, record);
-        case RT_HITTABLE_CONSTANT_MEDIUM:
-            return rt_const_medium_hit((const rt_const_medium_t *)hittable, ray, t_min, t_max, record);
-        default:
-            assert(0);
-    }
-    return false;
+    return hittable->hit(hittable, ray, t_min, t_max, record);
 }
 
 rt_hittable_t *rt_hittable_claim(rt_hittable_t *hittable)
@@ -52,61 +44,19 @@ rt_hittable_t *rt_hittable_claim(rt_hittable_t *hittable)
 
 void rt_hittable_delete(rt_hittable_t *hittable)
 {
-    if (--hittable->refcount > 0)
+    if (NULL == hittable || --hittable->refcount > 0)
     {
         return;
     }
 
-    switch (hittable->type)
-    {
-        case RT_HITTABLE_TYPE_SPHERE:
-            rt_sphere_delete((rt_sphere_t *)hittable);
-            break;
-        case RT_HITTABLE_TYPE_MOVING_SPHERE:
-            rt_moving_sphere_delete((rt_moving_sphere_t *)hittable);
-            break;
-        case RT_HITTABLE_TYPE_BVH_NODE:
-            rt_bvh_node_delete((rt_bvh_node_t *)hittable);
-            break;
-        case RT_HITTABLE_TYPE_AA_RECT:
-            rt_aa_rect_delete((rt_aa_rect_t *)hittable);
-            break;
-        case RT_HITTABLE_TYPE_BOX:
-            rt_box_delete((rt_box_t *)hittable);
-            break;
-        case RT_HITTABLE_TYPE_INSTANCE:
-            rt_instance_delete((rt_instance_t *)hittable);
-            break;
-        case RT_HITTABLE_CONSTANT_MEDIUM:
-            rt_const_medium_delete((rt_const_medium_t *)hittable);
-            break;
-        default:
-            assert(0);
-    }
+    hittable->delete (hittable);
 }
 
 bool rt_hittable_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb)
 {
-    switch (hittable->type)
-    {
-        case RT_HITTABLE_TYPE_SPHERE:
-            return rt_sphere_bb((const rt_sphere_t *)hittable, time0, time1, out_bb);
-        case RT_HITTABLE_TYPE_MOVING_SPHERE:
-            return rt_moving_sphere_bb((const rt_moving_sphere_t *)hittable, time0, time1, out_bb);
-        case RT_HITTABLE_TYPE_BVH_NODE:
-            return rt_bvh_node_bb((const rt_bvh_node_t *)hittable, time0, time1, out_bb);
-        case RT_HITTABLE_TYPE_AA_RECT:
-            return rt_aa_rect_bb((const rt_aa_rect_t *)hittable, time0, time1, out_bb);
-        case RT_HITTABLE_TYPE_BOX:
-            return rt_box_bb((const rt_box_t *)hittable, time0, time1, out_bb);
-        case RT_HITTABLE_TYPE_INSTANCE:
-            return rt_instance_bb((const rt_instance_t *)hittable, time0, time1, out_bb);
-        case RT_HITTABLE_CONSTANT_MEDIUM:
-            return rt_const_medium_bb((const rt_const_medium_t *)hittable, time0, time1, out_bb);
-        default:
-            assert(0);
-    }
-    return false;
+    assert(NULL != hittable);
+
+    return hittable->bb(hittable, time0, time1, out_bb);
 }
 
 int rt_hittable_box_cmp_x(const void *a, const void *b)
@@ -178,10 +128,18 @@ int rt_hittable_box_cmp_z(const void *a, const void *b)
     return 0;
 }
 
-void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type)
+static bool hit_base(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                     rt_hit_record_t *record)
 {
-    assert(NULL != hittable);
+    return false;
+}
 
-    hittable->refcount = 1;
-    hittable->type = type;
+static bool bb_base(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb)
+{
+    return false;
+}
+
+static void delete_base(rt_hittable_t *hittable)
+{
+    free(hittable);
 }

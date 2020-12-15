@@ -8,7 +8,7 @@
 #include <rt_hittable_shared.h>
 #include <assert.h>
 
-struct rt_aa_rect_s
+typedef struct rt_aa_rect_s
 {
     rt_hittable_t base;
     rt_material_t *material;
@@ -17,10 +17,15 @@ struct rt_aa_rect_s
 
     int axis_1, axis_2, axis_k;
     vec3_t outward_normal;
-};
+} rt_aa_rect_t;
 
-rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double axis1_max, double axis2_min,
-                             double axis2_max, double k, rt_material_t *material)
+static bool rt_aa_rect_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                           rt_hit_record_t *record);
+static bool rt_aa_rect_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb);
+static void rt_aa_rect_delete(rt_hittable_t *hittable);
+
+rt_hittable_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double axis1_max, double axis2_min,
+                              double axis2_max, double k, rt_material_t *material)
 {
     rt_aa_rect_t *result = calloc(1, sizeof(rt_aa_rect_t));
     assert(NULL != result);
@@ -59,25 +64,18 @@ rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double ax
     result->axis1_max = axis1_max;
     result->axis2_max = axis2_max;
 
-    rt_hittable_init(&result->base, RT_HITTABLE_TYPE_AA_RECT);
+    rt_hittable_init(&result->base, RT_HITTABLE_TYPE_AA_RECT, rt_aa_rect_hit, rt_aa_rect_bb, rt_aa_rect_delete);
 
-    return result;
+    return (rt_hittable_t *)result;
 }
 
-void rt_aa_rect_delete(rt_aa_rect_t *rect)
+bool rt_aa_rect_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
 {
-    if (NULL == rect)
-    {
-        return;
-    }
-    rt_material_delete(rect->material);
-    free(rect);
-}
-
-bool rt_aa_rect_hit(const rt_aa_rect_t *rect, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
-{
-    assert(NULL != rect);
+    assert(NULL != hittable);
     assert(NULL != ray);
+
+    assert(RT_HITTABLE_TYPE_AA_RECT == hittable->type);
+    rt_aa_rect_t *rect = (rt_aa_rect_t *)hittable;
 
     double t = (rect->k - ray->origin.components[rect->axis_k]) / ray->direction.components[rect->axis_k];
     if (t >= t_max || t <= t_min)
@@ -108,10 +106,13 @@ bool rt_aa_rect_hit(const rt_aa_rect_t *rect, const ray_t *ray, double t_min, do
     return true;
 }
 
-bool rt_aa_rect_bb(const rt_aa_rect_t *rect, double time0, double time1, rt_aabb_t *out_bb)
+bool rt_aa_rect_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb)
 {
-    assert(NULL != rect);
+    assert(NULL != hittable);
     assert(NULL != out_bb);
+
+    assert(RT_HITTABLE_TYPE_AA_RECT == hittable->type);
+    rt_aa_rect_t *rect = (rt_aa_rect_t *)hittable;
 
     out_bb->min.components[rect->axis_1] = rect->axis1_min;
     out_bb->max.components[rect->axis_1] = rect->axis1_max;
@@ -123,4 +124,17 @@ bool rt_aa_rect_bb(const rt_aa_rect_t *rect, double time0, double time1, rt_aabb
     out_bb->max.components[rect->axis_k] = rect->k + 0.0001;
 
     return true;
+}
+
+void rt_aa_rect_delete(rt_hittable_t *hittable)
+{
+    if (NULL == hittable)
+    {
+        return;
+    }
+    assert(RT_HITTABLE_TYPE_AA_RECT == hittable->type);
+    rt_aa_rect_t *rect = (rt_aa_rect_t *)hittable;
+
+    rt_material_delete(rect->material);
+    free(rect);
 }

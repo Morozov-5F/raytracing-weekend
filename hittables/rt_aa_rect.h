@@ -10,6 +10,7 @@
 #include <rt_weekend.h>
 #include <rt_material.h>
 #include <rt_aabb.h>
+#include "rt_hittable.h"
 
 typedef enum rt_aa_rect_type_e
 {
@@ -18,33 +19,26 @@ typedef enum rt_aa_rect_type_e
     RT_AA_RECT_TYPE_XZ,
 } rt_aa_rect_type_t;
 
-typedef struct rt_aa_rect_s rt_aa_rect_t;
+rt_hittable_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double axis1_max, double axis2_min,
+                              double axis2_max, double k, rt_material_t *material);
 
-rt_aa_rect_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double axis1_max, double axis2_min,
-                             double axis2_max, double k, rt_material_t *material);
-
-static inline rt_aa_rect_t *rt_aa_rect_new_xy(double x0, double x1, double y0, double y1, double k,
-                                              rt_material_t *material)
+static inline rt_hittable_t *rt_aa_rect_new_xy(double x0, double x1, double y0, double y1, double k,
+                                               rt_material_t *material)
 {
     return rt_aa_rect_new(RT_AA_RECT_TYPE_XY, x0, x1, y0, y1, k, material);
 }
 
-static inline rt_aa_rect_t *rt_aa_rect_new_yz(double y0, double y1, double z0, double z1, double k,
-                                              rt_material_t *material)
+static inline rt_hittable_t *rt_aa_rect_new_yz(double y0, double y1, double z0, double z1, double k,
+                                               rt_material_t *material)
 {
     return rt_aa_rect_new(RT_AA_RECT_TYPE_YZ, y0, y1, z0, z1, k, material);
 }
 
-static inline rt_aa_rect_t *rt_aa_rect_new_xz(double x0, double x1, double z0, double z1, double k,
-                                              rt_material_t *material)
+static inline rt_hittable_t *rt_aa_rect_new_xz(double x0, double x1, double z0, double z1, double k,
+                                               rt_material_t *material)
 {
     return rt_aa_rect_new(RT_AA_RECT_TYPE_XZ, x0, x1, z0, z1, k, material);
 }
 
-void rt_aa_rect_delete(rt_aa_rect_t *rect);
-
-bool rt_aa_rect_hit(const rt_aa_rect_t *rect, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record);
-
-bool rt_aa_rect_bb(const rt_aa_rect_t *rect, double time0, double time1, rt_aabb_t *out_bb);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_AA_RECT_H

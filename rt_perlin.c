@@ -112,7 +112,7 @@ static int *generate_permutation(size_t size)
     int *permutation = malloc(sizeof(int) * size);
     assert(NULL != permutation);
 
-    for (size_t i = 0; i < size; ++i)
+    for (int i = 0; i < size; ++i)
     {
         permutation[i] = i;
     }

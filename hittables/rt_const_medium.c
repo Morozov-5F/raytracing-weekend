@@ -6,11 +6,11 @@
  */
 #include <rt_texture.h>
 #include <assert.h>
-#include "rt_const_medium.h"
+#include "rt_hittable.h"
 #include "rt_hittable_shared.h"
 #include "rt_material.h"
 
-struct rt_const_medium_s
+typedef struct rt_const_medium_s
 {
     rt_hittable_t base;
 
@@ -18,44 +18,39 @@ struct rt_const_medium_s
     rt_material_t *phase_function;
 
     double inv_neg_density;
-};
+} rt_const_medium_t;
 
-rt_const_medium_t *rt_const_medium_new_with_texture(rt_hittable_t *hittable, double density, rt_texture_t *texture)
+static bool rt_const_medium_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                                rt_hit_record_t *record);
+static void rt_const_medium_delete(rt_hittable_t *hittable);
+static bool rt_const_medium_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb);
+
+rt_hittable_t *rt_const_medium_new_with_texture(rt_hittable_t *boundary, double density, rt_texture_t *texture)
 {
     rt_const_medium_t *result = calloc(1, sizeof(rt_const_medium_t));
     assert(NULL != result);
 
-    result->boundary = hittable;
+    result->boundary = boundary;
     result->inv_neg_density = -1.0 / density;
     result->phase_function = rt_mt_iso_new_with_texture(texture);
 
-    rt_hittable_init(&result->base, RT_HITTABLE_CONSTANT_MEDIUM);
+    rt_hittable_init(&result->base, RT_HITTABLE_CONSTANT_MEDIUM, rt_const_medium_hit, rt_const_medium_bb,
+                     rt_const_medium_delete);
 
-    return result;
+    return (rt_hittable_t *)result;
 }
 
-rt_const_medium_t *rt_const_medium_new_with_colour(rt_hittable_t *hittable, double density, colour_t colour)
+rt_hittable_t *rt_const_medium_new_with_colour(rt_hittable_t *boundary, double density, colour_t colour)
 {
-    return rt_const_medium_new_with_texture(hittable, density, rt_texture_sc_new(colour));
+    return rt_const_medium_new_with_texture(boundary, density, rt_texture_sc_new(colour));
 }
 
-void rt_const_medium_delete(rt_const_medium_t *medium)
+static bool rt_const_medium_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                                rt_hit_record_t *record)
 {
-    if (NULL == medium)
-    {
-        return;
-    }
-
-    rt_hittable_delete(medium->boundary);
-    rt_material_delete(medium->phase_function);
-
-    free(medium);
-}
-
-bool rt_const_medium_hit(const rt_const_medium_t *medium, const ray_t *ray, double t_min, double t_max,
-                         rt_hit_record_t *record)
-{
-    assert(NULL != medium);
+    assert(NULL != hittable);
+    assert(RT_HITTABLE_CONSTANT_MEDIUM == hittable->type);
+    rt_const_medium_t *medium = (rt_const_medium_t *)hittable;
 
     rt_hit_record_t hit1, hit2;
 
@@ -105,9 +100,27 @@ bool rt_const_medium_hit(const rt_const_medium_t *medium, const ray_t *ray, doub
     return true;
 }
 
-bool rt_const_medium_bb(const rt_const_medium_t *medium, double time0, double time1, rt_aabb_t *out_bb)
+static bool rt_const_medium_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb)
 {
-    assert(NULL != medium);
+    assert(NULL != hittable);
+    assert(RT_HITTABLE_CONSTANT_MEDIUM == hittable->type);
+    rt_const_medium_t *medium = (rt_const_medium_t *)hittable;
 
     return rt_hittable_bb(medium->boundary, time0, time1, out_bb);
+}
+
+static void rt_const_medium_delete(rt_hittable_t *hittable)
+{
+    if (NULL == hittable)
+    {
+        return;
+    }
+
+    assert(RT_HITTABLE_CONSTANT_MEDIUM == hittable->type);
+    rt_const_medium_t *medium = (rt_const_medium_t *)hittable;
+
+    rt_hittable_delete(medium->boundary);
+    rt_material_delete(medium->phase_function);
+
+    free(medium);
 }

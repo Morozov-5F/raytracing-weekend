@@ -5,58 +5,33 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-#include "rt_sphere.h"
+#include "rt_hittable.h"
 #include "rt_hittable_shared.h"
 #include <assert.h>
 #include <stdlib.h>
 
-struct rt_sphere_s
+typedef struct rt_sphere_s
 {
     rt_hittable_t base;
 
     point3_t center;
     double radius;
     rt_material_t *material;
-};
+} rt_sphere_t;
 
-static rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
-{
-    assert(NULL != material);
+static rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material);
+static bool rt_sphere_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                          rt_hit_record_t *record);
+static bool rt_sphere_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb);
+static void rt_sphere_delete(rt_hittable_t *hittable);
 
-    rt_sphere_t result = {
-        .radius = radius,
-        .center = center,
-        .material = material,
-    };
-    rt_hittable_init(&result.base, RT_HITTABLE_TYPE_SPHERE);
-    return result;
-}
-
-bool rt_sphere_hit(const rt_sphere_t *sphere, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
-{
-    assert(NULL != sphere);
-    return rt_sphere_hit_test_generic(sphere->center, sphere->radius, sphere->material, ray, t_min, t_max, record);
-}
-
-rt_sphere_t *rt_sphere_new(point3_t center, double radius, rt_material_t *material)
+rt_hittable_t *rt_sphere_new(point3_t center, double radius, rt_material_t *material)
 {
     rt_sphere_t *sphere = calloc(1, sizeof(rt_sphere_t));
     assert(NULL != sphere);
 
     *sphere = rt_sphere_init(center, radius, material);
-    return sphere;
-}
-
-void rt_sphere_delete(rt_sphere_t *sphere)
-{
-    if (NULL == sphere)
-    {
-        return;
-    }
-
-    rt_material_delete(sphere->material);
-
-    free(sphere);
+    return (rt_hittable_t *)sphere;
 }
 
 bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *material, const ray_t *ray, double t_min,
@@ -100,18 +75,6 @@ bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *m
     return true;
 }
 
-bool rt_sphere_bb(const rt_sphere_t *sphere, double time0, double time1, rt_aabb_t *out_bb)
-{
-    assert(NULL != sphere);
-    assert(NULL != out_bb);
-
-    vec3_t offset = vec3(sphere->radius, sphere->radius, sphere->radius);
-    out_bb->min = vec3_diff(sphere->center, offset);
-    out_bb->max = vec3_sum(sphere->center, offset);
-
-    return true;
-}
-
 void rt_get_sphere_uv(const point3_t *p, double *u, double *v)
 {
     assert(NULL != p);
@@ -123,4 +86,55 @@ void rt_get_sphere_uv(const point3_t *p, double *u, double *v)
 
     *u = phi / (2 * PI);
     *v = theta / PI;
+}
+
+static rt_sphere_t rt_sphere_init(point3_t center, double radius, rt_material_t *material)
+{
+    assert(NULL != material);
+
+    rt_sphere_t result = {
+        .radius = radius,
+        .center = center,
+        .material = material,
+    };
+    rt_hittable_init(&result.base, RT_HITTABLE_TYPE_SPHERE, rt_sphere_hit, rt_sphere_bb, rt_sphere_delete);
+    return result;
+}
+
+static bool rt_sphere_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                          rt_hit_record_t *record)
+{
+    assert(NULL != hittable);
+    assert(RT_HITTABLE_TYPE_SPHERE == hittable->type);
+
+    rt_sphere_t *sphere = (rt_sphere_t *)hittable;
+    return rt_sphere_hit_test_generic(sphere->center, sphere->radius, sphere->material, ray, t_min, t_max, record);
+}
+
+static bool rt_sphere_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb)
+{
+    assert(NULL != hittable);
+    assert(NULL != out_bb);
+    assert(RT_HITTABLE_TYPE_SPHERE == hittable->type);
+
+    rt_sphere_t *sphere = (rt_sphere_t *)hittable;
+    vec3_t offset = vec3(sphere->radius, sphere->radius, sphere->radius);
+    out_bb->min = vec3_diff(sphere->center, offset);
+    out_bb->max = vec3_sum(sphere->center, offset);
+
+    return true;
+}
+
+static void rt_sphere_delete(rt_hittable_t *hittable)
+{
+    if (NULL == hittable)
+    {
+        return;
+    }
+    assert(RT_HITTABLE_TYPE_SPHERE == hittable->type);
+
+    rt_sphere_t *sphere = (rt_sphere_t *)hittable;
+
+    rt_material_delete(sphere->material);
+    free(sphere);
 }

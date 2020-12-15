@@ -24,17 +24,28 @@ typedef enum rt_hittable_type_e
     RT_HITTABLE_CONSTANT_MEDIUM,
 } rt_hittable_type_t;
 
+typedef bool (*rt_hittable_hit_fn)(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                                   rt_hit_record_t *record);
+
+typedef bool (*rt_hittable_bb_fn)(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb);
+
+typedef void (*rt_hittable_delete_fn)(rt_hittable_t *hittable);
+
 struct rt_hittable_s
 {
     rt_hittable_type_t type;
     int refcount;
+
+    rt_hittable_hit_fn hit;
+    rt_hittable_bb_fn bb;
+    rt_hittable_delete_fn delete;
 };
+
+void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type, rt_hittable_hit_fn hit_fn,
+                      rt_hittable_bb_fn bb_fn, rt_hittable_delete_fn delete_fn);
 
 bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *material, const ray_t *ray, double t_min,
                                 double t_max, rt_hit_record_t *record);
-
-
-void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type);
 
 typedef int(*rt_hittable_compare_fn)(const void *a, const void *b);
 
