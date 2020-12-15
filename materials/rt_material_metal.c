@@ -46,7 +46,8 @@ static bool rt_mt_metal_scatter(const rt_material_t *material, const ray_t *inco
 
     rt_material_metal_t *metal = (rt_material_metal_t *)material;
 
-    vec3_t reflected = vec3_reflect(&incoming_ray->direction, &hit_record->normal);
+    vec3_t direction_normalized = vec3_normalized(incoming_ray->direction);
+    vec3_t reflected = vec3_reflect(&direction_normalized, &hit_record->normal);
     if (metal->fuzziness > 0)
     {
         vec3_add(&reflected, vec3_scale(vec3_random_in_unit_sphere(), metal->fuzziness));

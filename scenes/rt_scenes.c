@@ -315,3 +315,24 @@ rt_hittable_list_t *rt_scene_showcase(void)
 
     return objects;
 }
+
+rt_hittable_list_t *rt_scene_metal_test(void)
+{
+    rt_material_t *checker =
+        rt_mt_diffuse_new_with_texture(rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(5);
+
+    rt_hittable_list_add(objects, rt_sphere_new(point3(0, -1000, 0), 1000, checker));
+
+    rt_hittable_list_add(objects, rt_sphere_new(point3(-2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
+    rt_hittable_list_add(objects, rt_sphere_new(point3(0, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.5)));
+    rt_hittable_list_add(objects, rt_sphere_new(point3(2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 1.0)));
+
+    rt_hittable_t *box_instance = rt_instance_new(rt_box_new(point3(-1, 0, 10), point3(1, 2, 12), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
+    rt_instance_rotate_y(box_instance, 10);
+    rt_hittable_list_add(objects, box_instance);
+
+
+    return objects;
+}
