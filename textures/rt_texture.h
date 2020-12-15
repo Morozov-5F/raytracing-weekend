@@ -10,30 +10,12 @@
 #include <rt_weekend.h>
 #include <rt_colour.h>
 
-typedef enum rt_texture_type_e
-{
-    RT_TEXTURE_TYPE_NONE = -1,
-    RT_TEXTURE_TYPE_SOLID_COLOUR,
-    RT_TEXTURE_TYPE_CHECKER,
-    RT_TEXTURE_TYPE_NOISE,
-    RT_TEXTURE_TYPE_IMAGE,
-} rt_texture_type_t;
-
 typedef struct rt_texture_s rt_texture_t;
 
-typedef colour_t (*rt_texture_value_fn)(const rt_texture_t *texture, double u, double v, const vec3_t *p);
-typedef void (*rt_texture_free_fn)(rt_texture_t *texture);
-
-struct rt_texture_s
-{
-    rt_texture_type_t type;
-    int refcount;
-
-    rt_texture_value_fn get_value;
-    rt_texture_free_fn free;
-};
-
 rt_texture_t *rt_texture_claim(rt_texture_t *texture);
+
+colour_t rt_texture_value(const rt_texture_t *texture, double u, double v, const vec3_t *p);
+void rt_texture_delete(rt_texture_t *texture);
 
 // Solid colour constructors
 rt_texture_t *rt_texture_sc_new(colour_t colour);

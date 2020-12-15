@@ -46,7 +46,7 @@ bool rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *i
 
     vec3_t scatter_direction = vec3_sum(hit_record->normal, vec3_random_unit_vector());
     *scattered_ray = ray_init(hit_record->p, scatter_direction, incoming_ray->time);
-    *attenuation = material->texture->get_value(material->texture, hit_record->u, hit_record->v, &hit_record->p);
+    *attenuation = rt_texture_value(material->texture, hit_record->u, hit_record->v, &hit_record->p);
 
     return true;
 }
@@ -58,6 +58,6 @@ void rt_mt_diffuse_delete(rt_material_diffuse_t *diffuse)
         return;
     }
 
-    diffuse->texture->free(diffuse->texture);
+    rt_texture_delete(diffuse->texture);
     free(diffuse);
 }

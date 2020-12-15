@@ -49,10 +49,10 @@ static colour_t rt_texture_cp_value(const rt_texture_t *texture, double u, doubl
     double sines = sin(10 * p->x) * sin(10 * p->y) * sin(10 * p->z);
     if (sines > 0)
     {
-        return checker->even->get_value(checker->even, u, v, p);
+        return rt_texture_value(checker->even, u, v, p);
     }
 
-    return checker->even->get_value(checker->odd, u, v, p);
+    return rt_texture_value(checker->odd, u, v, p);
 }
 
 static void rt_texture_cp_delete(rt_texture_t *texture)
@@ -66,8 +66,8 @@ static void rt_texture_cp_delete(rt_texture_t *texture)
 
     rt_texture_cp_t *checker = (rt_texture_cp_t *)texture;
 
-    checker->even->free(checker->even);
-    checker->even->free(checker->odd);
+    rt_texture_delete(checker->even);
+    rt_texture_delete(checker->odd);
 
     free(checker);
 }

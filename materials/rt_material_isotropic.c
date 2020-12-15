@@ -38,7 +38,7 @@ bool rt_mt_iso_scatter(const rt_material_iso_t *material, const ray_t *incoming_
     assert(NULL != material);
 
     *scattered_ray = ray_init(hit_record->p, vec3_random_in_unit_sphere(), incoming_ray->time);
-    *attenuation = material->albedo->get_value(material->albedo, hit_record->u, hit_record->v, &hit_record->p);
+    *attenuation = rt_texture_value(material->albedo, hit_record->u, hit_record->v, &hit_record->p);
 
     return true;
 }
@@ -50,6 +50,6 @@ void rt_mt_iso_delete(rt_material_iso_t *material)
         return;
     }
 
-    material->albedo->free(material->albedo);
+    rt_texture_delete(material->albedo);
     free(material);
 }

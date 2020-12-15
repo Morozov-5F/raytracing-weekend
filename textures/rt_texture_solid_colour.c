@@ -6,6 +6,7 @@
  */
 #include <rt_texture_shared.h>
 #include <assert.h>
+#include "rt_texture.h"
 
 typedef struct rt_texture_sc_s
 {

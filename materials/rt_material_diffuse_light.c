@@ -42,7 +42,7 @@ bool rt_mt_dl_scatter(const rt_material_dl_t *material, const ray_t *incoming_ra
 colour_t rt_mt_dl_emit(const rt_material_dl_t *material, double u, double v, const point3_t *p)
 {
     assert(NULL != material);
-    return vec3_scale(material->texture->get_value(material->texture, u, v, p), material->intensity);
+    return vec3_scale(rt_texture_value(material->texture, u, v, p), material->intensity);
 }
 
 void rt_mt_dl_delete(rt_material_dl_t *material)
@@ -51,6 +51,6 @@ void rt_mt_dl_delete(rt_material_dl_t *material)
     {
         return;
     }
-    material->texture->free(material->texture);
+    rt_texture_delete(material->texture);
     free(material);
 }

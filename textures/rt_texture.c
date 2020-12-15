@@ -39,6 +39,22 @@ void rt_texture_init(rt_texture_t *texture, rt_texture_type_t type, rt_texture_v
     texture->free = free_fn;
 }
 
+colour_t rt_texture_value(const rt_texture_t *texture, double u, double v, const vec3_t *p)
+{
+    assert(NULL != texture);
+
+    return texture->get_value(texture, u, v, p);
+}
+
+void rt_texture_delete(rt_texture_t *texture)
+{
+    if (NULL != texture && --texture->refcount > 0)
+    {
+        return;
+    }
+    texture->free(texture);
+}
+
 static colour_t rt_texture_value_default(const rt_texture_t *texture, double u, double v, const vec3_t *p)
 {
     assert(0);
