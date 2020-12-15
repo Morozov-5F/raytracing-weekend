@@ -29,9 +29,9 @@ rt_perlin_t *rt_perlin_new(void)
 
     result->tile_size = 255;
 
-    result->x = generate_permutation(result->tile_size);
-    result->y = generate_permutation(result->tile_size);
-    result->z = generate_permutation(result->tile_size);
+    result->x = generate_permutation(result->tile_size + 1);
+    result->y = generate_permutation(result->tile_size + 1);
+    result->z = generate_permutation(result->tile_size + 1);
 
     result->random_vectors = malloc(sizeof(vec3_t) * result->tile_size);
     assert(NULL != result->random_vectors);

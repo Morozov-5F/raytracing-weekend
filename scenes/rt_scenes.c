@@ -277,7 +277,7 @@ rt_hittable_list_t *rt_scene_showcase(void)
         }
     }
 
-    rt_hittable_list_t *objects = rt_hittable_list_init(20);
+    rt_hittable_list_t *objects = rt_hittable_list_init(40);
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_bvh_node_new(ground_boxes, 0, 1));
 
     // Add a light source
