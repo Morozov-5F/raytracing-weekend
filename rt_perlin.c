@@ -33,7 +33,7 @@ rt_perlin_t *rt_perlin_new(void)
     result->y = generate_permutation(result->tile_size + 1);
     result->z = generate_permutation(result->tile_size + 1);
 
-    result->random_vectors = malloc(sizeof(vec3_t) * result->tile_size);
+    result->random_vectors = calloc(result->tile_size, sizeof(vec3_t));
     assert(NULL != result->random_vectors);
     for (size_t i = 0; i < result->tile_size; ++i)
     {
@@ -100,6 +100,7 @@ void rt_perlin_delete(rt_perlin_t *perlin)
     {
         return;
     }
+    free(perlin->random_vectors);
     free(perlin->x);
     free(perlin->y);
     free(perlin->z);

@@ -6,7 +6,6 @@
  */
 #include "rt_material_diffuse_light.h"
 #include <rt_material_shared.h>
-#include <rt_texture_solid_colour.h>
 #include <assert.h>
 
 struct rt_material_dl_s
@@ -19,7 +18,7 @@ struct rt_material_dl_s
 
 rt_material_dl_t *rt_mt_dl_new_with_albedo(colour_t albedo, double intensity)
 {
-    return rt_mt_dl_new_with_texture((rt_texture_t *)rt_texture_sc_new(albedo), intensity);
+    return rt_mt_dl_new_with_texture(rt_texture_sc_new(albedo), intensity);
 }
 
 rt_material_dl_t *rt_mt_dl_new_with_texture(rt_texture_t *texture, double intensity)
@@ -43,7 +42,7 @@ bool rt_mt_dl_scatter(const rt_material_dl_t *material, const ray_t *incoming_ra
 colour_t rt_mt_dl_emit(const rt_material_dl_t *material, double u, double v, const point3_t *p)
 {
     assert(NULL != material);
-    return vec3_scale(rt_texture_value(material->texture, u, v, p), material->intensity);
+    return vec3_scale(material->texture->get_value(material->texture, u, v, p), material->intensity);
 }
 
 void rt_mt_dl_delete(rt_material_dl_t *material)
@@ -52,6 +51,6 @@ void rt_mt_dl_delete(rt_material_dl_t *material)
     {
         return;
     }
-    rt_texture_delete(material->texture);
+    material->texture->free(material->texture);
     free(material);
 }

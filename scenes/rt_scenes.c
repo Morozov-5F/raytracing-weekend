@@ -21,9 +21,6 @@
 #include <rt_const_medium.h>
 
 #include <rt_texture.h>
-#include <rt_texture_checker_pattern.h>
-#include <rt_texture_noise.h>
-#include <rt_texture_image.h>
 #include <rt_aa_rect.h>
 #include <rt_box.h>
 #include <rt_instance.h>
@@ -31,7 +28,7 @@
 rt_hittable_list_t *rt_scene_random(void)
 {
     rt_material_t *ground_material = (rt_material_t *)rt_mt_diffuse_new_with_texture(
-        (rt_texture_t *)rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
+        rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
 
     rt_hittable_list_t *world = rt_hittable_list_init(500);
     rt_hittable_list_add(world, (rt_hittable_t *)rt_sphere_new(point3(0, -1000, 0), 1000, ground_material));
@@ -96,7 +93,7 @@ rt_hittable_list_t *rt_scene_random(void)
 rt_hittable_list_t *rt_scene_two_spheres(void)
 {
     rt_material_t *checker = (rt_material_t *)rt_mt_diffuse_new_with_texture(
-        (rt_texture_t *)rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
+        rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
 
     rt_hittable_list_t *objects = rt_hittable_list_init(2);
 
@@ -108,7 +105,7 @@ rt_hittable_list_t *rt_scene_two_spheres(void)
 
 rt_hittable_list_t *rt_scene_two_perlin_spheres(void)
 {
-    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_noise_new(4));
+    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture(rt_texture_noise_new(4));
 
     rt_hittable_list_t *objects = rt_hittable_list_init(2);
 
@@ -120,8 +117,8 @@ rt_hittable_list_t *rt_scene_two_perlin_spheres(void)
 
 rt_hittable_list_t *rt_scene_earth(void)
 {
-    rt_material_t *earth_material = (rt_material_t *)rt_mt_diffuse_new_with_texture(
-        (rt_texture_t *)rt_texture_image_new("assets/textures/earth_projection.jpg"));
+    rt_material_t *earth_material =
+        (rt_material_t *)rt_mt_diffuse_new_with_texture(rt_texture_image_new("assets/textures/earth_projection.jpg"));
 
     rt_hittable_list_t *objects = rt_hittable_list_init(1);
 
@@ -132,7 +129,7 @@ rt_hittable_list_t *rt_scene_earth(void)
 
 rt_hittable_list_t *rt_scene_light_sample(void)
 {
-    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_noise_new(4));
+    rt_material_t *noisy = (rt_material_t *)rt_mt_diffuse_new_with_texture(rt_texture_noise_new(4));
 
     rt_hittable_list_t *objects = rt_hittable_list_init(3);
 
@@ -205,6 +202,8 @@ rt_hittable_list_t *rt_scene_instance_test(void)
     rt_bvh_node_t *bvh = rt_bvh_node_new(objects, 0, 1);
     rt_hittable_list_t *result = rt_hittable_list_init(1);
     rt_hittable_list_add(result, (rt_hittable_t *)bvh);
+
+    rt_hittable_list_deinit(objects);
 
     return result;
 }
@@ -304,7 +303,7 @@ rt_hittable_list_t *rt_scene_showcase(void)
     // Sphere with glossy surface and fog inside
     rt_sphere_t *boundary = rt_sphere_new(point3(360, 150, 145), 70, (rt_material_t *)rt_mt_dielectric_new(1.5));
     rt_hittable_list_add(objects, (rt_hittable_t *)boundary);
-    rt_hittable_list_add(objects, (rt_hittable_t *)rt_const_medium_new_with_colour((rt_hittable_t *)boundary, 0.2,
+    rt_hittable_list_add(objects, (rt_hittable_t *)rt_const_medium_new_with_colour(rt_hittable_claim((rt_hittable_t *)boundary), 0.2,
                                                                                    colour(0.2, 0.4, 0.9)));
 
     // Global fog and distortion
@@ -313,12 +312,12 @@ rt_hittable_list_t *rt_scene_showcase(void)
         objects, (rt_hittable_t *)rt_const_medium_new_with_colour((rt_hittable_t *)boundary, 0.0001, colour(1, 1, 1)));
 
     // Add Earth
-    rt_material_t *earth = (rt_material_t *)rt_mt_diffuse_new_with_texture(
-        (rt_texture_t *)rt_texture_image_new("assets/textures/earth_projection.jpg"));
+    rt_material_t *earth =
+        (rt_material_t *)rt_mt_diffuse_new_with_texture(rt_texture_image_new("assets/textures/earth_projection.jpg"));
     rt_hittable_list_add(objects, (rt_hittable_t *)rt_sphere_new(point3(400, 200, 400), 100, earth));
 
     // Add Perlin noise texture
-    rt_texture_t *perlin = (rt_texture_t *)rt_texture_noise_new(0.1);
+    rt_texture_t *perlin = rt_texture_noise_new(0.1);
     rt_hittable_list_add(objects,
                          (rt_hittable_t *)rt_sphere_new(point3(220, 280, 300), 80,
                                                         (rt_material_t *)rt_mt_diffuse_new_with_texture(perlin)));
@@ -329,7 +328,7 @@ rt_hittable_list_t *rt_scene_showcase(void)
 
     for (int i = 0; i < NUMBER_OF_SPHERES; ++i)
     {
-        rt_hittable_list_add(spheres, (rt_hittable_t *)rt_sphere_new(vec3_random(0, 165), 10, white));
+        rt_hittable_list_add(spheres, (rt_hittable_t *)rt_sphere_new(vec3_random(0, 165), 10, rt_material_claim(white)));
     }
 
     rt_instance_t *spheres_instance = rt_instance_new((rt_hittable_t *)rt_bvh_node_new(spheres, 0, 1));
@@ -337,6 +336,7 @@ rt_hittable_list_t *rt_scene_showcase(void)
     rt_instance_translate(spheres_instance, point3(-100, 270, 395));
     rt_hittable_list_add(objects, (rt_hittable_t *)spheres_instance);
 
+    rt_material_delete(white);
     rt_material_delete(ground);
     rt_hittable_list_deinit(ground_boxes);
     rt_hittable_list_deinit(spheres);

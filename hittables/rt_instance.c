@@ -55,10 +55,11 @@ void rt_instance_rotate_y(rt_instance_t *instance, double y)
 
 void rt_instance_delete(rt_instance_t *instance)
 {
-    if (NULL != instance)
+    if (NULL == instance)
     {
         return;
     }
+
     rt_hittable_delete(instance->hittable);
     free(instance);
 }

@@ -4,7 +4,7 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
-#include <rt_texture_solid_colour.h>
+#include <rt_texture.h>
 #include <assert.h>
 #include "rt_const_medium.h"
 #include "rt_hittable_shared.h"
@@ -36,12 +36,12 @@ rt_const_medium_t *rt_const_medium_new_with_texture(rt_hittable_t *hittable, dou
 
 rt_const_medium_t *rt_const_medium_new_with_colour(rt_hittable_t *hittable, double density, colour_t colour)
 {
-    return rt_const_medium_new_with_texture(hittable, density, (rt_texture_t *)rt_texture_sc_new(colour));
+    return rt_const_medium_new_with_texture(hittable, density, rt_texture_sc_new(colour));
 }
 
 void rt_const_medium_delete(rt_const_medium_t *medium)
 {
-    if (NULL != medium)
+    if (NULL == medium)
     {
         return;
     }

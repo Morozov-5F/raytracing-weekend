@@ -10,7 +10,6 @@
 #include "rt_material_shared.h"
 
 #include <rt_texture.h>
-#include <rt_texture_solid_colour.h>
 
 struct rt_material_diffuse_s
 {
@@ -21,7 +20,7 @@ struct rt_material_diffuse_s
 
 rt_material_diffuse_t *rt_mt_diffuse_new_with_albedo(colour_t albedo)
 {
-    return rt_mt_diffuse_new_with_texture((rt_texture_t *)rt_texture_sc_new_with_components(albedo.x, albedo.y, albedo.z));
+    return rt_mt_diffuse_new_with_texture(rt_texture_sc_new_with_components(albedo.x, albedo.y, albedo.z));
 }
 
 rt_material_diffuse_t *rt_mt_diffuse_new_with_texture(rt_texture_t *texture)
@@ -47,7 +46,7 @@ bool rt_mt_diffuse_scatter(const rt_material_diffuse_t *material, const ray_t *i
 
     vec3_t scatter_direction = vec3_sum(hit_record->normal, vec3_random_unit_vector());
     *scattered_ray = ray_init(hit_record->p, scatter_direction, incoming_ray->time);
-    *attenuation = rt_texture_value(material->texture, hit_record->u, hit_record->v, &hit_record->p);
+    *attenuation = material->texture->get_value(material->texture, hit_record->u, hit_record->v, &hit_record->p);
 
     return true;
 }
@@ -59,6 +58,6 @@ void rt_mt_diffuse_delete(rt_material_diffuse_t *diffuse)
         return;
     }
 
-    rt_texture_delete(diffuse->texture);
+    diffuse->texture->free(diffuse->texture);
     free(diffuse);
 }
