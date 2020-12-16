@@ -52,11 +52,11 @@ int main(int argc, char const *argv[])
     // Declare Camera parameters
     point3_t look_from, look_at;
     vec3_t up = point3(0, 1, 0);
-    double focus_distance = 10.0, aperture = 0.1, vertical_fov = 40.0;
+    double focus_distance = 10.0, aperture = 0.0, vertical_fov = 40.0;
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_METAL_TEST;
+    rt_scene_id_t scene_id = RT_SCENE_SHOWCASE;
     rt_skybox_t *skybox = NULL;
 
     // Select a scene from a pre-defined one
