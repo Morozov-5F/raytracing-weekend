@@ -17,6 +17,8 @@
 #include <string.h>
 #include <scenes/rt_scenes.h>
 
+static void show_usage(const char *program_name, int err);
+
 static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, rt_skybox_t *skybox, int child_rays)
 {
     if (child_rays <= 0)
@@ -42,11 +44,80 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, rt_
 
 int main(int argc, char const *argv[])
 {
+    const char *number_of_samples_str = NULL;
+    const char *scene_id_str = NULL;
+    const char *file_name = NULL;
+    bool verbose = false;
+
+    // Parse console arguments
+    for (int i = 1; i < argc; ++i)
+    {
+        if (0 == strcmp(argv[i], "-s") || 0 == strcmp(argv[i], "--samples"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            number_of_samples_str = argv[++i];
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "--scene"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            scene_id_str = argv[++i];
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "-v") || 0 == strcmp(argv[i], "--verbose"))
+        {
+            verbose = true;
+        }
+        else if (0 == strcmp(argv[i], "-h"))
+        {
+            show_usage(argv[0], EXIT_SUCCESS);
+        }
+        else if ('-' == *argv[i])
+        {
+            fprintf(stderr, "Unknown argument '%s'\n", argv[i]);
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+        else if (i + 1 < argc)
+        {
+            fprintf(stderr, "Too many positional arguments (1 expected)\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+        file_name = argv[i];
+    }
+
+    // Parse resulting parameters
+    long number_of_samples = 1000;
+    if (NULL != number_of_samples_str)
+    {
+        char *end_ptr = NULL;
+        number_of_samples = strtol(number_of_samples_str, &end_ptr, 10);
+        if (*end_ptr != '\0')
+        {
+            fprintf(stderr, "Value of 'samples' is not a correct number");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
+
+    if (verbose)
+    {
+        fprintf(stderr, "Current parameters:\n");
+        fprintf(stderr, "\t- number of samples: %s\n", number_of_samples_str);
+        fprintf(stderr, "\t- scene ID:          %s\n", scene_id_str);
+        fprintf(stderr, "\t- file_name:         %s\n", file_name);
+    }
+
     // Image parameters
     const double ASPECT_RATIO = 3.0 / 2.0;
     const int IMAGE_WIDTH = 300;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
-    const int SAMPLES_PER_PIXEL = 200;
     const int CHILD_RAYS = 50;
 
     // Declare Camera parameters
@@ -155,17 +226,17 @@ int main(int argc, char const *argv[])
         rt_camera_new(look_from, look_at, up, vertical_fov, ASPECT_RATIO, aperture, focus_distance, 0.0, 1.0);
 
     FILE *out_file = stdout;
-    if (argc == 2)
+    if (NULL != file_name)
     {
-        out_file = fopen(argv[1], "w");
+        out_file = fopen(file_name, "w");
         if (NULL == out_file)
         {
             fprintf(stderr, "Unable to open file %s: %s", argv[1], strerror(errno));
             goto cleanup;
         }
     }
-    // Render
 
+    // Render
     fprintf(out_file, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
     for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
     {
@@ -174,7 +245,7 @@ int main(int argc, char const *argv[])
         for (int i = 0; i < IMAGE_WIDTH; ++i)
         {
             colour_t pixel = colour(0, 0, 0);
-            for (int s = 0; s < SAMPLES_PER_PIXEL; ++s)
+            for (int s = 0; s < number_of_samples; ++s)
             {
                 double u = (double)(i + rt_random_double(0, 1)) / (IMAGE_WIDTH - 1);
                 double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
@@ -182,7 +253,7 @@ int main(int argc, char const *argv[])
                 ray_t ray = rt_camera_get_ray(camera, u, v);
                 vec3_add(&pixel, ray_colour(&ray, world, skybox, CHILD_RAYS));
             }
-            rt_write_colour(out_file, pixel, SAMPLES_PER_PIXEL);
+            rt_write_colour(out_file, pixel, number_of_samples);
         }
     }
     fprintf(stderr, "\nDone\n");
@@ -192,5 +263,20 @@ cleanup:
     rt_camera_delete(camera);
     rt_skybox_delete(skybox);
 
-    return 0;
+    return EXIT_SUCCESS;
+}
+
+static void show_usage(const char *program_name, int err)
+{
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [output_file_name]\n", program_name);
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "\t-s | --samples     <int>      Number of rays to cast for each pixel\n");
+    fprintf(stderr, "\t--scene            <int>      ID of the scene to render\n");
+    fprintf(stderr, "\t-v | --verbose                Enable verbose output\n");
+    fprintf(stderr, "\t-h                            Show this message and exit\n");
+    fprintf(stderr, "Positional arguments:\n");
+    fprintf(stderr, "\toutput_file_name         Name of the output file. Outputs image to console if not specified.\n");
+
+    exit(err);
 }
