@@ -8,14 +8,12 @@
 #include <stdio.h>
 
 #include "hittables/rt_hittable_list.h"
-#include "materials/rt_material.h"
 #include "rt_camera.h"
-#include "rt_colour.h"
-#include "rt_weekend.h"
 #include "rt_skybox_simple.h"
 #include <errno.h>
 #include <string.h>
 #include <scenes/rt_scenes.h>
+#include <assert.h>
 
 static void show_usage(const char *program_name, int err);
 
@@ -56,7 +54,7 @@ int main(int argc, char const *argv[])
         {
             if (i + 1 >= argc)
             {
-                fprintf(stderr, "Argument '%s' doesn't have a value\n", argv[i]);
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
                 show_usage(argv[0], EXIT_FAILURE);
             }
             number_of_samples_str = argv[++i];
@@ -66,7 +64,7 @@ int main(int argc, char const *argv[])
         {
             if (i + 1 >= argc)
             {
-                fprintf(stderr, "Argument '%s' doesn't have a value\n", argv[i]);
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
                 show_usage(argv[0], EXIT_FAILURE);
             }
             scene_id_str = argv[++i];
@@ -82,15 +80,23 @@ int main(int argc, char const *argv[])
         }
         else if ('-' == *argv[i])
         {
-            fprintf(stderr, "Unknown argument '%s'\n", argv[i]);
+            fprintf(stderr, "Fatal error: Unknown argument '%s'\n", argv[i]);
             show_usage(argv[0], EXIT_FAILURE);
         }
         else if (i + 1 < argc)
         {
-            fprintf(stderr, "Too many positional arguments (1 expected)\n");
+            fprintf(stderr, "Fatal error: Too many positional arguments (1 expected)\n");
             show_usage(argv[0], EXIT_FAILURE);
         }
         file_name = argv[i];
+    }
+
+    if (verbose)
+    {
+        fprintf(stderr, "Non-parsed parameters:\n");
+        fprintf(stderr, "\t- number of samples: %s\n", number_of_samples_str);
+        fprintf(stderr, "\t- scene ID:          %s\n", scene_id_str);
+        fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
     // Parse resulting parameters
@@ -101,16 +107,26 @@ int main(int argc, char const *argv[])
         number_of_samples = strtol(number_of_samples_str, &end_ptr, 10);
         if (*end_ptr != '\0')
         {
-            fprintf(stderr, "Value of 'samples' is not a correct number");
+            fprintf(stderr, "Fatal error: Value of 'samples' is not a correct number\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
+    rt_scene_id_t scene_id = RT_SCENE_SHOWCASE;
+    if (NULL != scene_id_str)
+    {
+        scene_id = rt_scene_get_id_by_name(scene_id_str);
+        if (RT_SCENE_NONE == scene_id)
+        {
+            fprintf(stderr, "Fatal error: Invalid scene identifier\n");
             show_usage(argv[0], EXIT_FAILURE);
         }
     }
 
     if (verbose)
     {
-        fprintf(stderr, "Current parameters:\n");
-        fprintf(stderr, "\t- number of samples: %s\n", number_of_samples_str);
-        fprintf(stderr, "\t- scene ID:          %s\n", scene_id_str);
+        fprintf(stderr, "Parsed parameters:\n");
+        fprintf(stderr, "\t- number of samples: %ld\n", number_of_samples);
+        fprintf(stderr, "\t- scene ID:          %d\n", scene_id);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
@@ -127,7 +143,6 @@ int main(int argc, char const *argv[])
 
     // World
     rt_hittable_list_t *world = NULL;
-    rt_scene_id_t scene_id = RT_SCENE_SHOWCASE;
     rt_skybox_t *skybox = NULL;
 
     // Select a scene from a pre-defined one
@@ -220,6 +235,9 @@ int main(int argc, char const *argv[])
             skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_metal_test();
             break;
+        case RT_SCENE_NONE:
+            fprintf(stderr, "Fatal error: scene id is undefined after parsing the parameters\n");
+            return EXIT_FAILURE;
     }
 
     rt_camera_t *camera =
@@ -231,7 +249,7 @@ int main(int argc, char const *argv[])
         out_file = fopen(file_name, "w");
         if (NULL == out_file)
         {
-            fprintf(stderr, "Unable to open file %s: %s", argv[1], strerror(errno));
+            fprintf(stderr, "Fatal error: Unable to open file %s: %s", file_name, strerror(errno));
             goto cleanup;
         }
     }
@@ -271,12 +289,14 @@ static void show_usage(const char *program_name, int err)
     fprintf(stderr, "Usage:\n");
     fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [output_file_name]\n", program_name);
     fprintf(stderr, "Options:\n");
-    fprintf(stderr, "\t-s | --samples     <int>      Number of rays to cast for each pixel\n");
-    fprintf(stderr, "\t--scene            <int>      ID of the scene to render\n");
-    fprintf(stderr, "\t-v | --verbose                Enable verbose output\n");
-    fprintf(stderr, "\t-h                            Show this message and exit\n");
+    fprintf(stderr, "\t-s | --samples      <int>       Number of rays to cast for each pixel\n");
+    fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
+    fprintf(stderr, "\t-v | --verbose                  Enable verbose output\n");
+    fprintf(stderr, "\t-h                              Show this message and exit\n");
     fprintf(stderr, "Positional arguments:\n");
-    fprintf(stderr, "\toutput_file_name         Name of the output file. Outputs image to console if not specified.\n");
+    fprintf(stderr, "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
+    fprintf(stderr, "Available scenes:\n");
+    rt_scene_print_scenes_info(stderr);
 
     exit(err);
 }

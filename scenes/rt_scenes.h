@@ -11,6 +11,7 @@
 
 typedef enum rt_scene_id_s
 {
+    RT_SCENE_NONE = -1,
     RT_SCENE_RANDOM,
     RT_SCENE_TWO_SPHERES,
     RT_SCENE_TWO_PERLIN_SPHERES,
@@ -22,6 +23,14 @@ typedef enum rt_scene_id_s
     RT_SCENE_SHOWCASE,
     RT_SCENE_METAL_TEST,
 } rt_scene_id_t;
+
+rt_scene_id_t rt_scene_get_id_by_name(const char *name);
+
+const char *rt_scene_get_name_by_id(rt_scene_id_t scene_id);
+
+const char *rt_scene_get_available_scene_names_printable(void);
+
+void rt_scene_print_scenes_info(FILE *to);
 
 rt_hittable_list_t *rt_scene_random(void);
 

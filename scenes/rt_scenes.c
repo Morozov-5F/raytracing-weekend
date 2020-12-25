@@ -14,6 +14,8 @@
 #include <rt_bvh.h>
 #include <rt_aa_rect.h>
 #include <rt_instance.h>
+#include <string.h>
+#include <assert.h>
 
 rt_hittable_list_t *rt_scene_random(void)
 {
@@ -329,10 +331,71 @@ rt_hittable_list_t *rt_scene_metal_test(void)
     rt_hittable_list_add(objects, rt_sphere_new(point3(0, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.5)));
     rt_hittable_list_add(objects, rt_sphere_new(point3(2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 1.0)));
 
-    rt_hittable_t *box_instance = rt_instance_new(rt_box_new(point3(-1, 0, 10), point3(1, 2, 12), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
+    rt_hittable_t *box_instance =
+        rt_instance_new(rt_box_new(point3(-1, 0, 10), point3(1, 2, 12), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
     rt_instance_rotate_y(box_instance, 10);
     rt_hittable_list_add(objects, box_instance);
 
-
     return objects;
+}
+
+typedef struct rt_scenes_s
+{
+    rt_scene_id_t id;
+    const char *name;
+    const char *desc;
+} rt_scenes_t;
+
+static rt_scenes_t gs_scenes[] = {
+    {RT_SCENE_RANDOM, "random_spheres", "Scene from \'Ray Tracing In One Weekend\' cover (with checker texture)"},
+    {RT_SCENE_TWO_SPHERES, "two_spheres", "Two checkered spheres"},
+    {RT_SCENE_TWO_PERLIN_SPHERES, "perlin_spheres", "Two spheres with Perlin-based textures"},
+    {RT_SCENE_EARTH, "earth", "Sphere with Earth texture"},
+    {RT_SCENE_LIGHT_SAMPLE, "light_sample", "Sphere with a light source near it"},
+    {RT_SCENE_CORNELL_BOX, "cornell_box", "Cornell box scene"},
+    {RT_SCENE_INSTANCE_TEST, "instance_test", "Several rotated and translated cubes"},
+    {RT_SCENE_CORNELL_SMOKE, "cornell_smoke", "Cornell box scene but boxes as made of smoke"},
+    {RT_SCENE_SHOWCASE, "showcase", "Scene from \'Ray Tracing: The Next Week\' cover"},
+    {RT_SCENE_METAL_TEST, "metal_test", "Test for metal texture (several metal spheres)"},
+};
+
+rt_scene_id_t rt_scene_get_id_by_name(const char *name)
+{
+    if (NULL == name)
+    {
+        return RT_SCENE_NONE;
+    }
+
+    for (int i = 0; i < sizeof(gs_scenes)/sizeof(gs_scenes[0]); ++i)
+    {
+        if (0 == strcmp(gs_scenes[i].name, name))
+        {
+            return gs_scenes[i].id;
+        }
+    }
+
+    return RT_SCENE_NONE;
+}
+
+const char *rt_scene_get_name_by_id(rt_scene_id_t scene_id)
+{
+    for (int i = 0; i < sizeof(gs_scenes)/sizeof(gs_scenes[0]); ++i)
+    {
+        if (gs_scenes[i].id == scene_id)
+        {
+            return gs_scenes[i].name;
+        }
+    }
+
+    return NULL;
+}
+
+void rt_scene_print_scenes_info(FILE *to)
+{
+    assert(NULL != to);
+
+    for (int i = 0; i < sizeof(gs_scenes)/sizeof(gs_scenes[0]); ++i)
+    {
+        fprintf(to, "\t%-30s  %s\n", gs_scenes[i].name, gs_scenes[i].desc);
+    }
 }
