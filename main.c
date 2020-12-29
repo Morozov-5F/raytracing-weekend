@@ -45,6 +45,8 @@ int main(int argc, char const *argv[])
     const char *number_of_samples_str = NULL;
     const char *scene_id_str = NULL;
     const char *file_name = NULL;
+    const char *image_width_str = NULL;
+    const char *image_height_str = NULL;
     bool verbose = false;
 
     // Parse console arguments
@@ -73,6 +75,37 @@ int main(int argc, char const *argv[])
         else if (0 == strcmp(argv[i], "-v") || 0 == strcmp(argv[i], "--verbose"))
         {
             verbose = true;
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "-t") || 0 == strcmp(argv[i], "--threads"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            i++;
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "--width"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            image_width_str = argv[++i];
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "--height"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            image_height_str = argv[++i];
+            continue;
         }
         else if (0 == strcmp(argv[i], "-h"))
         {
@@ -96,6 +129,8 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "Non-parsed parameters:\n");
         fprintf(stderr, "\t- number of samples: %s\n", number_of_samples_str);
         fprintf(stderr, "\t- scene ID:          %s\n", scene_id_str);
+        fprintf(stderr, "\t- image width:       %s\n", image_width_str);
+        fprintf(stderr, "\t- image height:      %s\n", image_width_str);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
@@ -121,19 +156,52 @@ int main(int argc, char const *argv[])
             show_usage(argv[0], EXIT_FAILURE);
         }
     }
+    int image_width = 320;
+    if (NULL != image_width_str)
+    {
+        if (NULL == image_height_str)
+        {
+            fprintf(stderr, "Missing --height parameter. Image width should always be specified with height\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+        char *end_ptr = NULL;
+        image_width = (int)strtol(image_width_str, &end_ptr, 10);
+        if (*end_ptr != '\0')
+        {
+            fprintf(stderr, "Fatal error: Value of 'width' is not a correct number\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
+    int image_height = 320;
+    if (NULL != image_height_str)
+    {
+        if (NULL == image_width_str)
+        {
+            fprintf(stderr, "Missing --width parameter. Image height should always be specified with width\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+        char *end_ptr = NULL;
+        image_height = (int)strtol(image_height_str, &end_ptr, 10);
+        if (*end_ptr != '\0')
+        {
+            fprintf(stderr, "Fatal error: Value of 'height' is not a correct number\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
+
 
     if (verbose)
     {
         fprintf(stderr, "Parsed parameters:\n");
         fprintf(stderr, "\t- number of samples: %ld\n", number_of_samples);
         fprintf(stderr, "\t- scene ID:          %d\n", scene_id);
+        fprintf(stderr, "\t- image width:       %d\n", image_width);
+        fprintf(stderr, "\t- image height:      %d\n", image_height);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
     // Image parameters
-    const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 300;
-    const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
+    double ASPECT_RATIO = (double)image_width / image_height;
     const int CHILD_RAYS = 50;
 
     // Declare Camera parameters
@@ -255,18 +323,18 @@ int main(int argc, char const *argv[])
     }
 
     // Render
-    fprintf(out_file, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
-    for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
+    fprintf(out_file, "P3\n%d %d\n255\n", image_width, image_height);
+    for (int j = image_height - 1; j >= 0; --j)
     {
         fprintf(stderr, "\rScanlines remaining: %d", j);
         fflush(stderr);
-        for (int i = 0; i < IMAGE_WIDTH; ++i)
+        for (int i = 0; i < image_width; ++i)
         {
             colour_t pixel = colour(0, 0, 0);
             for (int s = 0; s < number_of_samples; ++s)
             {
-                double u = (double)(i + rt_random_double(0, 1)) / (IMAGE_WIDTH - 1);
-                double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
+                double u = (double)(i + rt_random_double(0, 1)) / (image_width - 1);
+                double v = (double)(j + rt_random_double(0, 1)) / (image_height - 1);
 
                 ray_t ray = rt_camera_get_ray(camera, u, v);
                 vec3_add(&pixel, ray_colour(&ray, world, skybox, CHILD_RAYS));
@@ -286,17 +354,22 @@ cleanup:
 
 static void show_usage(const char *program_name, int err)
 {
+    // clang-format off
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [output_file_name]\n", program_name);
+    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [-t|--threads THREADS] [--width WIDTH] [--height HEIGHT] [output_file_name]\n", program_name);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-s | --samples      <int>       Number of rays to cast for each pixel\n");
     fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
+    fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
+    fprintf(stderr, "\t--width             <int>       Image width in pixels. Should be used with --height option.\n");
+    fprintf(stderr, "\t--height            <int>       Image height in pixels. Should be used with --width option.\n");
     fprintf(stderr, "\t-v | --verbose                  Enable verbose output\n");
     fprintf(stderr, "\t-h                              Show this message and exit\n");
     fprintf(stderr, "Positional arguments:\n");
     fprintf(stderr, "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
     fprintf(stderr, "Available scenes:\n");
     rt_scene_print_scenes_info(stderr);
+    // clang-format on
 
     exit(err);
 }

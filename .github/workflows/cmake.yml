@@ -49,7 +49,7 @@ jobs:
     - name: Render Sample Image
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ./ray_tracing_one_week -s 10 --scene metal_test sample_image.ppm
+      run: ./ray_tracing_one_week --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
     - name: Convert Sample Image to PNG
       working-directory: ${{runner.workspace}}/build
