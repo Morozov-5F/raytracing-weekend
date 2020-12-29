@@ -11,6 +11,17 @@ if (HAVE_LIB_M)
     set(EXTRA_LIBS ${EXTRA_LIBS} m)
 endif ()
 
+set(THREADING_IMPLEMENTATION "None")
+
+find_package(Threads REQUIRED)
+if (CMAKE_USE_PTHREADS_INIT)
+    set(THREADING_IMPLEMENTATION threads/rt_thread_pool_unix.c)
+elseif(CMAKE_USE_WIN32_THREADS_INIT)
+    message(FATAL_ERROR "The Win32 threads are not implemented yet")
+else()
+    message(FATAL_ERROR "The System does not contain the supported threading library (pthread or windows threads)")
+endif()
+
 add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.c rt_skybox_simple.c
                # Materials
                materials/rt_material.c rt_hit.c materials/rt_material_diffuse.c materials/rt_material_metal.c
@@ -21,8 +32,10 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                # Textures
                textures/rt_texture.c textures/rt_texture_solid_colour.c textures/rt_texture_checker_pattern.c
                textures/rt_texture_noise.c textures/rt_texture_image.c
-               # Scenets
-               scenes/rt_scenes.c)
+               # Scenes
+               scenes/rt_scenes.c
+               # Threading
+               ${THREADING_IMPLEMENTATION})
 
 target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
                        -Wall -Wextra -Winline>
@@ -43,5 +56,5 @@ add_custom_command(TARGET ray_tracing_one_week PRE_BUILD
                    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:ray_tracing_one_week>/assets)
 
 
-target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures deps)
-target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS})
+target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures deps threads)
+target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS} Threads::Threads)

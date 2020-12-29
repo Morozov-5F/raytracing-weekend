@@ -13,7 +13,7 @@
 #include <errno.h>
 #include <string.h>
 #include <scenes/rt_scenes.h>
-#include <assert.h>
+#include <rt_thread_pool.h>
 
 static void show_usage(const char *program_name, int err);
 
