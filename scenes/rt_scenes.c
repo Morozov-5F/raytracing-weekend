@@ -328,7 +328,7 @@ rt_hittable_list_t *rt_scene_metal_test(void)
     rt_hittable_list_add(objects, rt_sphere_new(point3(0, -1000, 0), 1000, checker));
 
     rt_hittable_list_add(objects, rt_sphere_new(point3(-2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
-    rt_hittable_list_add(objects, rt_sphere_new(point3(0, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.5)));
+    rt_hittable_list_add(objects, rt_sphere_new(point3(0, 2, 0), 1, rt_mt_dielectric_new(1.5)));
     rt_hittable_list_add(objects, rt_sphere_new(point3(2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 1.0)));
 
     rt_hittable_t *box_instance =

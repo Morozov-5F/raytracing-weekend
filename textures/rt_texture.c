@@ -58,6 +58,7 @@ void rt_texture_delete(rt_texture_t *texture)
 static colour_t rt_texture_value_default(const rt_texture_t *texture, double u, double v, const vec3_t *p)
 {
     assert(0);
+    return colour(0, 0, 0);
 }
 
 static void rt_texture_delete_default(rt_texture_t *texture)

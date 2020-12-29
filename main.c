@@ -14,10 +14,57 @@
 #include <string.h>
 #include <scenes/rt_scenes.h>
 #include <rt_thread_pool.h>
+#include <assert.h>
+#include <rt_sync.h>
+
+typedef struct worker_arg_s
+{
+    struct
+    {
+        vec3_t *pixels;
+        int width;
+        int height;
+    } image;
+
+    struct
+    {
+        int x_start;
+        int y_start;
+
+        int width;
+        int height;
+    } chunk;
+
+    struct
+    {
+        int child_rays;
+        long number_of_samples;
+    } rendering;
+
+    struct
+    {
+        const rt_hittable_list_t *world;
+        const rt_skybox_t *skybox;
+        const rt_camera_t *camera;
+    } scene;
+
+    struct
+    {
+        rt_mutex_t *process_mutex;
+        int total_chunks;
+        int *processed_chunks;
+    } progress;
+} worker_arg_t;
+
+static void render_worker(void *args);
+static void render_worker_complete(int status, void *args);
+static void render_chunk(vec3_t *image, int image_width, int image_height, long number_of_samples, int child_rays,
+                         int column_start, int width, int row_start, int height, const rt_hittable_list_t *world,
+                         const rt_skybox_t *skybox, const rt_camera_t *camera);
 
 static void show_usage(const char *program_name, int err);
 
-static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, rt_skybox_t *skybox, int child_rays)
+static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays)
 {
     if (child_rays <= 0)
     {
@@ -45,6 +92,7 @@ int main(int argc, char const *argv[])
     const char *number_of_samples_str = NULL;
     const char *scene_id_str = NULL;
     const char *file_name = NULL;
+    const char *number_of_threads_str = NULL;
     bool verbose = false;
 
     // Parse console arguments
@@ -73,6 +121,16 @@ int main(int argc, char const *argv[])
         else if (0 == strcmp(argv[i], "-v") || 0 == strcmp(argv[i], "--verbose"))
         {
             verbose = true;
+        }
+        else if (0 == strcmp(argv[i], "-t") || 0 == strcmp(argv[i], "--threads"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            number_of_threads_str = argv[++i];
+            continue;
         }
         else if (0 == strcmp(argv[i], "-h"))
         {
@@ -121,20 +179,33 @@ int main(int argc, char const *argv[])
             show_usage(argv[0], EXIT_FAILURE);
         }
     }
+    long number_of_threads = rt_sync_get_number_of_cores();
+    if (NULL != number_of_threads_str)
+    {
+        char *end_ptr = NULL;
+        number_of_threads = strtol(number_of_threads_str, &end_ptr, 10);
+        if (*end_ptr != '\0')
+        {
+            fprintf(stderr, "Fatal error: Value of 'threads' is not a correct number\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
 
     if (verbose)
     {
         fprintf(stderr, "Parsed parameters:\n");
         fprintf(stderr, "\t- number of samples: %ld\n", number_of_samples);
         fprintf(stderr, "\t- scene ID:          %d\n", scene_id);
+        fprintf(stderr, "\t- number of threads: %ld\n", number_of_threads);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
     // Image parameters
-    const double ASPECT_RATIO = 3.0 / 2.0;
-    const int IMAGE_WIDTH = 300;
+    const double ASPECT_RATIO = 1.0;
+    const int IMAGE_WIDTH = 320;
     const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
     const int CHILD_RAYS = 50;
+    const int CHUNK_SIZE = 32;
 
     // Declare Camera parameters
     point3_t look_from, look_at;
@@ -243,6 +314,9 @@ int main(int argc, char const *argv[])
     rt_camera_t *camera =
         rt_camera_new(look_from, look_at, up, vertical_fov, ASPECT_RATIO, aperture, focus_distance, 0.0, 1.0);
 
+    vec3_t *image = calloc(IMAGE_HEIGHT * IMAGE_WIDTH, sizeof(vec3_t));
+    assert(NULL != image);
+
     FILE *out_file = stdout;
     if (NULL != file_name)
     {
@@ -254,32 +328,80 @@ int main(int argc, char const *argv[])
         }
     }
 
-    // Render
+    // Prepare a thread pool
+    rt_thread_pool_t *thread_pool = rt_tp_init(number_of_threads);
+    assert(NULL != thread_pool);
+
+    rt_mutex_t *progress_mutex = rt_mutex_init();
+    assert(NULL != progress_mutex);
+
+    // Distribute workers
+    int processed_chunks = 0;
+    int number_of_chunks = (int)ceil(IMAGE_HEIGHT / (double)CHUNK_SIZE) * (int)ceil(IMAGE_WIDTH / (double)CHUNK_SIZE);
+    for (int i = 0; i < ceil(IMAGE_HEIGHT / (double)CHUNK_SIZE); ++i)
+    {
+        for (int j = 0; j < ceil(IMAGE_WIDTH / (double)CHUNK_SIZE); ++j)
+        {
+            worker_arg_t *arg = malloc(sizeof(worker_arg_t));
+            assert(NULL != arg);
+
+            arg->scene.camera = camera;
+            arg->scene.skybox = skybox;
+            arg->scene.world = world;
+
+            arg->rendering.number_of_samples = number_of_samples;
+            arg->rendering.child_rays = CHILD_RAYS;
+
+            arg->chunk.x_start = j * CHUNK_SIZE;
+            arg->chunk.y_start = i * CHUNK_SIZE;
+            arg->chunk.width = IMAGE_WIDTH - j * CHUNK_SIZE < CHUNK_SIZE ? IMAGE_WIDTH - j * CHUNK_SIZE : CHUNK_SIZE;
+            arg->chunk.height = IMAGE_HEIGHT - i * CHUNK_SIZE < CHUNK_SIZE ? IMAGE_HEIGHT - i * CHUNK_SIZE : CHUNK_SIZE;
+
+            arg->image.pixels = image;
+            arg->image.width = IMAGE_WIDTH;
+            arg->image.height = IMAGE_HEIGHT;
+
+            arg->progress.process_mutex = progress_mutex;
+            arg->progress.total_chunks = number_of_chunks;
+            arg->progress.processed_chunks = &processed_chunks;
+
+            rt_tp_schedule_work(thread_pool, render_worker, arg, render_worker_complete);
+        }
+    }
+
+    if (verbose)
+    {
+        fprintf(stderr, "Rendering started\n");
+        fflush(stderr);
+    }
+
+    // Wait until all the workers finish
+    rt_tp_deinit(thread_pool);
+
+    if (verbose)
+    {
+        fprintf(stderr, "\nRendering done, starting output to file\n");
+        fflush(stderr);
+    }
+
+    // Output image to file
     fprintf(out_file, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
     for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
     {
-        fprintf(stderr, "\rScanlines remaining: %d", j);
-        fflush(stderr);
         for (int i = 0; i < IMAGE_WIDTH; ++i)
         {
-            colour_t pixel = colour(0, 0, 0);
-            for (int s = 0; s < number_of_samples; ++s)
-            {
-                double u = (double)(i + rt_random_double(0, 1)) / (IMAGE_WIDTH - 1);
-                double v = (double)(j + rt_random_double(0, 1)) / (IMAGE_HEIGHT - 1);
-
-                ray_t ray = rt_camera_get_ray(camera, u, v);
-                vec3_add(&pixel, ray_colour(&ray, world, skybox, CHILD_RAYS));
-            }
-            rt_write_colour(out_file, pixel, number_of_samples);
+            rt_write_colour(out_file, image[j * IMAGE_WIDTH + i], number_of_samples);
         }
     }
     fprintf(stderr, "\nDone\n");
+    fflush(stderr);
+
 cleanup:
     // Cleanup
     rt_hittable_list_deinit(world);
     rt_camera_delete(camera);
     rt_skybox_delete(skybox);
+    free(image);
 
     return EXIT_SUCCESS;
 }
@@ -290,13 +412,74 @@ static void show_usage(const char *program_name, int err)
     fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [output_file_name]\n", program_name);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-s | --samples      <int>       Number of rays to cast for each pixel\n");
-    fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
+    fprintf(
+        stderr,
+        "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
+    fprintf(stderr, "\t-t | --threads      <int>       Number of threads to utilize during rendering.\n");
     fprintf(stderr, "\t-v | --verbose                  Enable verbose output\n");
     fprintf(stderr, "\t-h                              Show this message and exit\n");
     fprintf(stderr, "Positional arguments:\n");
-    fprintf(stderr, "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
+    fprintf(stderr,
+            "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
     fprintf(stderr, "Available scenes:\n");
     rt_scene_print_scenes_info(stderr);
 
     exit(err);
+}
+
+static void render_chunk(vec3_t *image, int image_width, int image_height, long number_of_samples, int child_rays,
+                         int column_start, int width, int row_start, int height, const rt_hittable_list_t *world,
+                         const rt_skybox_t *skybox, const rt_camera_t *camera)
+{
+    for (int j = row_start + height - 1; j >= row_start; --j)
+    {
+        for (int i = column_start; i < column_start + width; ++i)
+        {
+            colour_t pixel = colour(0, 0, 0);
+            for (int s = 0; s < number_of_samples; ++s)
+            {
+                double u = (double)(i + rt_random_double(0, 1)) / (image_width - 1);
+                double v = (double)(j + rt_random_double(0, 1)) / (image_height - 1);
+
+                ray_t ray = rt_camera_get_ray(camera, u, v);
+                vec3_add(&pixel, ray_colour(&ray, world, skybox, child_rays));
+            }
+            image[j * image_width + i] = pixel;
+        }
+    }
+}
+
+static void render_worker(void *args)
+{
+    worker_arg_t *worker_arg = args;
+    assert(NULL != worker_arg);
+
+    render_chunk(worker_arg->image.pixels, worker_arg->image.width, worker_arg->image.height,
+                 worker_arg->rendering.number_of_samples, worker_arg->rendering.child_rays, worker_arg->chunk.x_start,
+                 worker_arg->chunk.width, worker_arg->chunk.y_start, worker_arg->chunk.height, worker_arg->scene.world,
+                 worker_arg->scene.skybox, worker_arg->scene.camera);
+}
+
+static void render_worker_complete(int status, void *args)
+{
+    worker_arg_t *worker_arg = args;
+
+    rt_mutex_lock(worker_arg->progress.process_mutex);
+
+    int last_processed_chunks = *(worker_arg->progress.processed_chunks);
+    *worker_arg->progress.processed_chunks += 1;
+    int current_processed_chunks = *(worker_arg->progress.processed_chunks);
+    int old_percentage = 100 * last_processed_chunks / worker_arg->progress.total_chunks;
+    int current_percentage = 100 * current_processed_chunks / worker_arg->progress.total_chunks;
+
+    if (current_percentage != old_percentage)
+    {
+        fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks,
+                worker_arg->progress.total_chunks, current_percentage);
+        fflush(stderr);
+    }
+
+    rt_mutex_unlock(worker_arg->progress.process_mutex);
+
+    free(worker_arg);
 }

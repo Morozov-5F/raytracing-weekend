@@ -6,7 +6,7 @@ set(CMAKE_C_STANDARD 11)
 
 include(CheckLibraryExists)
 
-CHECK_LIBRARY_EXISTS(m cos "" HAVE_LIB_M)
+CHECK_LIBRARY_EXISTS(m ceil "" HAVE_LIB_M)
 if (HAVE_LIB_M)
     set(EXTRA_LIBS ${EXTRA_LIBS} m)
 endif ()
@@ -15,7 +15,7 @@ set(THREADING_IMPLEMENTATION "None")
 
 find_package(Threads REQUIRED)
 if (CMAKE_USE_PTHREADS_INIT)
-    set(THREADING_IMPLEMENTATION threads/rt_thread_pool_unix.c)
+    set(THREADING_IMPLEMENTATION threads/rt_thread_pool_unix.c threads/rt_sync_unix.c)
 elseif(CMAKE_USE_WIN32_THREADS_INIT)
     message(FATAL_ERROR "The Win32 threads are not implemented yet")
 else()

@@ -29,7 +29,7 @@ rt_skybox_t *rt_skybox_new_background(colour_t background)
     return rt_skybox_new_gradient(background, background);
 }
 
-colour_t rt_skybox_value(rt_skybox_t *skybox, const ray_t *ray)
+colour_t rt_skybox_value(const rt_skybox_t *skybox, const ray_t *ray)
 {
     assert(NULL != skybox);
     assert(NULL != ray);

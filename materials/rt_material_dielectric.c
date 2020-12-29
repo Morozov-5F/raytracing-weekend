@@ -11,8 +11,9 @@
 typedef struct rt_material_dielectric_s
 {
     rt_material_t base;
-
     double refraction_factor;
+
+    colour_t colour;
 } rt_material_dielectric_t;
 
 static bool rt_mt_dielectric_scatter(const rt_material_t *material, const ray_t *incoming_ray,
@@ -26,7 +27,7 @@ rt_material_t *rt_mt_dielectric_new(double refraction_factor)
 
     rt_material_base_init(&material->base, RT_MATERIAL_TYPE_DIELECTRIC, rt_mt_dielectric_scatter, NULL, NULL);
     material->refraction_factor = refraction_factor;
-
+    material->colour = colour(0.0, 0.0, 0.0);
     return (rt_material_t *)material;
 }
 
@@ -48,7 +49,7 @@ static bool rt_mt_dielectric_scatter(const rt_material_t *material, const ray_t 
 
     assert(RT_MATERIAL_TYPE_DIELECTRIC == material->type);
 
-    rt_material_dielectric_t *dielectric = (rt_material_dielectric_t*)material;
+    rt_material_dielectric_t *dielectric = (rt_material_dielectric_t *)material;
 
     *attenuation = colour(1.0, 1.0, 1.0);
     double r = hit_record->front_face ? (1.0 / dielectric->refraction_factor) : dielectric->refraction_factor;
@@ -62,6 +63,15 @@ static bool rt_mt_dielectric_scatter(const rt_material_t *material, const ray_t 
         *scattered_ray = ray_init(hit_record->p, reflected, 0);
         return true;
     }
+
+    if (!hit_record->front_face)
+    {
+        double travel_distance = vec3_length(vec3_diff(hit_record->p, incoming_ray->origin));
+
+        colour_t absorbance = vec3_scale(dielectric->colour, travel_distance * -0.25);
+        *attenuation = colour(exp(absorbance.x), exp(absorbance.y), exp(absorbance.z));
+    }
+
     vec3_t refracted = vec3_refract(&direction_unit, &hit_record->normal, r);
     *scattered_ray = ray_init(hit_record->p, refracted, incoming_ray->time);
 
