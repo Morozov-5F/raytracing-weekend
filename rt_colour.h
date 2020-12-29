@@ -5,7 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-
 #ifndef RAY_TRACING_ONE_WEEK_RT_COLOUR_H
 #define RAY_TRACING_ONE_WEEK_RT_COLOUR_H
 
@@ -19,4 +18,4 @@ typedef vec3_t colour_t;
 
 void rt_write_colour(FILE *stream, colour_t pixel_colour, size_t samples_per_pixel);
 
-#endif //RAY_TRACING_ONE_WEEK_RT_COLOUR_H
+#endif // RAY_TRACING_ONE_WEEK_RT_COLOUR_H

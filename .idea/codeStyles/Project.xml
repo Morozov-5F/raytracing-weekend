@@ -1,5 +1,6 @@
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
+    <option name="SOFT_MARGINS" value="80,120" />
     <Objective-C>
       <option name="NAMESPACE_BRACE_PLACEMENT" value="2" />
       <option name="FUNCTION_BRACE_PLACEMENT" value="2" />
@@ -7,8 +8,8 @@
     </Objective-C>
     <Objective-C-extensions>
       <extensions>
-        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
         <pair source="c" header="h" fileNamingConvention="SNAKE_CASE" />
+        <pair source="cpp" header="h" fileNamingConvention="SNAKE_CASE" />
         <pair source="cu" header="cuh" fileNamingConvention="NONE" />
       </extensions>
       <rules>
@@ -30,6 +31,9 @@
     <clangFormatSettings>
       <option name="ENABLED" value="true" />
     </clangFormatSettings>
+    <codeStyleSettings language="CMake">
+      <option name="ALIGN_MULTILINE_PARAMETERS_IN_CALLS" value="true" />
+    </codeStyleSettings>
     <codeStyleSettings language="ObjectiveC">
       <option name="BRACE_STYLE" value="2" />
       <option name="CLASS_BRACE_STYLE" value="2" />

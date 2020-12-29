@@ -19,9 +19,12 @@ typedef struct rt_hit_record_s
 
     double t;
 
+    double u;
+    double v;
+
     bool front_face;
 } rt_hit_record_t;
 
 void rt_hit_record_set_front_face(rt_hit_record_t *record, const ray_t *ray, const vec3_t *outward_normal);
 
-#endif //RAY_TRACING_ONE_WEEK_RT_HIT_H
+#endif // RAY_TRACING_ONE_WEEK_RT_HIT_H
