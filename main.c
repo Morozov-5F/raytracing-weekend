@@ -93,6 +93,8 @@ int main(int argc, char const *argv[])
     const char *scene_id_str = NULL;
     const char *file_name = NULL;
     const char *number_of_threads_str = NULL;
+    const char *image_width_str = NULL;
+    const char *image_height_str = NULL;
     bool verbose = false;
 
     // Parse console arguments
@@ -121,6 +123,7 @@ int main(int argc, char const *argv[])
         else if (0 == strcmp(argv[i], "-v") || 0 == strcmp(argv[i], "--verbose"))
         {
             verbose = true;
+            continue;
         }
         else if (0 == strcmp(argv[i], "-t") || 0 == strcmp(argv[i], "--threads"))
         {
@@ -130,6 +133,26 @@ int main(int argc, char const *argv[])
                 show_usage(argv[0], EXIT_FAILURE);
             }
             number_of_threads_str = argv[++i];
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "--width"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            image_width_str = argv[++i];
+            continue;
+        }
+        else if (0 == strcmp(argv[i], "--height"))
+        {
+            if (i + 1 >= argc)
+            {
+                fprintf(stderr, "Fatal error: Argument '%s' doesn't have a value\n", argv[i]);
+                show_usage(argv[0], EXIT_FAILURE);
+            }
+            image_height_str = argv[++i];
             continue;
         }
         else if (0 == strcmp(argv[i], "-h"))
@@ -154,6 +177,9 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "Non-parsed parameters:\n");
         fprintf(stderr, "\t- number of samples: %s\n", number_of_samples_str);
         fprintf(stderr, "\t- scene ID:          %s\n", scene_id_str);
+        fprintf(stderr, "\t- number of threads: %s\n", number_of_threads_str);
+        fprintf(stderr, "\t- image width:       %s\n", image_width_str);
+        fprintf(stderr, "\t- image height:      %s\n", image_width_str);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
@@ -190,6 +216,39 @@ int main(int argc, char const *argv[])
             show_usage(argv[0], EXIT_FAILURE);
         }
     }
+    int image_width = 320;
+    if (NULL != image_width_str)
+    {
+        if (NULL == image_height_str)
+        {
+            fprintf(stderr, "Missing --height parameter. Image width should always be specified with height\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+        char *end_ptr = NULL;
+        image_width = (int)strtol(image_width_str, &end_ptr, 10);
+        if (*end_ptr != '\0')
+        {
+            fprintf(stderr, "Fatal error: Value of 'width' is not a correct number\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
+    int image_height = 320;
+    if (NULL != image_height_str)
+    {
+        if (NULL == image_width_str)
+        {
+            fprintf(stderr, "Missing --width parameter. Image height should always be specified with width\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+        char *end_ptr = NULL;
+        image_height = (int)strtol(image_height_str, &end_ptr, 10);
+        if (*end_ptr != '\0')
+        {
+            fprintf(stderr, "Fatal error: Value of 'height' is not a correct number\n");
+            show_usage(argv[0], EXIT_FAILURE);
+        }
+    }
+
 
     if (verbose)
     {
@@ -197,13 +256,13 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "\t- number of samples: %ld\n", number_of_samples);
         fprintf(stderr, "\t- scene ID:          %d\n", scene_id);
         fprintf(stderr, "\t- number of threads: %ld\n", number_of_threads);
+        fprintf(stderr, "\t- image width:       %d\n", image_width);
+        fprintf(stderr, "\t- image height:      %d\n", image_height);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
     }
 
     // Image parameters
-    const double ASPECT_RATIO = 1.0;
-    const int IMAGE_WIDTH = 320;
-    const int IMAGE_HEIGHT = (int)(IMAGE_WIDTH / ASPECT_RATIO);
+    double ASPECT_RATIO = (double)image_width / image_height;
     const int CHILD_RAYS = 50;
     const int CHUNK_SIZE = 32;
 
@@ -314,7 +373,7 @@ int main(int argc, char const *argv[])
     rt_camera_t *camera =
         rt_camera_new(look_from, look_at, up, vertical_fov, ASPECT_RATIO, aperture, focus_distance, 0.0, 1.0);
 
-    vec3_t *image = calloc(IMAGE_HEIGHT * IMAGE_WIDTH, sizeof(vec3_t));
+    vec3_t *image = calloc(image_height * image_width, sizeof(vec3_t));
     assert(NULL != image);
 
     FILE *out_file = stdout;
@@ -335,12 +394,22 @@ int main(int argc, char const *argv[])
     rt_mutex_t *progress_mutex = rt_mutex_init();
     assert(NULL != progress_mutex);
 
+    if (verbose)
+    {
+        fprintf(stderr, "Rendering started\n");
+        fflush(stderr);
+    }
+
     // Distribute workers
     int processed_chunks = 0;
-    int number_of_chunks = (int)ceil(IMAGE_HEIGHT / (double)CHUNK_SIZE) * (int)ceil(IMAGE_WIDTH / (double)CHUNK_SIZE);
-    for (int i = 0; i < ceil(IMAGE_HEIGHT / (double)CHUNK_SIZE); ++i)
+    int number_of_chunks = (int)ceil(image_height / (double)CHUNK_SIZE) * (int)ceil(image_width / (double)CHUNK_SIZE);
+
+    fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", 0, number_of_chunks, 0);
+    fflush(stderr);
+
+    for (int i = 0; i < ceil(image_height / (double)CHUNK_SIZE); ++i)
     {
-        for (int j = 0; j < ceil(IMAGE_WIDTH / (double)CHUNK_SIZE); ++j)
+        for (int j = 0; j < ceil(image_width / (double)CHUNK_SIZE); ++j)
         {
             worker_arg_t *arg = malloc(sizeof(worker_arg_t));
             assert(NULL != arg);
@@ -354,12 +423,12 @@ int main(int argc, char const *argv[])
 
             arg->chunk.x_start = j * CHUNK_SIZE;
             arg->chunk.y_start = i * CHUNK_SIZE;
-            arg->chunk.width = IMAGE_WIDTH - j * CHUNK_SIZE < CHUNK_SIZE ? IMAGE_WIDTH - j * CHUNK_SIZE : CHUNK_SIZE;
-            arg->chunk.height = IMAGE_HEIGHT - i * CHUNK_SIZE < CHUNK_SIZE ? IMAGE_HEIGHT - i * CHUNK_SIZE : CHUNK_SIZE;
+            arg->chunk.width = image_width - j * CHUNK_SIZE < CHUNK_SIZE ? image_width - j * CHUNK_SIZE : CHUNK_SIZE;
+            arg->chunk.height = image_height - i * CHUNK_SIZE < CHUNK_SIZE ? image_height - i * CHUNK_SIZE : CHUNK_SIZE;
 
             arg->image.pixels = image;
-            arg->image.width = IMAGE_WIDTH;
-            arg->image.height = IMAGE_HEIGHT;
+            arg->image.width = image_width;
+            arg->image.height = image_height;
 
             arg->progress.process_mutex = progress_mutex;
             arg->progress.total_chunks = number_of_chunks;
@@ -367,12 +436,6 @@ int main(int argc, char const *argv[])
 
             rt_tp_schedule_work(thread_pool, render_worker, arg, render_worker_complete);
         }
-    }
-
-    if (verbose)
-    {
-        fprintf(stderr, "Rendering started\n");
-        fflush(stderr);
     }
 
     // Wait until all the workers finish
@@ -385,12 +448,12 @@ int main(int argc, char const *argv[])
     }
 
     // Output image to file
-    fprintf(out_file, "P3\n%d %d\n255\n", IMAGE_WIDTH, IMAGE_HEIGHT);
-    for (int j = IMAGE_HEIGHT - 1; j >= 0; --j)
+    fprintf(out_file, "P3\n%d %d\n255\n", image_width, image_height);
+    for (int j = image_height - 1; j >= 0; --j)
     {
-        for (int i = 0; i < IMAGE_WIDTH; ++i)
+        for (int i = 0; i < image_width; ++i)
         {
-            rt_write_colour(out_file, image[j * IMAGE_WIDTH + i], number_of_samples);
+            rt_write_colour(out_file, image[j * image_width + i], number_of_samples);
         }
     }
     fprintf(stderr, "\nDone\n");
@@ -408,21 +471,22 @@ cleanup:
 
 static void show_usage(const char *program_name, int err)
 {
+    // clang-format off
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [output_file_name]\n", program_name);
+    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [-t|--threads THREADS] [--width WIDTH] [--height HEIGHT] [output_file_name]\n", program_name);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-s | --samples      <int>       Number of rays to cast for each pixel\n");
-    fprintf(
-        stderr,
-        "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
+    fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
     fprintf(stderr, "\t-t | --threads      <int>       Number of threads to utilize during rendering.\n");
+    fprintf(stderr, "\t--width             <int>       Image width in pixels. Should be used with --height option.\n");
+    fprintf(stderr, "\t--height            <int>       Image height in pixels. Should be used with --width option.\n");
     fprintf(stderr, "\t-v | --verbose                  Enable verbose output\n");
     fprintf(stderr, "\t-h                              Show this message and exit\n");
     fprintf(stderr, "Positional arguments:\n");
-    fprintf(stderr,
-            "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
+    fprintf(stderr, "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
     fprintf(stderr, "Available scenes:\n");
     rt_scene_print_scenes_info(stderr);
+    // clang-format on
 
     exit(err);
 }
@@ -474,8 +538,8 @@ static void render_worker_complete(int status, void *args)
 
     if (current_percentage != old_percentage)
     {
-        fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks,
-                worker_arg->progress.total_chunks, current_percentage);
+        fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks, worker_arg->progress.total_chunks,
+                current_percentage);
         fflush(stderr);
     }
 
