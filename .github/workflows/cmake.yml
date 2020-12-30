@@ -45,13 +45,11 @@ jobs:
       shell: bash
       run: |
         set -x
-        if [ "$RUNNER_OS" = "windows-latest" ]; then 
+        if [ "$RUNNER_OS" = "Windows" ]; then 
           ls Release
           cd Release
         fi
         ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
-      env: 
-        RUNNER_OS: ${{matrix.os}} 
 
     - name: Upload Samle Image
       uses: actions/upload-artifact@v2
