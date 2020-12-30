@@ -41,11 +41,11 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Render Sample Image
-      working-directory: ${{runner.workspace}}/build/bin
+      working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
-        if [ "$RUNNER_OS" -eq "windows-latest" ]; then
-          ls Releases && ./Releases/ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
+        if [ "$RUNNER_OS" -eq "windows-latest" ]; then 
+          ls Release && .\Release\ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
         else
           ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
         fi
