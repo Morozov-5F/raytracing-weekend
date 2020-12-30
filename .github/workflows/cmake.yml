@@ -8,7 +8,9 @@ env:
   
 
 jobs:
-  build-unix:
+  build:
+    name: "Build and Render"
+
     strategy:
       fail-fast: false
       matrix:
