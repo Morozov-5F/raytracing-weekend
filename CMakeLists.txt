@@ -15,7 +15,7 @@ set(THREADING_IMPLEMENTATION "None")
 
 find_package(Threads REQUIRED)
 if (CMAKE_USE_PTHREADS_INIT)
-    set(THREADING_IMPLEMENTATION threads/rt_thread_pool_unix.c threads/rt_sync_unix.c)
+    set(THREADING_IMPLEMENTATION threads/rt_sync_unix.c threads/rt_thread_unix.c)
 elseif(CMAKE_USE_WIN32_THREADS_INIT)
     set(THREADING_IMPLEMENTATION threads/rt_sync_win32.c threads/rt_thread_win32.c)
 else()

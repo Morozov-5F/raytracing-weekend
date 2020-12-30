@@ -51,5 +51,46 @@ void rt_mutex_deinit(rt_mutex_t *mutex)
     if (NULL != mutex)
     {
         pthread_mutex_destroy(&mutex->mutex);
+        free(mutex);
+    }
+}
+
+struct rt_cond_s
+{
+    pthread_cond_t cond;
+};
+
+rt_cond_t *rt_cond_init(void)
+{
+    rt_cond_t *new_cond = malloc(sizeof(rt_cond_t));
+    assert(NULL != new_cond);
+
+    int rc = pthread_cond_init(&new_cond->cond, NULL);
+    assert(0 == rc);
+
+    return new_cond;
+}
+
+int rt_cond_wait(rt_cond_t *cond, rt_mutex_t *mutex)
+{
+    assert(NULL != cond);
+    assert(NULL != mutex);
+
+    return pthread_cond_wait(&cond->cond, &mutex->mutex);
+}
+
+int rt_cond_signal(rt_cond_t *cond)
+{
+    assert(NULL != cond);
+
+    return pthread_cond_signal(&cond->cond);
+}
+
+void rt_cond_deinit(rt_cond_t *cond)
+{
+    if (NULL != cond)
+    {
+        pthread_cond_destroy(&cond->cond);
+        free(cond);
     }
 }
