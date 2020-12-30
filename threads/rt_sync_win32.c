@@ -8,24 +8,48 @@
 #include <stddef.h>
 
 #include <Windows.h>
+#include <assert.h>
+
+struct rt_mutex_s
+{
+    CRITICAL_SECTION cs;
+};
 
 rt_mutex_t *rt_mutex_init(void)
 {
-    return NULL;
+    rt_mutex_t *new_mutex = malloc(sizeof(rt_mutex_t));
+    assert(NULL != new_mutex);
+
+    InitializeCriticalSection(&new_mutex->cs);
+
+    return new_mutex;
 }
 
 int rt_mutex_lock(rt_mutex_t *mutex)
 {
+    assert(NULL != mutex);
+
+    EnterCriticalSection(&mutex->cs);
+
     return 0;
 }
 
 int rt_mutex_unlock(rt_mutex_t *mutex)
 {
+    assert(NULL != mutex);
+
+    LeaveCriticalSection(&mutex->cs);
+
     return 0;
 }
 
 void rt_mutex_deinit(rt_mutex_t *mutex)
 {
+    if (NULL != mutex)
+    {
+        DeleteCriticalSection(&mutex->cs);
+        free(mutex);
+    }
 }
 
 int rt_sync_get_number_of_cores(void)

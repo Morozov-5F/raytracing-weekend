@@ -440,6 +440,7 @@ int main(int argc, char const *argv[])
 
     // Wait until all the workers finish
     rt_tp_deinit(thread_pool);
+    rt_mutex_deinit(progress_mutex);
 
     if (verbose)
     {
