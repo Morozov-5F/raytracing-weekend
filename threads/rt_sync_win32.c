@@ -59,3 +59,45 @@ int rt_sync_get_number_of_cores(void)
 
     return system_info.dwNumberOfProcessors;
 }
+
+
+
+struct rt_cond_s
+{
+    CONDITION_VARIABLE cond;
+};
+
+
+rt_cond_t *rt_cond_init(void)
+{
+    rt_cond_t *new_cond = malloc(sizeof(rt_cond_t));
+    assert(NULL != new_cond);
+
+    InitializeConditionVariable(&new_cond->cond);
+
+    return new_cond;
+}
+
+int rt_cond_wait(rt_cond_t *cond, rt_mutex_t *mutex)
+{
+    assert(NULL != cond);
+    assert(NULL != mutex);
+
+    SleepConditionVariableCS(&cond->cond, &mutex->cs, INFINITE);
+
+    return 0;
+}
+
+int rt_cond_signal(rt_cond_t *cond)
+{
+    assert(NULL != cond);
+
+    WakeConditionVariable(&cond->cond);
+
+    return 0;
+}
+
+void rt_cond_deinit(rt_cond_t *cond)
+{
+    free(cond);
+}
