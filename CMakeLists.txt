@@ -15,9 +15,9 @@ set(THREADING_IMPLEMENTATION "None")
 
 find_package(Threads REQUIRED)
 if (CMAKE_USE_PTHREADS_INIT)
-    set(THREADING_IMPLEMENTATION threads/rt_thread_pool_unix.c threads/rt_sync_unix.c)
+    set(THREADING_IMPLEMENTATION threads/rt_sync_unix.c threads/rt_thread_unix.c)
 elseif(CMAKE_USE_WIN32_THREADS_INIT)
-    message(FATAL_ERROR "The Win32 threads are not implemented yet")
+    set(THREADING_IMPLEMENTATION threads/rt_sync_win32.c threads/rt_thread_win32.c)
 else()
     message(FATAL_ERROR "The System does not contain the supported threading library (pthread or windows threads)")
 endif()
@@ -35,7 +35,7 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                # Scenes
                scenes/rt_scenes.c
                # Threading
-               ${THREADING_IMPLEMENTATION})
+               ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c)
 
 target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
                        -Wall -Wextra -Winline>
