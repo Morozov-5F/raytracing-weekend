@@ -42,6 +42,10 @@ target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Cla
                        $<$<CXX_COMPILER_ID:MSVC>:
                        /WX /W4>)
 
+if (WIN32)
+    target_compile_definitions(ray_tracing_one_week WIN32_LEAN_AND_MEAN)
+endif()
+
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
     # Enable inline optimization under debug configurations.
     target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
