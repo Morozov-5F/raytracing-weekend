@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     runs-on: ${{matrix.os}}
 
@@ -50,10 +50,10 @@ jobs:
     - name: Render Sample Image
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: ./ray_tracing_one_week --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
+      run: ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
     - name: Upload Samle Image
       uses: actions/upload-artifact@v2
       with:
-        name: sample_image.png
+        name: sample_image_${{matrix.os}}.zip
         path: ${{runner.workspace}}/build/sample_image.ppm
