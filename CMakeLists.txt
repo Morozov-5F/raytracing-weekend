@@ -16,11 +16,11 @@ set(THREADING_IMPLEMENTATION "None")
 find_package(Threads REQUIRED)
 if (CMAKE_USE_PTHREADS_INIT)
     set(THREADING_IMPLEMENTATION threads/rt_sync_unix.c threads/rt_thread_unix.c)
-elseif(CMAKE_USE_WIN32_THREADS_INIT)
+elseif (CMAKE_USE_WIN32_THREADS_INIT)
     set(THREADING_IMPLEMENTATION threads/rt_sync_win32.c threads/rt_thread_win32.c)
-else()
+else ()
     message(FATAL_ERROR "The System does not contain the supported threading library (pthread or windows threads)")
-endif()
+endif ()
 
 add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.c rt_skybox_simple.c
                # Materials
@@ -44,7 +44,7 @@ target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Cla
 
 if (WIN32)
     target_compile_definitions(ray_tracing_one_week PRIVATE WIN32_LEAN_AND_MEAN)
-endif()
+endif ()
 
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
     # Enable inline optimization under debug configurations.
@@ -62,3 +62,9 @@ add_custom_command(TARGET ray_tracing_one_week PRE_BUILD
 
 target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures deps threads)
 target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS} Threads::Threads)
+
+set_target_properties(ray_tracing_one_week
+                      PROPERTIES
+                      ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                      LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+                      RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")

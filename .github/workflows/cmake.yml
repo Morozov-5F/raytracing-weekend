@@ -49,20 +49,18 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Render Sample Image
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{runner.workspace}}/build/bin
       shell: bash
       run: ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
-    - name: Upload Samle Image
+    - name: Upload Sample Image
       uses: actions/upload-artifact@v2
       with:
         name: sample_image_${{matrix.os}}.zip
-        path: ${{runner.workspace}}/build/sample_image.ppm
+        path: ${{runner.workspace}}/build/bin/sample_image.ppm
     
-    - name: Upload Samle Image
+    - name: Upload Binary
       uses: actions/upload-artifact@v2
       with:
         name:  ray_tracing_one_week-${{matrix.os}}.zip
-        path: |
-          ${{runner.workspace}}/build/ray_tracing_one_week{,.exe}
-          ${{runner.workspace}}/build/assets
+        path: ${{runner.workspace}}/build/bin
