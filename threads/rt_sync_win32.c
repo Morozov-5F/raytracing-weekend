@@ -7,6 +7,8 @@
 #include <rt_sync.h>
 #include <stddef.h>
 
+#include <Windows.h>
+
 rt_mutex_t *rt_mutex_init(void)
 {
     return NULL;
@@ -28,5 +30,8 @@ void rt_mutex_deinit(rt_mutex_t *mutex)
 
 int rt_sync_get_number_of_cores(void)
 {
-    return 0;
+    SYSTEM_INFO system_info;
+    GetSystemInfo(&system_info);
+
+    return system_info.dwNumberOfProcessors;
 }
