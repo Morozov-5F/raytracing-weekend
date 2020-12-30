@@ -43,7 +43,7 @@ target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Cla
                        /WX /W4>)
 
 if (WIN32)
-    target_compile_definitions(ray_tracing_one_week WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(ray_tracing_one_week PRIVATE WIN32_LEAN_AND_MEAN)
 endif()
 
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
