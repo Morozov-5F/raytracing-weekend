@@ -56,13 +56,13 @@ jobs:
     - name: Upload Sample Image
       uses: actions/upload-artifact@v2
       with:
-        name: sample_image_${{matrix.os}}.zip
+        name: sample_image_${{matrix.os}}
         path: ${{runner.workspace}}/build/bin/sample_image.ppm
     
     - name: Upload Binary
       uses: actions/upload-artifact@v2
       with:
-        name:  ray_tracing_one_week-${{matrix.os}}.zip
+        name:  ray_tracing_one_week-${{matrix.os}}
         path: |
           ${{runner.workspace}}/build/bin
           !${{runner.workspace}}/build/bin/sample_image.ppm
