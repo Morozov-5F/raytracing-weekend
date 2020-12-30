@@ -9,11 +9,12 @@ env:
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{matrix.os}}
 
     steps:
     - uses: actions/checkout@v2
@@ -51,13 +52,8 @@ jobs:
       shell: bash
       run: ./ray_tracing_one_week --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
-    - name: Convert Sample Image to PNG
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: convert sample_image.ppm sample_image.png
-
     - name: Upload Samle Image
       uses: actions/upload-artifact@v2
       with:
         name: sample_image.png
-        path: ${{runner.workspace}}/build/sample_image.png
+        path: ${{runner.workspace}}/build/sample_image.ppm
