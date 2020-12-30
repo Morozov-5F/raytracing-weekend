@@ -44,7 +44,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
-        if [ "$RUNNER_OS" -eq "windows-latest" ]; then 
+        if [ "$RUNNER_OS" = "windows-latest" ]; then 
           ls Release && .\Release\ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
         else
           ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
