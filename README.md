@@ -9,17 +9,8 @@ routines. This is far from optimal but should work.
 Here's the sample scene from the cover of the book:
 
 ![Sample image](/images/basic_rendering.jpg)
-
-Apart from core raytracer, I've decided to add some other features:
-
-* Parallel rendering using pthread and OpenMP. They are located in
-  the [parallel-rendering](https://github.com/Morozov-5F/raytracing-weekend/tree/parallel-rendering)
-  and [parallel-openmp](https://github.com/Morozov-5F/raytracing-weekend/tree/parallel-openmp) branches of the repo.
-* Lighting. I didn't use shadow rays I just casted a lot of rays per pixel and hoped for the best. Sample code is
-  located in the [lighting-test](https://github.com/Morozov-5F/raytracing-weekend/tree/lighting-test) branch. Here's how
-  the render looks:
-
-![Image with lighting](/images/lighting_sample.jpg)
+ 
+Apart from the core ray tracer I've decided to add command line options that are available by calling a ray tracer with `-h` or `--help` flags.
 
 I've selected C because I wanted some challenge and I think I got some. I decided to make vector and ray routines
 completely inlined to remove some overhead from function calls. I could have gone with macros but I thought the inlines
@@ -66,8 +57,12 @@ This project uses CMake to generate build system files.
    ? make
    ```
 1. Launch the application and view image
-   ``` bash
+   ```bash
    ? ./ray_tracing_one_week > image.ppm
    # The following line should open file in image viewer right from the console although it may not work -- depends on the distro settings
    ? xgd-open image.ppm
+   ```
+   On macOS:
+   ```bash
+   ? open image.ppm
    ```
