@@ -36,8 +36,7 @@ void rt_thread_join(rt_thread_t *thread)
         return;
     }
 
-    DWORD res = WaitForSingleObject(thread->thread_handle, INFINITE);
-    assert(0 == res);
+    WaitForSingleObject(thread->thread_handle, INFINITE);
 
     CloseHandle(thread->thread_handle);
     MemoryBarrier();
