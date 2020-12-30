@@ -43,7 +43,7 @@ jobs:
     - name: Render Sample Image
       working-directory: ${{runner.workspace}}/build
       shell: bash
-      run: exec ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
+      run: ls && ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
     - name: Upload Samle Image
       uses: actions/upload-artifact@v2
