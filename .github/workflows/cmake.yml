@@ -44,6 +44,7 @@ jobs:
       working-directory: ${{runner.workspace}}/build
       shell: bash
       run: |
+        set -x
         if [ "$RUNNER_OS" = "windows-latest" ]; then 
           ls Release
           cd Release
