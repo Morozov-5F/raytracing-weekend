@@ -45,8 +45,8 @@ jobs:
       shell: bash
       run: |
         if [ "$RUNNER_OS" = "windows-latest" ]; then 
-          cd Release
           ls Release
+          cd Release
         fi
         ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
       env: 
