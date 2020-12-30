@@ -32,7 +32,7 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DRUNTIME_OUTPUT_DIRECTORY=bin
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
@@ -41,9 +41,9 @@ jobs:
       run: cmake --build . --config $BUILD_TYPE
 
     - name: Render Sample Image
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{runner.workspace}}/build/bin
       shell: bash
-      run: ls && ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
+      run: ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
     - name: Upload Samle Image
       uses: actions/upload-artifact@v2
