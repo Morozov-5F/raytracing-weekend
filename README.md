@@ -13,7 +13,7 @@ And a showcase from the second:
 
 ![Showcase image](/images/showcase.png)
 
-Apart from the core ray tracer I've decided to add parallel rendering -- right now it has implementation for UNIX-like systems using pthread but later on I'm planning to add a Windows version. Also there are command line options that are available by calling a ray tracer with `-h` or `--help` flags.
+Apart from the core ray tracer I've decided to add parallel rendering -- right now it has implementation for UNIX-like systems and Windows. Also there are command line options that are available by calling a ray tracer with `-h` or `--help` flags.
 
 I've selected C because I wanted some challenge and I think I got some. I decided to make vector and ray routines completely inlined to remove some overhead from function calls. I could have gone with macros but I thought the inlines will suit better. Because of that even in debug mode code compiles with inline optimizations enabled.
 
