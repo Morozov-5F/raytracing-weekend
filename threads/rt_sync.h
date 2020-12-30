@@ -4,8 +4,8 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree.
  */
-#ifndef RAY_TRACING_ONE_WEEK_RT_THREAD_H
-#define RAY_TRACING_ONE_WEEK_RT_THREAD_H
+#ifndef RAY_TRACING_ONE_WEEK_RT_SYNC_H
+#define RAY_TRACING_ONE_WEEK_RT_SYNC_H
 
 int rt_sync_get_number_of_cores(void);
 
@@ -33,4 +33,4 @@ int rt_cond_signal(rt_cond_t *cond);
 
 void rt_cond_deinit(rt_cond_t *cond);
 
-#endif // RAY_TRACING_ONE_WEEK_RT_THREAD_H
+#endif // RAY_TRACING_ONE_WEEK_RT_SYNC_H
