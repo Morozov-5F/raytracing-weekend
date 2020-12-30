@@ -34,7 +34,7 @@ jobs:
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run:  |
         GENERATOR="Unix Makefiles"
-        if [ "$RUNNER_OS" = "Windows ]; then
+        if [ "$RUNNER_OS" = "Windows" ]; then
           GENERATOR="CodeBlocks - NMake Makefiles"
         fi
         cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "$GENERATOR"
