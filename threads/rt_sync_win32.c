@@ -9,6 +9,7 @@
 
 #include <Windows.h>
 #include <assert.h>
+#include <malloc.h>
 
 struct rt_mutex_s
 {
