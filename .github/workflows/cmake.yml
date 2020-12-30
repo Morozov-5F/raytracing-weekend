@@ -58,3 +58,11 @@ jobs:
       with:
         name: sample_image_${{matrix.os}}.zip
         path: ${{runner.workspace}}/build/sample_image.ppm
+    
+    - name: Upload Samle Image
+      uses: actions/upload-artifact@v2
+      with:
+        name:  ray_tracing_one_week-${{matrix.os}}.zip
+        path: |
+          ${{runner.workspace}}/build/ray_tracing_one_week{,.exe}
+          ${{runner.workspace}}/build/assets
