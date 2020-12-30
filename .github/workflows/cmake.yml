@@ -9,14 +9,18 @@ env:
 
 jobs:
   build:
-    # The CMake configure and build commands are platform agnostic and should work equally
-    # well on Windows or Mac.  You can convert this to a matrix build if you need
-    # cross-platform coverage.
-    # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
-    runs-on: ubuntu-latest
+    name: "Build and Render"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    runs-on: ${{matrix.os}}
 
     steps:
     - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
@@ -31,7 +35,12 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run:  |
+        GENERATOR="Unix Makefiles"
+        if [ "$RUNNER_OS" = "Windows" ]; then
+          GENERATOR="CodeBlocks - NMake Makefiles"
+        fi
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -G "$GENERATOR"
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
@@ -39,25 +48,21 @@ jobs:
       # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: cmake --build . --config $BUILD_TYPE
 
-    - name: Test
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      # Execute tests defined by the CMake configuration.  
-      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
-
     - name: Render Sample Image
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{runner.workspace}}/build/bin
       shell: bash
-      run: ./ray_tracing_one_week --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
+      run: ./ray_tracing_one_week --verbose --width 300 --height 200 -s 100 --scene metal_test sample_image.ppm
 
-    - name: Convert Sample Image to PNG
-      working-directory: ${{runner.workspace}}/build
-      shell: bash
-      run: convert sample_image.ppm sample_image.png
-
-    - name: Upload Samle Image
+    - name: Upload Sample Image
       uses: actions/upload-artifact@v2
       with:
-        name: sample_image.png
-        path: ${{runner.workspace}}/build/sample_image.png
+        name: sample_image_${{matrix.os}}.zip
+        path: ${{runner.workspace}}/build/bin/sample_image.ppm
+    
+    - name: Upload Binary
+      uses: actions/upload-artifact@v2
+      with:
+        name:  ray_tracing_one_week-${{matrix.os}}.zip
+        path: |
+          ${{runner.workspace}}/build/bin
+          !${{runner.workspace}}/build/bin/sample_image.ppm
