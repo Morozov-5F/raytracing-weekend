@@ -356,7 +356,7 @@ static void show_usage(const char *program_name, int err)
 {
     // clang-format off
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [-t|--threads THREADS] [--width WIDTH] [--height HEIGHT] [output_file_name]\n", program_name);
+    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [--width WIDTH] [--height HEIGHT] [output_file_name]\n", program_name);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-s | --samples      <int>       Number of rays to cast for each pixel\n");
     fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
