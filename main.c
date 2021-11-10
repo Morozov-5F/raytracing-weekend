@@ -17,6 +17,8 @@
 #include <assert.h>
 #include <rt_sync.h>
 
+typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays);
+
 typedef struct worker_arg_s
 {
     struct
@@ -39,6 +41,7 @@ typedef struct worker_arg_s
     {
         int child_rays;
         long number_of_samples;
+        render_fn_t render_function;
     } rendering;
 
     struct
@@ -60,7 +63,7 @@ static void render_worker(void *args);
 static void render_worker_complete(int status, void *args);
 static void render_chunk(vec3_t *image, int image_width, int image_height, long number_of_samples, int child_rays,
                          int column_start, int width, int row_start, int height, const rt_hittable_list_t *world,
-                         const rt_skybox_t *skybox, const rt_camera_t *camera);
+                         const rt_skybox_t *skybox, const rt_camera_t *camera, render_fn_t render_function);
 
 static void show_usage(const char *program_name, int err);
 
@@ -87,6 +90,38 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, con
     return emitted;
 }
 
+static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays)
+{
+    colour_t resulting_color = colour(0, 0, 0);
+    colour_t global_attenuation = colour(1, 1, 1);
+
+    ray_t current_ray = *ray;
+
+    for (int ray_hop = 0; ray_hop < child_rays; ray_hop++)
+    {
+        rt_hit_record_t record;
+        if (!rt_hittable_list_hit_test(list, &current_ray, 0.001, INFINITY, &record))
+        {
+            vec3_add(&resulting_color, vec3_multiply(rt_skybox_value(skybox, &current_ray), global_attenuation));
+            break;
+        }
+
+        colour_t emitted = rt_material_emit(record.material, record.u, record.v, &record.p);
+        vec3_add(&resulting_color, vec3_multiply(emitted, global_attenuation));
+
+        ray_t scattered;
+        colour_t attenuation;
+        bool ray_scattered = rt_material_scatter(record.material, &current_ray, &record, &attenuation, &scattered);
+        global_attenuation = vec3_multiply(attenuation, global_attenuation);
+        if (!ray_scattered)
+        {
+            break;
+        }
+        current_ray = scattered;
+    }
+    return resulting_color;
+}
+
 int main(int argc, char const *argv[])
 {
     const char *number_of_samples_str = NULL;
@@ -96,6 +131,7 @@ int main(int argc, char const *argv[])
     const char *image_width_str = NULL;
     const char *image_height_str = NULL;
     bool verbose = false;
+    bool render_recursive = true;
 
     // Parse console arguments
     for (int i = 1; i < argc; ++i)
@@ -159,6 +195,11 @@ int main(int argc, char const *argv[])
         {
             show_usage(argv[0], EXIT_SUCCESS);
         }
+        else if (0 == strcmp(argv[i], "-i"))
+        {
+            render_recursive = false;
+            continue;
+        }
         else if ('-' == *argv[i])
         {
             fprintf(stderr, "Fatal error: Unknown argument '%s'\n", argv[i]);
@@ -181,6 +222,7 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "\t- image width:       %s\n", image_width_str);
         fprintf(stderr, "\t- image height:      %s\n", image_width_str);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
+        fprintf(stderr, "\t- renderer:          %s\n", render_recursive ? "recursive" : "iterative");
     }
 
     // Parse resulting parameters
@@ -248,7 +290,11 @@ int main(int argc, char const *argv[])
             show_usage(argv[0], EXIT_FAILURE);
         }
     }
-
+    render_fn_t render_function = ray_colour;
+    if (!render_recursive)
+    {
+        render_function = ray_color_iterative;
+    }
 
     if (verbose)
     {
@@ -259,6 +305,7 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "\t- image width:       %d\n", image_width);
         fprintf(stderr, "\t- image height:      %d\n", image_height);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
+        fprintf(stderr, "\t- render function:   %s\n", render_function == ray_colour ? "ray_colour" : "ray_colou_iterative");
     }
 
     // Image parameters
@@ -420,6 +467,7 @@ int main(int argc, char const *argv[])
 
             arg->rendering.number_of_samples = number_of_samples;
             arg->rendering.child_rays = CHILD_RAYS;
+            arg->rendering.render_function = render_function;
 
             arg->chunk.x_start = j * CHUNK_SIZE;
             arg->chunk.y_start = i * CHUNK_SIZE;
@@ -474,7 +522,7 @@ static void show_usage(const char *program_name, int err)
 {
     // clang-format off
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [-t|--threads THREADS] [--width WIDTH] [--height HEIGHT] [output_file_name]\n", program_name);
+    fprintf(stderr, "%s [-s|--samples N] [--scene SCENE] [-v|--verbose] [-t|--threads THREADS] [--width WIDTH] [--height HEIGHT] [-i] [output_file_name]\n", program_name);
     fprintf(stderr, "Options:\n");
     fprintf(stderr, "\t-s | --samples      <int>       Number of rays to cast for each pixel\n");
     fprintf(stderr, "\t--scene             <string>    ID of the scene to render. List of available scenes is printed below.\n");
@@ -483,6 +531,7 @@ static void show_usage(const char *program_name, int err)
     fprintf(stderr, "\t--height            <int>       Image height in pixels. Should be used with --width option.\n");
     fprintf(stderr, "\t-v | --verbose                  Enable verbose output\n");
     fprintf(stderr, "\t-h                              Show this message and exit\n");
+    fprintf(stderr, "\t-i                              Use iterative rendering loop instead of recursive\n");
     fprintf(stderr, "Positional arguments:\n");
     fprintf(stderr, "\toutput_file_name                Name of the output file. Outputs image to console if not specified.\n");
     fprintf(stderr, "Available scenes:\n");
@@ -494,7 +543,7 @@ static void show_usage(const char *program_name, int err)
 
 static void render_chunk(vec3_t *image, int image_width, int image_height, long number_of_samples, int child_rays,
                          int column_start, int width, int row_start, int height, const rt_hittable_list_t *world,
-                         const rt_skybox_t *skybox, const rt_camera_t *camera)
+                         const rt_skybox_t *skybox, const rt_camera_t *camera, render_fn_t render_function)
 {
     for (int j = row_start + height - 1; j >= row_start; --j)
     {
@@ -507,7 +556,7 @@ static void render_chunk(vec3_t *image, int image_width, int image_height, long 
                 double v = (double)(j + rt_random_double(0, 1)) / (image_height - 1);
 
                 ray_t ray = rt_camera_get_ray(camera, u, v);
-                vec3_add(&pixel, ray_colour(&ray, world, skybox, child_rays));
+                vec3_add(&pixel, render_function(&ray, world, skybox, child_rays));
             }
             image[j * image_width + i] = pixel;
         }
@@ -522,7 +571,7 @@ static void render_worker(void *args)
     render_chunk(worker_arg->image.pixels, worker_arg->image.width, worker_arg->image.height,
                  worker_arg->rendering.number_of_samples, worker_arg->rendering.child_rays, worker_arg->chunk.x_start,
                  worker_arg->chunk.width, worker_arg->chunk.y_start, worker_arg->chunk.height, worker_arg->scene.world,
-                 worker_arg->scene.skybox, worker_arg->scene.camera);
+                 worker_arg->scene.skybox, worker_arg->scene.camera, worker_arg->rendering.render_function);
 }
 
 static void render_worker_complete(int status, void *args)

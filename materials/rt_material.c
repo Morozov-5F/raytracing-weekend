@@ -71,7 +71,7 @@ void rt_material_delete(rt_material_t *material)
         return;
     }
 
-    material->delete (material);
+    material->delete(material);
 }
 
 static bool scatter_base(const rt_material_t *material, const ray_t *incoming_ray, const rt_hit_record_t *hit_record,
