@@ -34,6 +34,8 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                textures/rt_texture_noise.c textures/rt_texture_image.c
                # Scenes
                scenes/rt_scenes.c
+               # Random number generation
+               random/rt_random.c random/rt_random.h
                # Threading
                ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c)
 

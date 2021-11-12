@@ -133,6 +133,8 @@ int main(int argc, char const *argv[])
     bool verbose = false;
     bool render_recursive = true;
 
+    rt_random_seed(5489);
+
     // Parse console arguments
     for (int i = 1; i < argc; ++i)
     {
