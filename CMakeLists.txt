@@ -5,11 +5,24 @@ project(ray_tracing_one_week C)
 set(CMAKE_C_STANDARD 11)
 
 include(CheckLibraryExists)
+include(CheckIncludeFile)
+include(CheckSymbolExists)
 
 CHECK_LIBRARY_EXISTS(m ceil "" HAVE_LIB_M)
 if (HAVE_LIB_M)
     set(EXTRA_LIBS ${EXTRA_LIBS} m)
 endif ()
+
+# Check that the compiler's C11 has thread local variables required for reliable random
+CHECK_INCLUDE_FILE("threads.h" HAVE_THREADS_HEADER)
+if (HAVE_THREADS_HEADER)
+    CHECK_SYMBOL_EXISTS(thread_local "threads.h" HAVE_THREAD_LOCAL)
+    if (NOT HAVE_THREAD_LOCAL)
+        message(FATAL_ERROR "The compiler does not support thread local variables from C11 standard")
+    endif()
+else()
+    message(FATAL_ERROR "The compiler does not support thread local variables from C11 standard")
+endif()
 
 set(THREADING_IMPLEMENTATION "None")
 
@@ -51,7 +64,7 @@ endif ()
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
     # Enable inline optimization under debug configurations.
     target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-                           -finline-funcitons>
+                           -finline-functions>
                            $<$<CXX_COMPILER_ID:MSVC>:
                            /Ob>)
 endif ()
