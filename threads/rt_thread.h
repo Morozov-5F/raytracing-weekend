@@ -8,9 +8,10 @@
 #ifndef RAY_TRACING_ONE_WEEK_RT_THREAD_H
 #define RAY_TRACING_ONE_WEEK_RT_THREAD_H
 
+// TODO: Add-in compiler version check
 #if defined(__GNUC__) || defined(__clang__)
 #define RT_THREAD_LOCAL __thread
-#elif defined(__MSVC__)
+#elif defined(_MSC_VER)
 #define RT_THREAD_LOCAL __declspec(thread)
 #else
 #warning "Thread local storage is not supported for this compiler, there might be artifacts in the rendered image in case of multi-threaded rendering"
