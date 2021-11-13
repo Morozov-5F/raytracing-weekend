@@ -5,6 +5,8 @@ project(ray_tracing_one_week C)
 set(CMAKE_C_STANDARD 11)
 
 include(CheckLibraryExists)
+include(CheckIncludeFile)
+include(CheckSymbolExists)
 
 CHECK_LIBRARY_EXISTS(m ceil "" HAVE_LIB_M)
 if (HAVE_LIB_M)
@@ -34,6 +36,8 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                textures/rt_texture_noise.c textures/rt_texture_image.c
                # Scenes
                scenes/rt_scenes.c
+               # Random number generation
+               random/rt_random.c random/rt_random.h
                # Threading
                ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c)
 
@@ -49,7 +53,7 @@ endif ()
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
     # Enable inline optimization under debug configurations.
     target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-                           -finline-funcitons>
+                           -finline-functions>
                            $<$<CXX_COMPILER_ID:MSVC>:
                            /Ob>)
 endif ()
