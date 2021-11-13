@@ -23,7 +23,7 @@
 
 static inline double rt_random_double(double min, double max)
 {
-    return min + (max - min) * rt_random() / (RT_RANDOM_MAX + 1.0);
+    return min + (max - min) * rt_random() / (RT_RANDOM_MAX + 0.0);
 }
 
 static inline double rt_clamp(double x, double min, double max)
