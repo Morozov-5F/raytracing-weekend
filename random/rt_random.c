@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include "rt_random.h"
+#include "rt_thread.h"
 
 struct rt_mt19937_s
 {
@@ -26,7 +27,10 @@ struct rt_mt19937_s
     uint64_t *MT;
 };
 
-static struct rt_mt19937_s gs_generator;
+static RT_THREAD_LOCAL struct rt_mt19937_s gs_generator = {
+    .index = UINT64_MAX
+};
+
 static void twist(struct rt_mt19937_s *gen);
 
 void rt_random_seed(uint64_t seed)
@@ -70,6 +74,11 @@ uint64_t rt_random(void)
 {
     if (gs_generator.index >= gs_generator.n)
     {
+        if (gs_generator.index > gs_generator.n)
+        {
+            rt_random_seed(RT_RANDOM_DEFAULT_SEED);
+        }
+
         twist(&gs_generator);
     }
 

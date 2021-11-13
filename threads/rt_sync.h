@@ -10,7 +10,6 @@
 int rt_sync_get_number_of_cores(void);
 
 
-
 typedef struct rt_mutex_s rt_mutex_t;
 
 rt_mutex_t *rt_mutex_init(void);
@@ -20,7 +19,6 @@ int rt_mutex_lock(rt_mutex_t *mutex);
 int rt_mutex_unlock(rt_mutex_t *mutex);
 
 void rt_mutex_deinit(rt_mutex_t *mutex);
-
 
 
 typedef struct rt_cond_s rt_cond_t;

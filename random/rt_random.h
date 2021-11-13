@@ -13,6 +13,7 @@
 #include <math.h>
 
 #define RT_RANDOM_MAX UINT64_MAX
+#define RT_RANDOM_DEFAULT_SEED 5489
 
 void rt_random_seed(uint64_t seed);
 
