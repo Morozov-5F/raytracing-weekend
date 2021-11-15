@@ -22,6 +22,7 @@ typedef enum rt_hittable_type_e
     RT_HITTABLE_TYPE_BOX,
     RT_HITTABLE_TYPE_INSTANCE,
     RT_HITTABLE_CONSTANT_MEDIUM,
+    RT_HITTABLE_TYPE_TRIANGLE,
 } rt_hittable_type_t;
 
 typedef bool (*rt_hittable_hit_fn)(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,

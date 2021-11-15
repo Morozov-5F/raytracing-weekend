@@ -339,6 +339,44 @@ rt_hittable_list_t *rt_scene_metal_test(void)
     return objects;
 }
 
+rt_hittable_list_t *rt_scene_triangle_test(void)
+{
+    rt_material_t *green = rt_mt_diffuse_new_with_albedo(colour(0.12, 0.45, 0.15));
+    rt_material_t *floor_mat = rt_mt_diffuse_new_with_texture(rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
+    rt_material_t *mirror = rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
+    rt_material_t *glass = rt_mt_dielectric_new(1.01);
+
+    rt_hittable_list_t *objects = rt_hittable_list_init(10);
+
+    rt_hittable_t *floor = rt_aa_rect_new_xz(-10, 10, -10, 10, -2, floor_mat);
+    rt_hittable_list_add(objects, floor);
+
+    rt_hittable_t *side = rt_triangle_new(point3(-2, -2, 0), point3(-2, 0, 0), point3(-2, -2, 8), glass);
+    rt_hittable_list_add(objects, side);
+    side = rt_triangle_new(point3(-2, -2, 0), point3(2, -2, 0), point3(-2, 0, 0), rt_material_claim(mirror));
+    rt_hittable_list_add(objects, side);
+    side = rt_triangle_new(point3(-2, 0, 0), point3(2, -2, 0), point3(2, 0, 0), rt_material_claim(mirror));
+    rt_hittable_list_add(objects, side);
+    side = rt_triangle_new(point3(2, 0, 0), point3(2, -2, 0), point3(2, -2, 8), rt_material_claim(glass));
+    rt_hittable_list_add(objects, side);
+
+    double z = 2;
+    double a = z + sqrt(3.) / 3., b = z - sqrt(3.) / 6., c = -2 + sqrt(3.) / 3;
+    side = rt_triangle_new(point3(0, -2, a), point3(-0.5, -2, b), point3(0.5, -2, b), green);
+    rt_hittable_list_add(objects, side);
+    side = rt_triangle_new(point3(0, -2, a), point3(-0.5, -2, b), point3(0, c, 1), rt_material_claim(green));
+    rt_hittable_list_add(objects, side);
+    side = rt_triangle_new(point3(0, -2, a), point3(0.5, -2, b), point3(0, c, 1), rt_material_claim(green));
+    rt_hittable_list_add(objects, side);
+    side = rt_triangle_new(point3(-0.5, -2, b),  point3(0.5, -2, b), point3(0, c, 1), rt_material_claim(green));
+    rt_hittable_list_add(objects, side);
+
+    rt_hittable_t *sphere = rt_sphere_new(point3(-4, 0, -4), 2, mirror);
+    rt_hittable_list_add(objects, sphere);
+
+    return objects;
+}
+
 typedef struct rt_scenes_s
 {
     rt_scene_id_t id;
@@ -357,6 +395,7 @@ static rt_scenes_t gs_scenes[] = {
     {RT_SCENE_CORNELL_SMOKE, "cornell_smoke", "Cornell box scene but boxes as made of smoke"},
     {RT_SCENE_SHOWCASE, "showcase", "Scene from \'Ray Tracing: The Next Week\' cover"},
     {RT_SCENE_METAL_TEST, "metal_test", "Test for metal texture (several metal spheres)"},
+    {RT_SCENE_TRIANGLE_TEST, "triangle_test", "Test for triangle objects"},
 };
 
 rt_scene_id_t rt_scene_get_id_by_name(const char *name)

@@ -39,7 +39,7 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                # Random number generation
                random/rt_random.c random/rt_random.h
                # Threading
-               ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c)
+               ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c hittables/rt_triangle.c hittables/rt_triangle.h)
 
 target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
                        -Wall -Wextra -Winline>
