@@ -40,4 +40,7 @@ rt_hittable_t *rt_sphere_new(point3_t center, double radius, rt_material_t *mate
 rt_hittable_t *rt_moving_sphere_new(point3_t center_start, point3_t center_end, double time_start, double time_end,
                                     double radius, rt_material_t *material);
 
+// Triangle
+rt_hittable_t *rt_triangle_new(point3_t a, point3_t b, point3_t c, rt_material_t *material);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_H

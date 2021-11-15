@@ -22,6 +22,7 @@ typedef enum rt_scene_id_s
     RT_SCENE_CORNELL_SMOKE,
     RT_SCENE_SHOWCASE,
     RT_SCENE_METAL_TEST,
+    RT_SCENE_TRIANGLE_TEST,
 } rt_scene_id_t;
 
 rt_scene_id_t rt_scene_get_id_by_name(const char *name);
@@ -51,5 +52,7 @@ rt_hittable_list_t *rt_scene_cornell_box_smoke_boxes(void);
 rt_hittable_list_t *rt_scene_showcase(void);
 
 rt_hittable_list_t *rt_scene_metal_test(void);
+
+rt_hittable_list_t *rt_scene_triangle_test(void);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_SCENES_H
