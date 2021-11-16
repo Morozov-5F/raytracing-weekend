@@ -6,7 +6,7 @@
  */
 #include <assert.h>
 #include <float.h>
-#include "rt_triangle.h"
+#include "rt_hittable.h"
 #include "rt_hittable_shared.h"
 
 typedef struct rt_triangle_s
