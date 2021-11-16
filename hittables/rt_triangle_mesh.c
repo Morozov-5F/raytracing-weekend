@@ -9,6 +9,7 @@
 #include "rt_hittable.h"
 #include "rt_hittable_shared.h"
 #include "rt_hittable_list.h"
+#include "rt_bvh.h"
 
 typedef struct rt_mesh_s
 {
@@ -37,13 +38,18 @@ static rt_mesh_t rt_mesh_init(const point3_t *vertices, size_t vertices_count, c
                               rt_material_t *material)
 {
     assert(NULL != vertices);
+    assert(NULL != triangles);
+    assert(NULL != material);
 
     rt_mesh_t result = {
-        .triangles = rt_hittable_list_init(triangles_count),
+        .triangles = rt_hittable_list_init(1),
         .min = vec3(0, 0, 0),
         .max = vec3(0, 0, 0),
     };
-    assert(NULL != triangles);
+    assert(NULL != result.triangles);
+
+    rt_hittable_list_t *triangles_list = rt_hittable_list_init(triangles_count);
+    assert(NULL != triangles_list);
 
     for (size_t i = 0; i < triangles_count; ++i)
     {
@@ -64,8 +70,11 @@ static rt_mesh_t rt_mesh_init(const point3_t *vertices, size_t vertices_count, c
         result.max.y = fmax(result.max.y, fmax(a.y, fmax(b.y, c.y)));
         result.max.z = fmax(result.max.z, fmax(a.z, fmax(b.z, c.z)));
 
-        rt_hittable_list_add(result.triangles, rt_triangle_new(a, b, c, rt_material_claim(material)));
+        rt_hittable_list_add(triangles_list, rt_triangle_new(a, b, c, rt_material_claim(material)));
     }
+
+    rt_hittable_list_add(result.triangles, rt_bvh_node_new(triangles_list, 0, 1));
+    rt_hittable_list_deinit(triangles_list);
 
     rt_material_delete(material);
 
