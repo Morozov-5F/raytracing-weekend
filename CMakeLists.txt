@@ -31,6 +31,7 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                # Hittables
                hittables/rt_hittable.c hittables/rt_sphere.c hittables/rt_hittable_list.c main.c hittables/rt_moving_sphere.c
                hittables/rt_bvh.c hittables/rt_aa_rect.c hittables/rt_box.c hittables/rt_instance.c hittables/rt_const_medium.c
+               hittables/rt_triangle.c hittables/rt_triangle_mesh.c
                # Textures
                textures/rt_texture.c textures/rt_texture_solid_colour.c textures/rt_texture_checker_pattern.c
                textures/rt_texture_noise.c textures/rt_texture_image.c
@@ -39,7 +40,7 @@ add_executable(ray_tracing_one_week rt_camera.c rt_colour.c rt_aabb.c rt_perlin.
                # Random number generation
                random/rt_random.c random/rt_random.h
                # Threading
-               ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c hittables/rt_triangle.c hittables/rt_triangle.h)
+               ${THREADING_IMPLEMENTATION} threads/rt_thread_pool.c)
 
 target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
                        -Wall -Wextra -Winline>

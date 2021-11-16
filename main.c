@@ -419,7 +419,7 @@ int main(int argc, char const *argv[])
             return EXIT_FAILURE;
 
         case RT_SCENE_TRIANGLE_TEST:
-            look_from = point3(0, 0, 20);
+            look_from = point3(0, 2, 20);
             look_at = point3(0, 0, 0);
             vertical_fov = 20.0;
 
