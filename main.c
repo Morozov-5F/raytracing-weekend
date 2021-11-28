@@ -414,18 +414,19 @@ int main(int argc, char const *argv[])
             skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_metal_test();
             break;
-        case RT_SCENE_NONE:
-            fprintf(stderr, "Fatal error: scene id is undefined after parsing the parameters\n");
-            return EXIT_FAILURE;
 
         case RT_SCENE_TRIANGLE_TEST:
             look_from = point3(0, 2, 20);
-            look_at = point3(0, 0, 0);
+            look_at = point3(0, -0.5, 0);
             vertical_fov = 20.0;
 
             skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_triangle_test();
             break;
+
+        case RT_SCENE_NONE:
+            fprintf(stderr, "Fatal error: scene id is undefined after parsing the parameters\n");
+            return EXIT_FAILURE;
     }
 
     rt_camera_t *camera =
