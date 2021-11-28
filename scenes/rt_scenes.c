@@ -332,8 +332,9 @@ rt_hittable_list_t *rt_scene_metal_test(void)
     rt_hittable_list_add(objects, rt_sphere_new(point3(2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 1.0)));
 
     rt_hittable_t *box_instance =
-        rt_instance_new(rt_box_new(point3(-1, 0, 10), point3(1, 2, 12), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
-    rt_instance_rotate_y(box_instance, 10);
+        rt_instance_new(rt_box_new(point3(-1, -1, -1), point3(1, 1, 1), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
+    rt_instance_rotate_y(box_instance, 45);
+    rt_instance_translate(box_instance, vec3(2, 1, 11));
     rt_hittable_list_add(objects, box_instance);
 
     return objects;
