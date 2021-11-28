@@ -346,7 +346,6 @@ rt_hittable_list_t *rt_scene_triangle_test(void)
     rt_material_t *floor_mat =
         rt_mt_diffuse_new_with_texture(rt_texture_cp_new_with_colour(colour(0.2, 0.3, 0.1), colour(0.9, 0.9, 0.9)));
     rt_material_t *mirror = rt_mt_metal_new(colour(0.7, 0.6, 0.5), 0.0);
-    rt_material_t *glass = rt_mt_dielectric_new(1.01);
 
     rt_hittable_list_t *objects = rt_hittable_list_init(10);
 
