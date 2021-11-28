@@ -86,7 +86,7 @@ static bool rt_instance_hit(const rt_hittable_t *hittable, const ray_t *ray, dou
     vec3_add(&record->p, instance->offset);
 
     vec3_t new_normal = rt_mat3_mul_vec3(&instance->transform_matrix_bb, &record->normal);
-    rt_hit_record_set_front_face(record, &ray, &new_normal);
+    rt_hit_record_set_front_face(record, ray, &new_normal);
 
     return true;
 }
