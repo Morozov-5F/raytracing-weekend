@@ -179,8 +179,8 @@ rt_hittable_list_t *rt_scene_instance_test(void)
 
     rt_hittable_t *box = rt_box_new(point3(-1, -1, -1), point3(1, 1, 1), green);
     rt_hittable_t *instance = rt_instance_new(box);
-    rt_instance_rotate_y(instance, 0);
-    rt_instance_translate(instance, point3(1, 0, 0));
+    rt_instance_rotate_y(instance, 45);
+    rt_instance_translate(instance, point3(1, 0, 0.1));
 
     rt_hittable_list_add(objects, instance);
     rt_hittable_list_add(objects, rt_box_new(point3(-0.25, -0.25, -0.25), point3(0.25, 0.25, 0.25), red));
@@ -332,8 +332,9 @@ rt_hittable_list_t *rt_scene_metal_test(void)
     rt_hittable_list_add(objects, rt_sphere_new(point3(2, 2, 0), 1, rt_mt_metal_new(colour(0.8, 0.8, 0.9), 1.0)));
 
     rt_hittable_t *box_instance =
-        rt_instance_new(rt_box_new(point3(-1, 0, 10), point3(1, 2, 12), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
-    rt_instance_rotate_y(box_instance, 10);
+        rt_instance_new(rt_box_new(point3(-1, -1, -1), point3(1, 1, 1), rt_mt_metal_new(colour(0.8, 0.8, 0.9), 0.0)));
+    rt_instance_rotate_y(box_instance, 45);
+    rt_instance_translate(box_instance, vec3(2, 1, 11));
     rt_hittable_list_add(objects, box_instance);
 
     return objects;
