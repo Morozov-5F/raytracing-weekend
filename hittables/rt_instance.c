@@ -105,8 +105,6 @@ static bool rt_instance_bb(const rt_hittable_t *hittable, double time0, double t
         return false;
     }
 
-    hittable_bb = rt_aabb(vec3_sum(hittable_bb.min, instance->offset), vec3_sum(hittable_bb.max, instance->offset));
-
     vec3_t min = hittable_bb.min, max = hittable_bb.max;
     for (int i = 0; i < 2; i++)
     {
@@ -119,7 +117,6 @@ static bool rt_instance_bb(const rt_hittable_t *hittable, double time0, double t
                                         k * hittable_bb.max.z + (1 - k) * hittable_bb.min.z);
 
                 vec3_t tester = rt_mat3_mul_vec3(&instance->transform_matrix_bb, &point);
-
                 for (int c = 0; c < 3; c++)
                 {
                     min.components[c] = fmin(min.components[c], tester.components[c]);
@@ -128,8 +125,7 @@ static bool rt_instance_bb(const rt_hittable_t *hittable, double time0, double t
             }
         }
     }
-
-    *out_bb = rt_aabb(min, max);
+    *out_bb = rt_aabb(vec3_sum(min, instance->offset), vec3_sum(max, instance->offset));
 
     return true;
 }
