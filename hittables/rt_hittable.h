@@ -44,6 +44,7 @@ rt_hittable_t *rt_moving_sphere_new(point3_t center_start, point3_t center_end, 
 rt_hittable_t *rt_triangle_new(point3_t a, point3_t b, point3_t c, rt_material_t *material);
 
 // Mesh composed of triangles
-rt_hittable_t *rt_triangle_mesh_new(const point3_t *vertices, size_t vertices_count, const size_t *triangles, size_t triangles_count, rt_material_t *material);
+rt_hittable_t *rt_triangle_mesh_new(const point3_t *vertices, size_t vertices_count, const size_t *triangles,
+                                    size_t triangles_count, rt_material_t *material);
 
 #endif // RAY_TRACING_ONE_WEEK_RT_HITTABLE_H

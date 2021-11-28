@@ -69,7 +69,8 @@ rt_hittable_t *rt_aa_rect_new(rt_aa_rect_type_t type, double axis1_min, double a
     return (rt_hittable_t *)result;
 }
 
-bool rt_aa_rect_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max, rt_hit_record_t *record)
+bool rt_aa_rect_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
+                    rt_hit_record_t *record)
 {
     assert(NULL != hittable);
     assert(NULL != ray);

@@ -40,5 +40,4 @@ static inline rt_hittable_t *rt_aa_rect_new_xz(double x0, double x1, double z0, 
     return rt_aa_rect_new(RT_AA_RECT_TYPE_XZ, x0, x1, z0, z1, y, material);
 }
 
-
 #endif // RAY_TRACING_ONE_WEEK_RT_AA_RECT_H
