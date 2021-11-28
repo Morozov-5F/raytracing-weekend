@@ -19,13 +19,15 @@ typedef struct rt_mesh_s
     vec3_t min, max;
 } rt_mesh_t;
 
-static rt_mesh_t rt_mesh_init(const point3_t *vertices, size_t vertices_count, const size_t *triangles, size_t triangles_count, rt_material_t *material);
+static rt_mesh_t rt_mesh_init(const point3_t *vertices, size_t vertices_count, const size_t *triangles,
+                              size_t triangles_count, rt_material_t *material);
 static bool rt_mesh_hit(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
                         rt_hit_record_t *record);
 static bool rt_mesh_bb(const rt_hittable_t *hittable, double time0, double time1, rt_aabb_t *out_bb);
 static void rt_mesh_delete(rt_hittable_t *hittable);
 
-rt_hittable_t *rt_triangle_mesh_new(const point3_t *vertices, size_t vertices_count, const size_t *triangles, size_t triangles_count, rt_material_t *material)
+rt_hittable_t *rt_triangle_mesh_new(const point3_t *vertices, size_t vertices_count, const size_t *triangles,
+                                    size_t triangles_count, rt_material_t *material)
 {
     rt_mesh_t *mesh = (rt_mesh_t *)calloc(1, sizeof(rt_mesh_t));
     assert(NULL != mesh);
@@ -34,8 +36,8 @@ rt_hittable_t *rt_triangle_mesh_new(const point3_t *vertices, size_t vertices_co
     return (rt_hittable_t *)mesh;
 }
 
-static rt_mesh_t rt_mesh_init(const point3_t *vertices, size_t vertices_count, const size_t *triangles, size_t triangles_count,
-                              rt_material_t *material)
+static rt_mesh_t rt_mesh_init(const point3_t *vertices, size_t vertices_count, const size_t *triangles,
+                              size_t triangles_count, rt_material_t *material)
 {
     assert(NULL != vertices);
     assert(NULL != triangles);
@@ -114,4 +116,3 @@ static void rt_mesh_delete(rt_hittable_t *hittable)
     const rt_mesh_t *mesh = (const rt_mesh_t *)hittable;
     rt_hittable_list_deinit(mesh->triangles);
 }
-

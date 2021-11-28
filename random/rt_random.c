@@ -27,9 +27,7 @@ struct rt_mt19937_s
     uint64_t *MT;
 };
 
-static RT_THREAD_LOCAL struct rt_mt19937_s gs_generator = {
-    .index = UINT64_MAX
-};
+static RT_THREAD_LOCAL struct rt_mt19937_s gs_generator = {.index = UINT64_MAX};
 
 static void twist(struct rt_mt19937_s *gen);
 
@@ -66,7 +64,8 @@ void rt_random_seed(uint64_t seed)
 
     for (int i = 1; i < gs_generator.n; ++i)
     {
-        gs_generator.MT[i] = gs_generator.f * (gs_generator.MT[i - 1] ^ (gs_generator.MT[i - 1] >> (gs_generator.w - 2))) + i;
+        gs_generator.MT[i] =
+            gs_generator.f * (gs_generator.MT[i - 1] ^ (gs_generator.MT[i - 1] >> (gs_generator.w - 2))) + i;
     }
 }
 

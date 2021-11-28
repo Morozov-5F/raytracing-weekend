@@ -61,13 +61,10 @@ int rt_sync_get_number_of_cores(void)
     return system_info.dwNumberOfProcessors;
 }
 
-
-
 struct rt_cond_s
 {
     CONDITION_VARIABLE cond;
 };
-
 
 rt_cond_t *rt_cond_init(void)
 {

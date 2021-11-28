@@ -35,7 +35,7 @@
         (head)->last = &RT_QUEUE_FIRST(head);                                                                          \
     } while (0)
 
-#define RT_QUEUE_ENQUEUE(head, elm, field)                                                                         \
+#define RT_QUEUE_ENQUEUE(head, elm, field)                                                                             \
     do                                                                                                                 \
     {                                                                                                                  \
         RT_QUEUE_NEXT((elm), field) = NULL;                                                                            \
@@ -43,7 +43,7 @@
         (head)->last = &RT_QUEUE_NEXT((elm), field);                                                                   \
     } while (0)
 
-#define RT_QUEUE_DEQUEUE(head, field)                                                                              \
+#define RT_QUEUE_DEQUEUE(head, field)                                                                                  \
     do                                                                                                                 \
     {                                                                                                                  \
         if ((RT_QUEUE_FIRST((head)) = RT_QUEUE_NEXT(RT_QUEUE_FIRST((head)), field)) == NULL)                           \

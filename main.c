@@ -17,7 +17,8 @@
 #include <assert.h>
 #include <rt_sync.h>
 
-typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays);
+typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
+                                int child_rays);
 
 typedef struct worker_arg_s
 {
@@ -90,7 +91,8 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, con
     return emitted;
 }
 
-static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays)
+static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
+                                    int child_rays)
 {
     colour_t resulting_color = colour(0, 0, 0);
     colour_t global_attenuation = colour(1, 1, 1);
@@ -307,7 +309,8 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "\t- image width:       %d\n", image_width);
         fprintf(stderr, "\t- image height:      %d\n", image_height);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
-        fprintf(stderr, "\t- render function:   %s\n", render_function == ray_colour ? "ray_colour" : "ray_colou_iterative");
+        fprintf(stderr, "\t- render function:   %s\n",
+                render_function == ray_colour ? "ray_colour" : "ray_colou_iterative");
     }
 
     // Image parameters

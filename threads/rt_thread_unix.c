@@ -20,7 +20,8 @@ rt_thread_t *rt_thread_create(rt_thread_fn_t thread_fn, void *arg)
     rt_thread_t *new_thread = malloc(sizeof(rt_thread_t));
     assert(NULL != new_thread);
 
-    union {
+    union
+    {
         void (*in)(void *);
         void *(*out)(void *);
     } fn = {
