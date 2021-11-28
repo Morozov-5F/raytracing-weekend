@@ -179,8 +179,8 @@ rt_hittable_list_t *rt_scene_instance_test(void)
 
     rt_hittable_t *box = rt_box_new(point3(-1, -1, -1), point3(1, 1, 1), green);
     rt_hittable_t *instance = rt_instance_new(box);
-    rt_instance_rotate_y(instance, 0);
-    rt_instance_translate(instance, point3(1, 0, 0));
+    rt_instance_rotate_y(instance, 45);
+    rt_instance_translate(instance, point3(1, 0, 0.1));
 
     rt_hittable_list_add(objects, instance);
     rt_hittable_list_add(objects, rt_box_new(point3(-0.25, -0.25, -0.25), point3(0.25, 0.25, 0.25), red));
