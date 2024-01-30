@@ -1,6 +1,6 @@
 # raytracing-weekend
 
-Simple path rendered written in modern C. Based on [_Ray Tracing in One
+Simple path renderer written in modern C. Based on [_Ray Tracing in One
 Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html) and [_Ray Tracing: The Next Week_](https://raytracing.github.io/books/RayTracingTheNextWeek.html) books by Peter Shirley.
 
 This project uses [PPM image format](https://en.wikipedia.org/wiki/Netpbm#PPM_example) to simplify image output routines. This is far from optimal but should work.
