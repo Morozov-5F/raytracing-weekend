@@ -16,14 +16,34 @@
 struct rt_thread_s
 {
     HANDLE thread_handle;
+    rt_thread_fn_t thread_fn;
+    void *arg;
 };
+
+static void thread_func(void* arg)
+{
+    rt_thread_t *thread_handle = (rt_thread_t *)arg;
+    assert(NULL != thread_handle);
+
+    thread_handle->thread_fn(thread_handle->arg);
+
+    _endthread();
+}
 
 rt_thread_t *rt_thread_create(rt_thread_fn_t thread_fn, void *arg)
 {
+    if (NULL == thread_func)
+    {
+        return NULL;
+    }
+
     rt_thread_t *new_thread = malloc(sizeof(rt_thread_t));
     assert(NULL != new_thread);
 
-    new_thread->thread_handle = (HANDLE)_beginthread(thread_fn, 0, arg);
+    new_thread->thread_fn = thread_fn;
+    new_thread->arg = arg;
+
+    new_thread->thread_handle = (HANDLE)_beginthread(thread_func, 0, (void*)new_thread);
     assert(NULL != new_thread->thread_handle);
 
     return new_thread;
@@ -38,7 +58,6 @@ void rt_thread_join(rt_thread_t *thread)
 
     WaitForSingleObject(thread->thread_handle, INFINITE);
 
-    CloseHandle(thread->thread_handle);
     MemoryBarrier();
 
     free(thread);
