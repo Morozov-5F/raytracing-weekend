@@ -74,8 +74,17 @@ rt_thread_pool_t *rt_tp_init(size_t number_of_threads)
     return result;
 }
 
-void rt_tp_deinit(rt_thread_pool_t *thread_pool)
+void rt_tp_deinit(rt_thread_pool_t *thread_pool, bool graceful)
 {
+    if (!graceful)
+    {
+        for (size_t i = 0; i < thread_pool->number_of_threads; ++i)
+        {
+            rt_thread_kill(thread_pool->threads[i]);
+        }
+        goto done;
+    }
+
     for (size_t i = 0; i < thread_pool->number_of_threads; ++i)
     {
         enqueue_work(thread_pool, RT_TP_WORK_TYPE_STOP, NULL, NULL, NULL);
@@ -96,6 +105,7 @@ void rt_tp_deinit(rt_thread_pool_t *thread_pool)
         free(item);
     }
 
+done:
     rt_mutex_deinit(thread_pool->work_mutex);
     rt_cond_deinit(thread_pool->work_signal);
 

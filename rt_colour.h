@@ -18,4 +18,6 @@ typedef vec3_t colour_t;
 
 void rt_write_colour(FILE *stream, colour_t pixel_colour, size_t samples_per_pixel);
 
+void rt_convert_to_rgb(colour_t pixel_colour, size_t samples_per_pixel, int *r, int *g, int *b);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_COLOUR_H

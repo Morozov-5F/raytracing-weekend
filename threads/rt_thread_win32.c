@@ -62,3 +62,14 @@ void rt_thread_join(rt_thread_t *thread)
 
     free(thread);
 }
+
+void rt_thread_kill(rt_thread_t* thread)
+{
+    if (NULL == thread)
+    {
+        return;
+    }
+
+    TerminateThread(thread->thread_handle, 100);
+    rt_thread_join(thread);
+}

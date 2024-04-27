@@ -17,7 +17,11 @@
 #include <assert.h>
 #include <rt_sync.h>
 
-typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays);
+#include <rt_window.h>
+
+
+typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
+                                int child_rays);
 
 typedef struct worker_arg_s
 {
@@ -90,7 +94,8 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, con
     return emitted;
 }
 
-static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays)
+static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
+                                    int child_rays)
 {
     colour_t resulting_color = colour(0, 0, 0);
     colour_t global_attenuation = colour(1, 1, 1);
@@ -298,6 +303,13 @@ int main(int argc, char const *argv[])
         render_function = ray_color_iterative;
     }
 
+    rt_window_t *window = rt_window_init(argv[0], image_width, image_height);
+    if (NULL == window)
+    {
+        fprintf(stderr, "Fatal error: Unable to create a window\n");
+        exit(EXIT_FAILURE);
+    }
+
     if (verbose)
     {
         fprintf(stderr, "Parsed parameters:\n");
@@ -307,7 +319,8 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "\t- image width:       %d\n", image_width);
         fprintf(stderr, "\t- image height:      %d\n", image_height);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
-        fprintf(stderr, "\t- render function:   %s\n", render_function == ray_colour ? "ray_colour" : "ray_colou_iterative");
+        fprintf(stderr, "\t- render function:   %s\n",
+                render_function == ray_colour ? "ray_colour" : "ray_colour_iterative");
     }
 
     // Image parameters
@@ -414,6 +427,7 @@ int main(int argc, char const *argv[])
             skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_metal_test();
             break;
+
         case RT_SCENE_NONE:
             fprintf(stderr, "Fatal error: scene id is undefined after parsing the parameters\n");
             return EXIT_FAILURE;
@@ -489,8 +503,12 @@ int main(int argc, char const *argv[])
     }
 
     // Wait until all the workers finish
-    rt_tp_deinit(thread_pool);
+    rt_tp_deinit(thread_pool, true);
     rt_mutex_deinit(progress_mutex);
+
+    rt_window_show(window);
+    rt_window_display_image(window, image, image_width, image_height, number_of_samples);
+    rt_window_process(window);
 
     if (verbose)
     {
