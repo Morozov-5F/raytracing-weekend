@@ -63,7 +63,6 @@ add_custom_command(TARGET ray_tracing_one_week PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory
                    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:ray_tracing_one_week>/assets)
 
-
 target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures deps threads)
 target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS} Threads::Threads)
 
@@ -72,3 +71,7 @@ set_target_properties(ray_tracing_one_week
                       ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                       LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
                       RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+# Define the install targets
+install(TARGETS ray_tracing_one_week RUNTIME DESTINATION bin)
+install(DIRECTORY assets DESTINATION bin)
