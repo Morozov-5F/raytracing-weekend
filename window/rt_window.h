@@ -7,10 +7,8 @@
 
 #pragma once
 
-#include <stddef.h>
 #include <stdbool.h>
-#include <rt_weekend.h>
-#include <rt_vec3.h>
+#include <rt_colour.h>
 
 typedef struct rt_window_s rt_window_t;
 
@@ -22,4 +20,4 @@ void rt_window_process(rt_window_t *window);
 
 void rt_window_close(rt_window_t *window);
 
-bool rt_window_display_image(rt_window_t *window, vec3_t *image, size_t width, size_t height, size_t samples_per_pixel);
+bool rt_window_display_image(rt_window_t *window, colour_t *image, size_t width, size_t height, size_t samples_per_pixel);
