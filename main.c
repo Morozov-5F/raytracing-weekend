@@ -18,7 +18,7 @@
 #include <rt_sync.h>
 
 #include <rt_window.h>
-
+#include <stdatomic.h>
 
 typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
                                 int child_rays);
@@ -57,9 +57,7 @@ typedef struct worker_arg_s
 
     struct
     {
-        rt_mutex_t *process_mutex;
-        int total_chunks;
-        int *processed_chunks;
+        atomic_int *processed_chunks;
     } progress;
 } worker_arg_t;
 
@@ -464,8 +462,13 @@ int main(int argc, char const *argv[])
     }
 
     // Distribute workers
-    int processed_chunks = 0;
+    atomic_int processed_chunks;
+    int last_processed_chunks = 0;
+    atomic_init(&processed_chunks, 0);
     int number_of_chunks = (int)ceil(image_height / (double)CHUNK_SIZE) * (int)ceil(image_width / (double)CHUNK_SIZE);
+
+    rt_window_show(window);
+    rt_window_display_image(window, image, image_width, image_height, number_of_samples);
 
     fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", 0, number_of_chunks, 0);
     fflush(stderr);
@@ -494,19 +497,37 @@ int main(int argc, char const *argv[])
             arg->image.width = image_width;
             arg->image.height = image_height;
 
-            arg->progress.process_mutex = progress_mutex;
-            arg->progress.total_chunks = number_of_chunks;
             arg->progress.processed_chunks = &processed_chunks;
 
             rt_tp_schedule_work(thread_pool, render_worker, arg, render_worker_complete);
         }
     }
 
+    for (volatile int current_processed_chunks = processed_chunks; current_processed_chunks < number_of_chunks; current_processed_chunks = processed_chunks)
+    {
+        if (current_processed_chunks == last_processed_chunks)
+        {
+            continue;
+        }
+
+        int old_percentage = 100 * last_processed_chunks / number_of_chunks;
+        int current_percentage = 100 * current_processed_chunks / number_of_chunks;
+
+        if (current_percentage != old_percentage)
+        {
+            fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks, number_of_chunks, current_percentage);
+            fflush(stderr);
+        }
+
+        rt_window_display_image(window, image, image_width, image_height, number_of_samples);
+
+        last_processed_chunks = current_processed_chunks;
+    }
+
     // Wait until all the workers finish
     rt_tp_deinit(thread_pool, true);
     rt_mutex_deinit(progress_mutex);
 
-    rt_window_show(window);
     rt_window_display_image(window, image, image_width, image_height, number_of_samples);
     rt_window_process(window);
 
@@ -598,22 +619,7 @@ static void render_worker_complete(int status, void *args)
 {
     worker_arg_t *worker_arg = args;
 
-    rt_mutex_lock(worker_arg->progress.process_mutex);
-
-    int last_processed_chunks = *(worker_arg->progress.processed_chunks);
-    *worker_arg->progress.processed_chunks += 1;
-    int current_processed_chunks = *(worker_arg->progress.processed_chunks);
-    int old_percentage = 100 * last_processed_chunks / worker_arg->progress.total_chunks;
-    int current_percentage = 100 * current_processed_chunks / worker_arg->progress.total_chunks;
-
-    if (current_percentage != old_percentage)
-    {
-        fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks, worker_arg->progress.total_chunks,
-                current_percentage);
-        fflush(stderr);
-    }
-
-    rt_mutex_unlock(worker_arg->progress.process_mutex);
+    atomic_fetch_add(worker_arg->progress.processed_chunks, 1);
 
     free(worker_arg);
 }
