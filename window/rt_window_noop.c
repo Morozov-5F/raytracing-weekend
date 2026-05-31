@@ -1,0 +1,37 @@
+/**
+ * Copyright (c) 2026, Evgeniy Morozov
+ * All rights reserved.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+#include <rt_window.h>
+
+struct rt_window_s
+{
+    int noop;
+};
+
+rt_window_t *rt_window_init(const char *window_title, size_t width, size_t height)
+{
+    static rt_window_t window;
+    return &window;
+}
+
+bool rt_window_show(rt_window_t *window)
+{
+    return false;
+}
+
+void rt_window_process(rt_window_t *window)
+{
+}
+
+void rt_window_close(rt_window_t *window)
+{
+}
+
+bool rt_window_display_image(rt_window_t *window, colour_t *image, size_t width, size_t height, size_t samples_per_pixel)
+{
+    return false;
+}

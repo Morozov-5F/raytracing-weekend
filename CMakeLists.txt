@@ -26,6 +26,8 @@ else ()
     message(FATAL_ERROR "The System does not contain the supported threading library (pthread or windows threads)")
 endif ()
 
+set(OS_WINDOW_IMPLEMENTATION "window/rt_window_noop.c")
+
 if (ENABLE_GUI)
     if (WIN32)
         # TODO: properly verify that there is actually a windows library available
