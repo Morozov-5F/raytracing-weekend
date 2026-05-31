@@ -25,4 +25,6 @@ rt_thread_t *rt_thread_create(rt_thread_fn_t thread_fn, void *arg);
 
 void rt_thread_join(rt_thread_t *thread);
 
+void rt_thread_kill(rt_thread_t *thread);
+
 #endif // RAY_TRACING_ONE_WEEK_RT_THREAD_H

@@ -29,6 +29,7 @@ jobs:
         run: |
           cmake -S "${{ github.workspace }}" \
             -B "${{ runner.workspace }}/build" \
+            -DENABLE_GUI=OFF \
             -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
             -DCMAKE_INSTALL_PREFIX="${{ runner.workspace }}/install"
 

@@ -17,7 +17,11 @@
 #include <assert.h>
 #include <rt_sync.h>
 
-typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays);
+#include <rt_window.h>
+#include <stdatomic.h>
+
+typedef colour_t (*render_fn_t)(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
+                                int child_rays);
 
 typedef struct worker_arg_s
 {
@@ -53,9 +57,7 @@ typedef struct worker_arg_s
 
     struct
     {
-        rt_mutex_t *process_mutex;
-        int total_chunks;
-        int *processed_chunks;
+        atomic_int *processed_chunks;
     } progress;
 } worker_arg_t;
 
@@ -90,7 +92,8 @@ static colour_t ray_colour(const ray_t *ray, const rt_hittable_list_t *list, con
     return emitted;
 }
 
-static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox, int child_rays)
+static colour_t ray_color_iterative(const ray_t *ray, const rt_hittable_list_t *list, const rt_skybox_t *skybox,
+                                    int child_rays)
 {
     colour_t resulting_color = colour(0, 0, 0);
     colour_t global_attenuation = colour(1, 1, 1);
@@ -298,6 +301,13 @@ int main(int argc, char const *argv[])
         render_function = ray_color_iterative;
     }
 
+    rt_window_t *window = rt_window_init(argv[0], image_width, image_height);
+    if (NULL == window)
+    {
+        fprintf(stderr, "Fatal error: Unable to create a window\n");
+        exit(EXIT_FAILURE);
+    }
+
     if (verbose)
     {
         fprintf(stderr, "Parsed parameters:\n");
@@ -307,7 +317,8 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "\t- image width:       %d\n", image_width);
         fprintf(stderr, "\t- image height:      %d\n", image_height);
         fprintf(stderr, "\t- file_name:         %s\n", file_name);
-        fprintf(stderr, "\t- render function:   %s\n", render_function == ray_colour ? "ray_colour" : "ray_colou_iterative");
+        fprintf(stderr, "\t- render function:   %s\n",
+                render_function == ray_colour ? "ray_colour" : "ray_colour_iterative");
     }
 
     // Image parameters
@@ -414,6 +425,7 @@ int main(int argc, char const *argv[])
             skybox = rt_skybox_new_gradient(colour(1, 1, 1), colour(0.5, 0.7, 1));
             world = rt_scene_metal_test();
             break;
+
         case RT_SCENE_NONE:
             fprintf(stderr, "Fatal error: scene id is undefined after parsing the parameters\n");
             return EXIT_FAILURE;
@@ -450,8 +462,13 @@ int main(int argc, char const *argv[])
     }
 
     // Distribute workers
-    int processed_chunks = 0;
+    atomic_int processed_chunks;
+    int last_processed_chunks = 0;
+    atomic_init(&processed_chunks, 0);
     int number_of_chunks = (int)ceil(image_height / (double)CHUNK_SIZE) * (int)ceil(image_width / (double)CHUNK_SIZE);
+
+    rt_window_show(window);
+    rt_window_display_image(window, image, image_width, image_height, number_of_samples);
 
     fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", 0, number_of_chunks, 0);
     fflush(stderr);
@@ -480,17 +497,39 @@ int main(int argc, char const *argv[])
             arg->image.width = image_width;
             arg->image.height = image_height;
 
-            arg->progress.process_mutex = progress_mutex;
-            arg->progress.total_chunks = number_of_chunks;
             arg->progress.processed_chunks = &processed_chunks;
 
             rt_tp_schedule_work(thread_pool, render_worker, arg, render_worker_complete);
         }
     }
 
+    for (volatile int current_processed_chunks = processed_chunks; current_processed_chunks < number_of_chunks; current_processed_chunks = processed_chunks)
+    {
+        if (current_processed_chunks == last_processed_chunks)
+        {
+            continue;
+        }
+
+        int old_percentage = 100 * last_processed_chunks / number_of_chunks;
+        int current_percentage = 100 * current_processed_chunks / number_of_chunks;
+
+        if (current_percentage != old_percentage)
+        {
+            fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks, number_of_chunks, current_percentage);
+            fflush(stderr);
+        }
+
+        rt_window_display_image(window, image, image_width, image_height, number_of_samples);
+
+        last_processed_chunks = current_processed_chunks;
+    }
+
     // Wait until all the workers finish
-    rt_tp_deinit(thread_pool);
+    rt_tp_deinit(thread_pool, true);
     rt_mutex_deinit(progress_mutex);
+
+    rt_window_display_image(window, image, image_width, image_height, number_of_samples);
+    rt_window_process(window);
 
     if (verbose)
     {
@@ -580,22 +619,7 @@ static void render_worker_complete(int status, void *args)
 {
     worker_arg_t *worker_arg = args;
 
-    rt_mutex_lock(worker_arg->progress.process_mutex);
-
-    int last_processed_chunks = *(worker_arg->progress.processed_chunks);
-    *worker_arg->progress.processed_chunks += 1;
-    int current_processed_chunks = *(worker_arg->progress.processed_chunks);
-    int old_percentage = 100 * last_processed_chunks / worker_arg->progress.total_chunks;
-    int current_percentage = 100 * current_processed_chunks / worker_arg->progress.total_chunks;
-
-    if (current_percentage != old_percentage)
-    {
-        fprintf(stderr, "\rProgress: %d/%d chunks (%3d%%)", current_processed_chunks, worker_arg->progress.total_chunks,
-                current_percentage);
-        fflush(stderr);
-    }
-
-    rt_mutex_unlock(worker_arg->progress.process_mutex);
+    atomic_fetch_add(worker_arg->progress.processed_chunks, 1);
 
     free(worker_arg);
 }
