@@ -32,6 +32,10 @@ if (ENABLE_GUI)
     if (WIN32)
         # TODO: properly verify that there is actually a windows library available
         set(OS_WINDOW_IMPLEMENTATION "window/rt_window_win32.c")
+    elseif (LINUX)
+        find_package(X11 REQUIRED)
+        set(OS_WINDOW_IMPLEMENTATION "window/rt_window_x11.c")
+        set(WINDOWING_LIBRARY X11)
     else()
         # TODO: windows implementation for other platforms
         message(WARNING "GUI is not available for this platform yet")
@@ -59,10 +63,9 @@ add_executable(ray_tracing_one_week ${OS_APP_TYPE} rt_camera.c rt_colour.c rt_aa
                # Window management
                ${OS_WINDOW_IMPLEMENTATION})
 
-target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-                       -Wall -Wextra -Winline>
-                       $<$<CXX_COMPILER_ID:MSVC>:
-                       /WX /W4>)
+target_compile_options(ray_tracing_one_week PRIVATE
+                       $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>: -Wall -Wextra -Winline>
+                       $<$<CXX_COMPILER_ID:MSVC>:/WX /W4>)
 
 if (WIN32)
     target_compile_definitions(ray_tracing_one_week PRIVATE WIN32_LEAN_AND_MEAN)
@@ -74,10 +77,9 @@ endif()
 
 if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
     # Enable inline optimization under debug configurations.
-    target_compile_options(ray_tracing_one_week PRIVATE $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:
-                           -finline-functions>
-                           $<$<CXX_COMPILER_ID:MSVC>:
-                           /Ob>)
+    target_compile_options(ray_tracing_one_week PRIVATE
+                           $<$<OR:$<CXX_COMPILER_ID:Clang>,$<CXX_COMPILER_ID:AppleClang>,$<CXX_COMPILER_ID:GNU>>:-finline-functions>
+                           $<$<CXX_COMPILER_ID:MSVC>:/Ob>)
 endif ()
 
 # Copy assets into a build directory
@@ -86,7 +88,7 @@ add_custom_command(TARGET ray_tracing_one_week PRE_BUILD
                    ${CMAKE_SOURCE_DIR}/assets $<TARGET_FILE_DIR:ray_tracing_one_week>/assets)
 
 target_include_directories(ray_tracing_one_week PRIVATE ./ materials hittables textures deps threads window main)
-target_link_libraries(ray_tracing_one_week ${EXTRA_LIBS} Threads::Threads)
+target_link_libraries(ray_tracing_one_week PRIVATE ${EXTRA_LIBS} ${WINDOWING_LIBRARY} Threads::Threads)
 
 set_target_properties(ray_tracing_one_week
                       PROPERTIES

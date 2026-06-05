@@ -531,6 +531,8 @@ int main(int argc, char const *argv[])
     rt_window_display_image(window, image, image_width, image_height, number_of_samples);
     rt_window_process(window);
 
+    rt_window_close(window);
+
     if (verbose)
     {
         fprintf(stderr, "\nRendering done, starting output to file\n");
