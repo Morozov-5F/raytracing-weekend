@@ -22,6 +22,8 @@ typedef enum rt_hittable_type_e
     RT_HITTABLE_TYPE_BOX,
     RT_HITTABLE_TYPE_INSTANCE,
     RT_HITTABLE_CONSTANT_MEDIUM,
+    RT_HITTABLE_TYPE_TRIANGLE,
+    RT_HITTABLE_TYPE_MESH,
 } rt_hittable_type_t;
 
 typedef bool (*rt_hittable_hit_fn)(const rt_hittable_t *hittable, const ray_t *ray, double t_min, double t_max,
@@ -47,7 +49,7 @@ void rt_hittable_init(rt_hittable_t *hittable, rt_hittable_type_t type, rt_hitta
 bool rt_sphere_hit_test_generic(point3_t center, double radius, rt_material_t *material, const ray_t *ray, double t_min,
                                 double t_max, rt_hit_record_t *record);
 
-typedef int(*rt_hittable_compare_fn)(const void *a, const void *b);
+typedef int (*rt_hittable_compare_fn)(const void *a, const void *b);
 
 int rt_hittable_box_cmp_x(const void *a, const void *b);
 

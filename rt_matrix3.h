@@ -36,7 +36,8 @@ static inline rt_matrix3_t rt_mat3_mul(const rt_matrix3_t *a, const rt_matrix3_t
     {
         for (int column = 0; column < 3; ++column)
         {
-            res.matrix[row][column] = a->matrix[0][row] * b->matrix[column][0] + a->matrix[1][row] * b->matrix[column][1] +
+            res.matrix[row][column] = a->matrix[0][row] * b->matrix[column][0] +
+                                      a->matrix[1][row] * b->matrix[column][1] +
                                       a->matrix[2][row] * b->matrix[column][2];
         }
     }

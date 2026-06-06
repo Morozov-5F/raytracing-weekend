@@ -24,7 +24,8 @@ typedef enum vec3_axis_e
 union vec3_u
 {
     double components[3];
-    struct {
+    struct
+    {
         double x;
         double y;
         double z;
