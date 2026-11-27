@@ -4,7 +4,7 @@ on:
   push:
 
 env:
-  BUILD_TYPE: Release
+  CMAKE_PRESET: release-no-gui
 
 jobs:
   build:
@@ -26,20 +26,21 @@ jobs:
 
       - name: Configure CMake
         shell: bash
+        working-directory: ${{ github.workspace }}
         run: |
-          cmake -S "${{ github.workspace }}" \
-            -B "${{ runner.workspace }}/build" \
-            -DENABLE_GUI=OFF \
-            -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+          cmake \
+            --preset ${{ env.CMAKE_PRESET }} \
             -DCMAKE_INSTALL_PREFIX="${{ runner.workspace }}/install"
 
       - name: Build
         shell: bash
-        run: cmake --build "${{ runner.workspace }}/build" --config ${{ env.BUILD_TYPE }}
+        working-directory: ${{ github.workspace }}
+        run: cmake --build --preset ${{ env.CMAKE_PRESET }}
 
       - name: Install
         shell: bash
-        run: cmake --install "${{ runner.workspace }}/build" --config ${{ env.BUILD_TYPE }}
+        working-directory: ${{ github.workspace }}
+        run: cmake --build --preset ${{ env.CMAKE_PRESET }} --target install
 
       - name: Render Sample Image
         shell: bash

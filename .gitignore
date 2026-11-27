@@ -39,6 +39,8 @@
 
 # CMake
 cmake-build-*/
+CMakeUserPresets.json
+compile_commands.json
 
 # Mongo Explorer plugin
 .idea/**/mongoSettings.xml
@@ -469,3 +471,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
