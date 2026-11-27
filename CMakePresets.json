@@ -1,0 +1,70 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+	"major": 3,
+	"minor": 19,
+	"patch": 0
+  },
+  "configurePresets": [
+	{
+	  "name": "base",
+	  "hidden": true,
+	  "generator": "Ninja",
+	  "binaryDir": "${sourceDir}/cmake-build-${presetName}",
+	  "cacheVariables": {
+		"CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+		"ENABLE_GUI": true
+	  }
+	},
+	{
+	  "name": "debug",
+	  "displayName": "Debug",
+	  "inherits": "base",
+	  "cacheVariables": {
+		"CMAKE_BUILD_TYPE": "Debug"
+	  }
+	},
+	{
+	  "name": "release",
+	  "displayName": "Release",
+	  "inherits": "base",
+	  "cacheVariables": {
+		"CMAKE_BUILD_TYPE": "RelWithDebInfo"
+	  }
+	},
+	{
+	  "name": "debug-no-gui",
+	  "displayName": "Debug - No GUI",
+	  "inherits": "debug",
+	  "cacheVariables": {
+		"ENABLE_GUI": false
+	  }
+	},
+	{
+	  "name": "release-no-gui",
+	  "displayName": "Release - No GUI",
+	  "inherits": "release",
+	  "cacheVariables": {
+		"ENABLE_GUI": false
+	  }
+	}
+  ],
+  "buildPresets": [
+	{
+	  "name": "debug",
+	  "configurePreset": "debug"
+	},
+	{
+	  "name": "release",
+	  "configurePreset": "release"
+	},
+	{
+      "name": "debug-no-gui",
+      "configurePreset": "debug-no-gui"
+	},
+	{
+      "name": "release-no-gui",
+      "configurePreset": "release-no-gui"
+	}
+  ]
+}

@@ -23,44 +23,33 @@ I'm not sure if my render is entirely correct but I'm pretty happy with it consi
 
 ## Building
 
-This project uses CMake to generate build system files.
+This project uses CMake to generate build system files. It's using presets to simplify the configuration.
 
-1. Create a build directory:
-   ```bash
-   ? mkdir -p build
-   ```
-1. Go to new directory:
-   ```bash
-   ? cd build
-   ```
-1. Run CMake to generate project. I recommend [Ninja](https://ninja-build.org/) as a build system, but UNIX Makefiles
+1. Run CMake to configure the project. I recommend [Ninja](https://ninja-build.org/) as a build system, but UNIX Makefiles
    will work too.
    ```bash
-   # To use Ninja
-   ? cmake -G Ninja -DCMAKE_BUILD_TYPE=Release..
+   ? cmake --preset release
    ```
    or
-   ```bash
-   # To use CMake (under Linux)
-   ? cmake ..
+    ```bash
+   ? cmake --preset release -G "Unix Makefiles"
    ```
-1. Build the application:
+   to configure the Makefile-based build system.
+1. Build the application
    ```bash
-   # For ninja
-   ? ninja build
-   ```
-   or
-   ```bash
-   # For makefile
-   ? make
+   ? cmake --build --preset release
    ```
 1. Launch the application and view image
    ```bash
-   ? ./ray_tracing_one_week > image.ppm
+   ? ./cmake-build-release/bin/ray_tracing_one_week image.ppm
    # The following line should open file in image viewer right from the console although it may not work -- depends on the distro settings
    ? xgd-open image.ppm
    ```
    On macOS:
    ```bash
    ? open image.ppm
+   ```
+   To view supported flags and options:
+   ```
+   ? ./cmake-build-release/bin/ray_tracing_one_wee --h
    ```
